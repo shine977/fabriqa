@@ -5,6 +5,6 @@ import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
 export class Customer extends PublicEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
-  @Column({ type: 'int', width: 50 })
+  @Column({ type: 'int', width: 50, nullable: true })
   groud_id: number;
 }
