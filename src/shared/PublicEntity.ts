@@ -1,12 +1,12 @@
 import {
   CreateDateColumn,
   DeleteDateColumn,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 export class PublicEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('increment', { unsigned: true })
   id: number;
   @CreateDateColumn()
   created_at: Date;

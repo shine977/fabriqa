@@ -14,7 +14,7 @@ export enum TAXES {
 export class Customer extends PublicEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
-  @Column({ type: 'int', width: 50 })
+  @Column({ type: 'int', width: 50, nullable: true })
   groud_id: number;
   @Column({ type: 'char', length: 255, comment: '送货地址' })
   delivery_address: string;

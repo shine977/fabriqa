@@ -12,8 +12,14 @@ export class CustomersService {
     @InjectRepository(Customer)
     private readonly customerRepo: Repository<Customer>,
   ) {}
-  create(createCustomerDto: CreateCustomerDto) {
-    return 'This action adds a new customer';
+  async create(createCustomerDto: CreateCustomerDto) {
+    console.log('createCustomerDto', createCustomerDto);
+    const { raw } = await this.customerRepo.insert(createCustomerDto);
+    if (raw.affectedRows) {
+      return {
+        status: 0,
+      };
+    }
   }
 
   async findAll() {
