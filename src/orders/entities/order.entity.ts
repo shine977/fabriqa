@@ -16,10 +16,10 @@ export class Order extends PublicEntity {
   @Column({ type: 'decimal', width: 50, precision: 2, comment: '金额' })
   amount: number;
 
-  @Column({ type: 'datetime', length: 255, comment: '采购日期' })
+  @Column({ type: 'datetime', comment: '采购日期' })
   purchase_date: number;
   @Column({ type: 'varchar', length: 255, comment: '付款条件' })
   payment_clause: string;
-  @Column({ type: 'datetime', length: 255, comment: '交期' })
+  @Column({ type: 'datetime', comment: '交期' })
   delivery: string;
 }

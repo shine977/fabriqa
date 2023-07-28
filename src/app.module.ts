@@ -7,6 +7,11 @@ import { CustomersModule } from './customers/customers.module';
 import { ProductsModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
 import { DeliveriesModule } from './deliveries/deliveries.module';
+import { MouldModule } from './bom/mould.module';
+import { MaterialModule } from './bom/material.module';
+import { PartModule } from './bom/part.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -24,6 +29,11 @@ import { DeliveriesModule } from './deliveries/deliveries.module';
     ProductsModule,
     OrdersModule,
     DeliveriesModule,
+    MouldModule,
+    MaterialModule,
+    PartModule,
+    AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

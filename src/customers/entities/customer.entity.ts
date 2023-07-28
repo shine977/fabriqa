@@ -1,5 +1,6 @@
+import { Part } from 'src/bom/entities/part.entity';
 import { PublicEntity } from 'src/shared/PublicEntity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 export enum CURRENCY {
   RMB = 'RMB',
@@ -41,4 +42,6 @@ export class Customer extends PublicEntity {
   tax_rate: number;
   @Column({ type: 'enum', enum: TAXES, comment: '税种', default: TAXES.VAT })
   taxes: TAXES;
+  @OneToMany(() => Part, (part) => part.customer)
+  parts: Part[];
 }
