@@ -16,19 +16,19 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { Public } from 'src/common/decorator/public.decorator';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @UseGuards(AuthGuard('local'))
-  login(@Body() user: Pick<CreateUserDto, 'username'>) {
+  @Public()
+  login(@Body() user: CreateUserDto) {
     return this.authService.getTokenForUser(user.username);
   }
 
   @Get('profile')
-  @UseGuards(AuthGuard('jwt'))
   async getProfile(@Request() request) {
     console.log('getProfile', request);
     return request.user;

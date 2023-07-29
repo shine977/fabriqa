@@ -15,6 +15,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(User) private readonly userRpository: Repository<User>,
   ) {}
+
   async getTokenForUser(username: string): Promise<User & { token: string }> {
     // const str = encryptData(
     //   JSON.stringify({
