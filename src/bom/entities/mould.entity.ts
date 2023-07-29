@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 import { Part } from './part.entity';
-import { PublicEntity } from 'src/shared/PublicEntity';
+import { PublicEntity } from 'src/common/entity/PublicEntity';
 
 @Entity()
 export class Mould extends PublicEntity {

@@ -1,5 +1,5 @@
 import { Part } from 'src/bom/entities/part.entity';
-import { PublicEntity } from 'src/shared/PublicEntity';
+import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
 export enum CURRENCY {

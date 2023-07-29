@@ -1,6 +1,9 @@
+import { IsOptional } from 'class-validator';
+
 export class CreateUserDto {
   uid: string;
   username: string;
   password: string;
-  token: string;
+  @IsOptional()
+  email: string;
 }

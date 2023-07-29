@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { Material } from './material.entity';
 import { Mould } from './mould.entity';
-import { PublicEntity } from 'src/shared/PublicEntity';
+import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Customer } from 'src/customers/entities/customer.entity';
 
 @Entity()

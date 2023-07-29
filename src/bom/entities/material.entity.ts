@@ -1,4 +1,4 @@
-import { PublicEntity } from 'src/shared/PublicEntity';
+import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { Part } from './part.entity';
 

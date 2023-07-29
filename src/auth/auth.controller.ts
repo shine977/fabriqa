@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Type,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -20,34 +21,16 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('/login')
+  @Post('login')
   @UseGuards(AuthGuard('local'))
-  login(@Body() createAuthDto: CreateUserDto) {
-    // return this.authService.create(createAuthDto);
-    return {
-      uid: createAuthDto.uid,
-      token: this.authService.getTokenForUser(createAuthDto),
-    };
+  login(@Body() user: Pick<CreateUserDto, 'username'>) {
+    return this.authService.getTokenForUser(user.username);
   }
 
   @Get('profile')
   @UseGuards(AuthGuard('jwt'))
   async getProfile(@Request() request) {
+    console.log('getProfile', request);
     return request.user;
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
   }
 }

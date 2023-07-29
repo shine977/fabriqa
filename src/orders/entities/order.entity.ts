@@ -1,4 +1,4 @@
-import { PublicEntity } from 'src/shared/PublicEntity';
+import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity } from 'typeorm';
 @Entity({ name: 'orders', orderBy: { created_at: 'DESC' } })
 export class Order extends PublicEntity {
