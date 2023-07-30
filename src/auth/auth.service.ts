@@ -1,29 +1,34 @@
 import { Injectable } from '@nestjs/common';
 
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/user/entities/user.entity';
-import { Repository } from 'typeorm';
+import { UserEntity } from 'src/user/entities/user.entity';
+
 import { UnifyResponse, unifyResponse } from 'src/common/utils/unifyResponse';
 import { CodeTips, ErrorCode } from 'src/config/code';
+import { JwtService } from '@nestjs/jwt';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    // private readonly jwtService: JwtService,
-    @InjectRepository(User) private readonly userRpository: Repository<User>,
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async getTokenForUser(username: string): Promise<User | UnifyResponse> {
-    const user = await this.userRpository.findOneBy({ username });
+  async authenticate(
+    username: string,
+  ): Promise<Partial<UserEntity> | UnifyResponse> {
+    const user = await this.userService.findOneByUsername(username);
     if (!user) {
       return unifyResponse(CodeTips.c1001, ErrorCode.code);
     }
-    // const token = this.jwtService.sign({
-    //   username: user.username,
-    //   sub: user.uid,
-    // });
-    return {
-      ...user,
-    };
+
+    const token = this.jwtService.sign({
+      username: user.username,
+      sub: user.uid,
+    });
+    return unifyResponse('注册成功', { ...user, token });
+  }
+  async validateUser(uid: string) {
+    return await this.userService.findByUId(uid);
   }
 }

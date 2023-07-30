@@ -5,44 +5,31 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import * as dayjs from 'dayjs';
-export class PublicEntity {
+export abstract class PublicEntity {
   @PrimaryGeneratedColumn('increment', { unsigned: true })
   id: number;
   @CreateDateColumn({
+    name: 'created_at',
     transformer: {
-      to(value) {
-        console.log('CreateDateColumn transformer to', value);
-        console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'));
-        return dayjs().format('YYYY-MM-DD HH:mm:ss');
-      },
-      from: (date) => date,
+      to: (date) => date,
+      from: (date) => dayjs(date).format('YYYY-MM-DD HH:mm:ss'),
     },
   })
-  created_at: Date;
+  createdAt: Date;
   @UpdateDateColumn({
+    name: 'updated_at',
     transformer: {
-      to(value) {
-        console.log('UpdateDateColumn transformer to', value);
-        console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'));
-        return dayjs().format('YYYY-MM-DD HH:mm:ss');
-      },
-      from(value) {
-        return value;
-      },
+      to: (date) => date,
+      from: (date) => dayjs(date).format('YYYY-MM-DD HH:mm:ss'),
     },
   })
-  updated_at: Date;
+  updatedAt: Date;
   @DeleteDateColumn({
+    name: 'deleted_at',
     transformer: {
-      to(value) {
-        console.log('DeleteDateColumn transformer to', value);
-        console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'));
-        return dayjs().format('YYYY-MM-DD HH:mm:ss');
-      },
-      from(value) {
-        return value;
-      },
+      to: (date) => date,
+      from: (date) => date && dayjs(date).format('YYYY-MM-DD HH:mm:ss'),
     },
   })
-  deleted_at: Date;
+  deletedAt: Date;
 }

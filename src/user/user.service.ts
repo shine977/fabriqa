@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { encryptData } from 'src/common/utils/crypto';
 import { JwtService } from '@nestjs/jwt';
@@ -12,24 +12,12 @@ import { ErrorCode } from 'src/config/code';
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly jwtService: JwtService,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
-  async create(userDto: CreateUserDto) {
-    let user = await this.userRepository.findOne({
-      where: { username: userDto.username },
-    });
-    if (user) {
-      return unifyResponse(`User ${user.username} is existed!`, ErrorCode.code);
-    }
-
-    userDto.password = encryptData(userDto.password);
-    user = await this.userRepository.save(userDto);
-    const token = this.jwtService.sign({
-      sub: user.uid,
-      username: user.username,
-    });
-    return { ...user, token };
+  async create(user: CreateUserDto) {
+    user.password = encryptData(user.password);
+    return await this.userRepository.save(this.userRepository.create(user));
   }
 
   findAll() {
@@ -46,5 +34,11 @@ export class UserService {
 
   remove(id: number) {
     return this.userRepository.delete(id);
+  }
+  findOneByUsername(username: string) {
+    return this.userRepository.findOneBy({ username });
+  }
+  async findByUId(uid: string): Promise<UserEntity | null> {
+    return await this.userRepository.findOneOrFail({ where: { uid } });
   }
 }

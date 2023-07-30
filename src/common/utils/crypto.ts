@@ -1,22 +1,5 @@
-import {
-  createCipheriv,
-  createDecipheriv,
-  randomBytes,
-  scryptSync,
-} from 'crypto';
-import { promisify } from 'util';
-function getAlgorithm(keyBase64: string) {
-  const key = Buffer.from(keyBase64, 'base64');
-  switch (key.length) {
-    case 16:
-      return 'aes-128-ctr';
-    case 32:
-      return 'aes-256-ctr';
-  }
-  throw new Error('Invalid key length: ' + key.length);
-}
+import { createCipheriv, createDecipheriv } from 'crypto';
 
-const keyBase64 = 'DWIzFkO22qfVMgx2fIsxOXnwz10pRuZfFJBvf4RS3eY=';
 const key = 'e3a74e3c7599f3ab4601d587bd2cc768';
 const iv = '4601d587bd2cc768';
 
