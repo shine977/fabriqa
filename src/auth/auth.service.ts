@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+
 import * as bcrypt from 'bcrypt';
-import { encryptData } from 'src/common/utils/crypto';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -25,6 +25,7 @@ export class AuthService {
     // );
 
     const user = await this.userRpository.findOneBy({ username });
+
     const token = this.jwtService.sign({
       username: user.username,
       sub: user.uid,

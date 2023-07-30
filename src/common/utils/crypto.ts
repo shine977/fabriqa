@@ -1,25 +1,32 @@
-import { createCipheriv, createHash } from 'crypto';
-const key = createHash('sha512')
-  .update(process.env.AUTH_SECRET)
-  .digest('hex')
-  .substring(0, 32);
-const iv = createHash('sha512')
-  .update(process.env.AUTH_SECRET)
-  .digest('hex')
-  .substring(0, 16);
+import {
+  createCipheriv,
+  createDecipheriv,
+  randomBytes,
+  scryptSync,
+} from 'crypto';
+import { promisify } from 'util';
+function getAlgorithm(keyBase64: string) {
+  const key = Buffer.from(keyBase64, 'base64');
+  switch (key.length) {
+    case 16:
+      return 'aes-128-ctr';
+    case 32:
+      return 'aes-256-ctr';
+  }
+  throw new Error('Invalid key length: ' + key.length);
+}
 
-export const encryptData = (data) => {
+const keyBase64 = 'DWIzFkO22qfVMgx2fIsxOXnwz10pRuZfFJBvf4RS3eY=';
+const key = 'e3a74e3c7599f3ab4601d587bd2cc768';
+const iv = '4601d587bd2cc768';
+
+export function encryptData(plainText) {
   const cipher = createCipheriv('aes-256-cbc', key, iv);
-  return Buffer.from(
-    cipher.update(data, 'utf8', 'hex') + cipher.final('hex'),
-  ).toString('base64');
-};
+  return cipher.update(plainText, 'binary', 'hex') + cipher.final('hex');
+}
 
-export const decryptData = (data) => {
-  const buff = Buffer.from(data, 'base64');
-  const decipher = createCipheriv('aes-256-cbc', key, iv);
-  return (
-    decipher.update(buff.toString('utf8'), 'hex', 'utf8') +
-    decipher.final('utf8')
-  );
-};
+export function decryptData(crypted) {
+  crypted = Buffer.from(crypted, 'hex').toString('binary');
+  const decipher = createDecipheriv('aes-256-cbc', key, iv);
+  return decipher.update(crypted, 'binary', 'utf8') + decipher.final('utf8');
+}

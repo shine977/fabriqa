@@ -12,9 +12,11 @@ import { MaterialModule } from './bom/material.module';
 import { PartModule } from './bom/part.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',

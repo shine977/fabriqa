@@ -9,8 +9,8 @@ export class User extends PublicEntity {
   uid: string;
   @Column({ unique: true, length: 32 })
   username: string;
-  @Column()
+  @Column({ type: 'char', length: 255 })
   password: string;
-  @Column({ unique: true, nullable: true })
+  @Column({ unique: true, nullable: true, length: 100 })
   email: string;
 }
