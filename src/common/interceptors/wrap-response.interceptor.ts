@@ -7,8 +7,10 @@ import {
 import { EMPTY, Observable, catchError, map } from 'rxjs';
 
 interface WrapResponse {
-  code?: string;
+  code: number;
   message: string;
+  items: any[];
+  item?: object;
 }
 
 @Injectable()
@@ -19,14 +21,20 @@ export class WrapResponseInterceptor implements NestInterceptor {
   ): Observable<any> {
     return next.handle().pipe(
       map((data) => {
-        return {
+        let response = {
           code: 0,
           message: 'successful',
-          ...data,
-        };
+        } as WrapResponse;
+        if (Array.isArray(data)) {
+          response.items = data;
+        } else {
+          response = { ...response, ...data };
+        }
+
+        return response;
       }),
       catchError((err) => {
-        console.log('catchError', err);
+        console.info('catchError', err);
         return EMPTY;
       }),
     );

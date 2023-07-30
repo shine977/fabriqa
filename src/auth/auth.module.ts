@@ -13,20 +13,20 @@ import { AuthGuard } from './auth.guard';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    JwtModule.registerAsync({
-      useFactory: () => ({
-        global: true,
-        secret: process.env.AUTH_SECRET,
-        signOptions: { expiresIn: '24h' },
-      }),
-    }),
+    // JwtModule.registerAsync({
+    //   useFactory: () => ({
+    //     global: true,
+    //     secret: process.env.AUTH_SECRET,
+    //     signOptions: { expiresIn: '24h' },
+    //   }),
+    // }),
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
     LocalStrategy,
     JwtStrategy,
-    { provide: APP_GUARD, useClass: AuthGuard },
+    // { provide: APP_GUARD, useClass: AuthGuard },
   ],
 })
 export class AuthModule {}

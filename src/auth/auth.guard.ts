@@ -29,6 +29,11 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.AUTH_SECRET,
       });
+      console.log(payload);
+      const { iat, exp } = payload;
+      if (Date.now() / 1000 - iat >= exp) {
+        throw new UnauthorizedException('Token过期，请重新登录！');
+      }
       request['user'] = payload;
     } catch {
       throw new UnauthorizedException();
