@@ -31,6 +31,7 @@ export function unifyResponse(code: number, message?: string): BaseResponse;
 export function unifyResponse(options: UnifyPaginationResponse, message?: string): UnifyPaginationResponse;
 /* @description: 返回对象 */
 export function unifyResponse(options: UnifyObjectResponse, message?: string): UnifyObjectResponse;
+
 export function unifyResponse(options: any, message?: string): UnifySigleResponse {
   const response = {
     code: 0,

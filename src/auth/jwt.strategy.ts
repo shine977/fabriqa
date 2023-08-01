@@ -8,14 +8,11 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private readonly authService: AuthService,
-    private config: ConfigService,
-  ) {
+  constructor(private readonly authService: AuthService, private config: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: config.get('jwt.secretOrPrivateKey'),
+      secretOrKey: config.get('jwt.publicKey'),
     });
   }
   async validate(payload: any) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateMaterialDto } from './dto/create-material.dto';
 import { UpdateMaterialDto } from './dto/update-material.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -31,15 +31,24 @@ export class MaterialService {
     return unifyResponse({ items: results, total });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} material`;
+  async findOne(id: number) {
+    const result = await this.materialRepo.findOne({ where: { id } });
+    return unifyResponse({ item: result });
   }
 
-  update(id: number, updateMaterialDto: UpdateMaterialDto) {
-    return `This action updates a #${id} material`;
+  async update(id: number, updateMaterialDto: UpdateMaterialDto) {
+    const { affected } = await this.materialRepo.update(id, updateMaterialDto);
+    if (affected) {
+      return unifyResponse(0, '更新成功');
+    }
+    throw new BadRequestException('更新失败');
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} material`;
+  async remove(id: number) {
+    const { affected } = await this.materialRepo.softDelete(id);
+    if (affected) {
+      return unifyResponse(0, '删除成功');
+    }
+    throw new BadRequestException('删除失败');
   }
 }

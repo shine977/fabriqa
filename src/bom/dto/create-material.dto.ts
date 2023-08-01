@@ -17,4 +17,6 @@ export class CreateMaterialDto {
   picture: string;
   @IsNotEmpty()
   grade: string;
+  @IsOptional()
+  pictures: string;
 }
