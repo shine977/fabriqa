@@ -1,46 +1,36 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-
-interface WrapResponse {
-  code: number;
-  message: string;
-  items: any[];
-  item?: object;
-}
+import { UnifyResponse } from '../utils/unifyResponse';
 
 @Injectable()
 export class WrapResponseInterceptor implements NestInterceptor {
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler<WrapResponse>,
-  ): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler<UnifyResponse>): Observable<any> {
     return next.handle().pipe(
       map((data) => {
         console.log(data);
-        let response = {
-          code: 0,
-          message: 'Succesfully',
-        } as WrapResponse;
-        if (Array.isArray(data)) {
-          response.items = data;
-        } else if (
-          typeof data == 'string' ||
-          typeof data == 'boolean' ||
-          typeof data == 'number'
-        ) {
-          response.item = data;
-        } else {
-          if (data.message) {
-            response = { ...response, ...data };
-          } else {
-            response.item = data;
-          }
+        const response = data;
+        if (!data.code) {
+          response.code = 0;
         }
+        if (!data.message) {
+          response.message = 'Succesfully';
+        }
+
+        // if (Array.isArray(data)) {
+        //   response.items = data;
+        // } else if (
+        //   typeof data == 'string' ||
+        //   typeof data == 'boolean' ||
+        //   typeof data == 'number'
+        // ) {
+        //   response.item = data;
+        // } else {
+        //   if (data.message) {
+        //     response = { ...response, ...data };
+        //   } else {
+        //     response.item = data;
+        //   }
+        // }
 
         return response;
       }),

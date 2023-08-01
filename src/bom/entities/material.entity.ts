@@ -1,6 +1,6 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
-import { Part } from './part.entity';
+import { PartEntity } from './part.entity';
 
 export enum MATERIAL_TYPE {
   PLASTIC = 'plastic',
@@ -8,8 +8,8 @@ export enum MATERIAL_TYPE {
   METAL = 'metal',
 }
 
-@Entity()
-export class Material extends PublicEntity {
+@Entity({ name: 'materials', orderBy: { created_at: 'DESC' } })
+export class MaterialEntity extends PublicEntity {
   @Column({ type: 'varchar', length: 100, comment: '材料名称' })
   name: string;
   @Column({ type: 'decimal', precision: 2, comment: '单价', default: 0 })
@@ -34,6 +34,6 @@ export class Material extends PublicEntity {
   @Column({ type: 'varchar', length: 255, comment: '照片', nullable: true })
   picture: string;
 
-  @OneToMany(() => Part, (part) => part.materials)
-  parts: Part[];
+  @OneToMany(() => PartEntity, (part) => part.materials)
+  parts: PartEntity[];
 }

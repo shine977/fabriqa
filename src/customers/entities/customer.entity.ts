@@ -1,4 +1,4 @@
-import { Part } from 'src/bom/entities/part.entity';
+import { PartEntity } from 'src/bom/entities/part.entity';
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
@@ -12,7 +12,7 @@ export enum TAXES {
 }
 
 @Entity({ name: 'customers', orderBy: { created_at: 'DESC' } })
-export class Customer extends PublicEntity {
+export class CustomerEntity extends PublicEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
   @Column({ type: 'int', width: 50, nullable: true })
@@ -42,6 +42,6 @@ export class Customer extends PublicEntity {
   tax_rate: number;
   @Column({ type: 'enum', enum: TAXES, comment: '税种', default: TAXES.VAT })
   taxes: TAXES;
-  @OneToMany(() => Part, (part) => part.customer)
-  parts: Part[];
+  @OneToMany(() => PartEntity, (part) => part.customer)
+  parts: PartEntity[];
 }

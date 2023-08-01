@@ -3,11 +3,11 @@ import { MouldService } from './mould.service';
 import { MouldController } from './mould.controller';
 import { MaterialModule } from './material.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Mould } from './entities/mould.entity';
+import { MouldEntity } from './entities/mould.entity';
 
 @Module({
   controllers: [MouldController],
   providers: [MouldService],
-  imports: [MaterialModule, TypeOrmModule.forFeature([Mould])],
+  imports: [MaterialModule, TypeOrmModule.forFeature([MouldEntity])],
 })
 export class MouldModule {}

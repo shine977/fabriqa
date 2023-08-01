@@ -2,7 +2,7 @@ import { generateString } from '@nestjs/typeorm';
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity, Generated } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'users' })
 export class UserEntity extends PublicEntity {
   @Generated('uuid')
   @Column({ type: 'varchar', length: 64 })

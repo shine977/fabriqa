@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Customer } from './entities/customer.entity';
+import { CustomerEntity } from './entities/customer.entity';
 import { Repository } from 'typeorm';
 import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class CustomersService {
   constructor(
-    @InjectRepository(Customer)
-    private readonly customerRepo: Repository<Customer>,
+    @InjectRepository(CustomerEntity)
+    private readonly customerRepo: Repository<CustomerEntity>,
   ) {}
   async create(createCustomerDto: CreateCustomerDto) {
     console.log('createCustomerDto', createCustomerDto);
@@ -23,7 +23,7 @@ export class CustomersService {
   }
 
   async findAll() {
-    return paginate<Customer>(this.customerRepo, {} as IPaginationOptions);
+    return paginate<CustomerEntity>(this.customerRepo, {} as IPaginationOptions);
     // const [result, total] = await this.customerRepo.findAndCount({
     //   take: 10,
     //   skip: 0,

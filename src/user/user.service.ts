@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { encryptData } from 'src/common/utils/crypto';
 import { JwtService } from '@nestjs/jwt';
 import { unifyResponse } from 'src/common/utils/unifyResponse';
@@ -20,8 +20,13 @@ export class UserService {
     return await this.userRepository.save(this.userRepository.create(user));
   }
 
-  findAll() {
-    return this.userRepository.find();
+  async findAll(query) {
+    const [results, total] = await this.userRepository.findAndCount({
+      where: { username: Like(`%${query.username || ''}%`) },
+      take: query.take,
+      skip: (query.current - 1) * query.take,
+    });
+    return unifyResponse({ items: results, total });
   }
 
   findOne(id: string) {

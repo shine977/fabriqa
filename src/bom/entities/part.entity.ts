@@ -1,11 +1,11 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
-import { Material } from './material.entity';
-import { Mould } from './mould.entity';
+import { MaterialEntity } from './material.entity';
+import { MouldEntity } from './mould.entity';
 import { PublicEntity } from 'src/common/entity/PublicEntity';
-import { Customer } from 'src/customers/entities/customer.entity';
+import { CustomerEntity } from 'src/customers/entities/customer.entity';
 
-@Entity()
-export class Part extends PublicEntity {
+@Entity({ name: 'parts', orderBy: { created_at: 'DESC' } })
+export class PartEntity extends PublicEntity {
   @Column({
     type: 'decimal',
     name: 'processing_fee',
@@ -45,12 +45,12 @@ export class Part extends PublicEntity {
     width: 8,
     comment: '克重',
   })
-  @ManyToOne(() => Material, (materail) => materail.parts)
-  materials: Material[];
+  @ManyToOne(() => MaterialEntity, (materail) => materail.parts)
+  materials: MaterialEntity[];
 
-  @ManyToOne(() => Mould, (mould) => mould.parts)
-  mould: Mould;
+  @ManyToOne(() => MouldEntity, (mould) => mould.parts)
+  mould: MouldEntity;
 
-  @ManyToOne(() => Customer, (customer) => customer.parts)
-  customer: Customer;
+  @ManyToOne(() => CustomerEntity, (customer) => customer.parts)
+  customer: CustomerEntity;
 }

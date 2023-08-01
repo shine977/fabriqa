@@ -1,7 +1,7 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity, Index } from 'typeorm';
 @Entity({ name: 'orders', orderBy: { created_at: 'DESC' } })
-export class Order extends PublicEntity {
+export class OrderEntity extends PublicEntity {
   @Index()
   @Column({ type: 'varchar', length: 255, comment: '订单号' })
   no: string;
