@@ -5,9 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Like, Repository } from 'typeorm';
 import { encryptData } from 'src/common/utils/crypto';
-import { JwtService } from '@nestjs/jwt';
+
 import { unifyResponse } from 'src/common/utils/unifyResponse';
-import { ErrorCode } from 'src/config/code';
 
 @Injectable()
 export class UserService {

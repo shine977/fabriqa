@@ -14,25 +14,33 @@ export class MaterialService {
     private readonly materialRepo: Repository<MaterialEntity>,
   ) {}
   async create(createMaterialDto: CreateMaterialDto) {
+    console.log('create', createMaterialDto);
     const materail = await this.materialRepo.findOne({
       where: { grade: createMaterialDto.grade },
     });
 
     if (materail) return unifyResponse(ErrorCode.code, '牌号已存在！');
-    return this.materialRepo.save(createMaterialDto);
+    const item = await this.materialRepo.save(createMaterialDto);
+    return unifyResponse({ item });
   }
+  async findAll(query) {
+    const qb = this.materialRepo.createQueryBuilder('materail');
+    qb.leftJoinAndSelect('materail.parts', 'parts', 'materail.id = parts.materialId ');
+    if (query.name) {
+      qb.where(`material.name =:${query.name}`);
+    }
 
-  async findAll() {
-    const [results, total] = await this.materialRepo.findAndCount({
-      take: 10,
-      skip: 0,
-    });
+    const [results, total] = await qb
+      .offset((query.current - 1) * query.take)
+      .limit(query.take)
+
+      .getManyAndCount();
 
     return unifyResponse({ items: results, total });
   }
 
   async findOne(id: number) {
-    const result = await this.materialRepo.findOne({ where: { id } });
+    const result = await this.materialRepo.find({ relations: ['parts'], where: { id } });
     return unifyResponse({ item: result });
   }
 

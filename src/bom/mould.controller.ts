@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { MouldService } from './mould.service';
 import { CreateMouldDto } from './dto/create-mould.dto';
 import { UpdateMouldDto } from './dto/update-mould.dto';

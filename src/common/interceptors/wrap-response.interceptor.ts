@@ -1,6 +1,6 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-import { UnifyResponse } from '../utils/unifyResponse';
+import { UnifyResponse, UnifySigleResponse } from '../utils/unifyResponse';
 
 @Injectable()
 export class WrapResponseInterceptor implements NestInterceptor {
@@ -8,12 +8,14 @@ export class WrapResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data) => {
         console.log(data);
-        const response = data;
-        if (!data.code) {
-          response.code = 0;
-        }
-        if (!data.message) {
-          response.message = 'Succesfully';
+        const response = data || ({ code: 0, message: 'Succesfully' } as UnifyResponse);
+        if (data) {
+          if (!data.code) {
+            response.code = 0;
+          }
+          if (!data.message) {
+            response.message = 'Succesfully';
+          }
         }
 
         // if (Array.isArray(data)) {

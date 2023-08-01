@@ -12,7 +12,7 @@ export class MouldEntity extends PublicEntity {
   @Column({ type: 'decimal', precision: 2, default: 0 })
   price: number;
   @OneToMany(() => PartEntity, (part) => part)
-  parts: PartEntity[];
+  parts: PartEntity;
   @OneToMany(() => CustomerEntity, (customer) => customer.moulds)
   customers: CustomerEntity[];
 }

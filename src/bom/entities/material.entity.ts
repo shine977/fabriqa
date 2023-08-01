@@ -1,5 +1,5 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
-import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { PartEntity } from './part.entity';
 
 export enum MATERIAL_TYPE {
@@ -12,8 +12,10 @@ export enum MATERIAL_TYPE {
 export class MaterialEntity extends PublicEntity {
   @Column({ type: 'varchar', length: 100, comment: '材料名称' })
   name: string;
+
   @Column({ type: 'decimal', precision: 2, comment: '单价', default: 0 })
   price: number;
+
   @Column({
     type: 'enum',
     enum: MATERIAL_TYPE,
@@ -22,18 +24,21 @@ export class MaterialEntity extends PublicEntity {
   })
   type: string;
 
-  @Column({ type: 'varchar', length: 100, comment: '料号', nullable: true })
+  @Column({ type: 'varchar', name: 'code', length: 100, comment: '料号', nullable: true })
   code: string;
 
   @Column({ type: 'varchar', length: 30, comment: '颜色', nullable: true })
   color: string;
+
   @Column({ type: 'varchar', length: 255, comment: '牌号', nullable: true })
   grade: string;
+
   @Column({ type: 'varchar', length: 255, comment: '厂家' })
   vendor: string;
+
   @Column({ type: 'varchar', length: 255, comment: '照片', nullable: true })
   picture: string;
 
-  @OneToMany(() => PartEntity, (part) => part.materials)
+  @OneToMany(() => PartEntity, (part) => part.material)
   parts: PartEntity[];
 }

@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { MaterialEntity } from './material.entity';
 import { MouldEntity } from './mould.entity';
 import { PublicEntity } from 'src/common/entity/PublicEntity';
@@ -45,12 +45,17 @@ export class PartEntity extends PublicEntity {
     width: 8,
     comment: '克重',
   })
+  gram_weight: number;
+
   @ManyToOne(() => MaterialEntity, (materail) => materail.parts)
-  materials: MaterialEntity[];
+  @JoinColumn()
+  material: MaterialEntity;
 
   @ManyToOne(() => MouldEntity, (mould) => mould.parts)
+  @JoinColumn()
   mould: MouldEntity;
 
   @ManyToOne(() => CustomerEntity, (customer) => customer.parts)
+  @JoinColumn()
   customer: CustomerEntity;
 }
