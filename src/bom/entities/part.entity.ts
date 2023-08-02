@@ -15,7 +15,7 @@ export class PartEntity extends PublicEntity {
     default: 0,
     nullable: true,
   })
-  processingFee: string;
+  processingFee: number;
 
   @Column({
     type: 'decimal',
@@ -41,11 +41,21 @@ export class PartEntity extends PublicEntity {
 
   @Column({
     type: 'decimal',
+    name: 'gram_weight',
     precision: 2,
     width: 8,
     comment: '克重',
   })
-  gram_weight: number;
+  gramWeight: number;
+
+  @Column({
+    type: 'decimal',
+    name: 'actual_gram_weight',
+    precision: 2,
+    width: 8,
+    comment: '送样克重',
+  })
+  sampleWeight: number;
 
   @ManyToOne(() => MaterialEntity, (materail) => materail.parts)
   @JoinColumn()
