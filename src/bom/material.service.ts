@@ -25,7 +25,10 @@ export class MaterialService {
   }
   async findAll(query) {
     const qb = this.materialRepo.createQueryBuilder('materail');
-    qb.leftJoinAndSelect('materail.parts', 'parts', 'materail.id = parts.materialId ');
+    if (query.getParts) {
+      qb.leftJoinAndSelect('materail.parts', 'parts', 'materail.id = parts.materialId ');
+    }
+
     if (query.name) {
       qb.where(`material.name =:${query.name}`);
     }

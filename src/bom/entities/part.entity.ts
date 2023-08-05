@@ -57,6 +57,15 @@ export class PartEntity extends PublicEntity {
   })
   sampleWeight: number;
 
+  @Column({
+    type: 'decimal',
+    name: 'gate_weight',
+    precision: 2,
+    width: 8,
+    comment: '浇口克重',
+  })
+  gateWeight: number;
+
   @ManyToOne(() => MaterialEntity, (materail) => materail.parts)
   @JoinColumn()
   material: MaterialEntity;

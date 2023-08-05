@@ -1,5 +1,5 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { PartEntity } from './part.entity';
 
 export enum MATERIAL_TYPE {

@@ -43,8 +43,10 @@ export class CustomerEntity extends PublicEntity {
   tax_rate: number;
   @Column({ type: 'enum', enum: TAXES, comment: '税种', default: TAXES.VAT })
   taxes: TAXES;
+
   @OneToMany(() => PartEntity, (part) => part.customer)
   parts: PartEntity[];
-  @OneToMany(() => MouldEntity, (mould) => mould.customers)
+
+  @OneToMany(() => MouldEntity, (mould) => mould.customer)
   moulds: MouldEntity[];
 }
