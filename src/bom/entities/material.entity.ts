@@ -1,6 +1,6 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity, OneToMany } from 'typeorm';
-import { PartEntity } from './part.entity';
+import { ComponentEntity } from './component.entity';
 
 export enum MATERIAL_TYPE {
   PLASTIC = 'plastic',
@@ -39,6 +39,6 @@ export class MaterialEntity extends PublicEntity {
   @Column({ type: 'varchar', length: 255, comment: '照片', nullable: true })
   picture: string;
 
-  @OneToMany(() => PartEntity, (part) => part.material)
-  parts: PartEntity[];
+  @OneToMany(() => ComponentEntity, (component) => component.material)
+  components: ComponentEntity[];
 }

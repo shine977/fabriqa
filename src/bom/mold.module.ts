@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { MouldService } from './mould.service';
-import { MouldController } from './mould.controller';
+import { MouldService } from './mold.service';
+import { MouldController } from './mold.controller';
 import { MaterialModule } from './material.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MouldEntity } from './entities/mould.entity';
+import { MoldEntity } from './entities/mold.entity';
 
 @Module({
   controllers: [MouldController],
   providers: [MouldService],
-  imports: [MaterialModule, TypeOrmModule.forFeature([MouldEntity])],
+  imports: [MaterialModule, TypeOrmModule.forFeature([MoldEntity])],
 })
 export class MouldModule {}

@@ -1,11 +1,11 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { MaterialEntity } from './material.entity';
-import { MouldEntity } from './mould.entity';
+import { MoldEntity } from './mold.entity';
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { CustomerEntity } from 'src/customers/entities/customer.entity';
 
-@Entity({ name: 'parts', orderBy: { created_at: 'DESC' } })
-export class PartEntity extends PublicEntity {
+@Entity({ name: 'components', orderBy: { created_at: 'DESC' } })
+export class ComponentEntity extends PublicEntity {
   @Column({
     type: 'decimal',
     name: 'processing_fee',
@@ -66,15 +66,15 @@ export class PartEntity extends PublicEntity {
   })
   gateWeight: number;
 
-  @ManyToOne(() => MaterialEntity, (materail) => materail.parts)
-  @JoinColumn()
+  @ManyToOne(() => MaterialEntity, (materail) => materail.components)
+  @JoinColumn({ name: 'material_id' })
   material: MaterialEntity;
 
-  @ManyToOne(() => MouldEntity, (mould) => mould.parts)
-  @JoinColumn()
-  mould: MouldEntity;
+  @ManyToOne(() => MoldEntity, (mold) => mold.components)
+  @JoinColumn({ name: 'mold_id' })
+  mold: MoldEntity;
 
-  @ManyToOne(() => CustomerEntity, (customer) => customer.parts)
-  @JoinColumn()
+  @ManyToOne(() => CustomerEntity, (customer) => customer.components)
+  @JoinColumn({ name: 'customer_id' })
   customer: CustomerEntity;
 }

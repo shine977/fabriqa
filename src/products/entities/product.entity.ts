@@ -1,7 +1,8 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
-import { Column, Entity } from 'typeorm';
+import { TenantEntity } from 'src/tenant/entities/tenant.entity';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 @Entity({ name: 'products', orderBy: { created_at: 'DESC' } })
-export class Product extends PublicEntity {
+export class ProductEntity extends PublicEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
   @Column({ type: 'varchar', length: 255 })
@@ -10,4 +11,8 @@ export class Product extends PublicEntity {
   color: string;
   @Column({ type: 'decimal', precision: 2, width: 50 })
   price: number;
+
+  @ManyToOne(() => TenantEntity, (tenant) => tenant.products)
+  @JoinColumn({ name: 'tenant_id' })
+  tenant: TenantEntity;
 }

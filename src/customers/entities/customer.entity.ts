@@ -1,5 +1,5 @@
-import { MouldEntity } from 'src/bom/entities/mould.entity';
-import { PartEntity } from 'src/bom/entities/part.entity';
+import { MoldEntity } from 'src/bom/entities/mold.entity';
+import { ComponentEntity } from 'src/bom/entities/component.entity';
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
@@ -44,9 +44,9 @@ export class CustomerEntity extends PublicEntity {
   @Column({ type: 'enum', enum: TAXES, comment: '税种', default: TAXES.VAT })
   taxes: TAXES;
 
-  @OneToMany(() => PartEntity, (part) => part.customer)
-  parts: PartEntity[];
+  @OneToMany(() => ComponentEntity, (component) => component.customer)
+  components: ComponentEntity[];
 
-  @OneToMany(() => MouldEntity, (mould) => mould.customer)
-  moulds: MouldEntity[];
+  @OneToMany(() => MoldEntity, (molds) => molds.customer)
+  molds: MoldEntity[];
 }

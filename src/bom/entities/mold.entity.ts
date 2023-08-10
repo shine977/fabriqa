@@ -1,10 +1,10 @@
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
-import { PartEntity } from './part.entity';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { ComponentEntity } from './component.entity';
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { CustomerEntity } from 'src/customers/entities/customer.entity';
 
-@Entity({ name: 'moulds', orderBy: { created_at: 'DESC' } })
-export class MouldEntity extends PublicEntity {
+@Entity({ name: 'molds', orderBy: { created_at: 'DESC' } })
+export class MoldEntity extends PublicEntity {
   @Column({ comment: '模具名' })
   name: string;
 
@@ -17,9 +17,10 @@ export class MouldEntity extends PublicEntity {
   @Column({ type: 'decimal', precision: 2, default: 0, comment: '价格' })
   price: number;
 
-  @OneToMany(() => PartEntity, (part) => part)
-  parts: PartEntity;
+  @OneToMany(() => ComponentEntity, (component) => component)
+  components: ComponentEntity;
 
-  @ManyToOne(() => CustomerEntity, (customer) => customer.moulds)
+  @ManyToOne(() => CustomerEntity, (customer) => customer.molds)
+  @JoinColumn({ name: 'customer_id' })
   customer: CustomerEntity;
 }

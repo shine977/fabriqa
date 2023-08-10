@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePartDto } from './dto/create-part.dto';
-import { UpdatePartDto } from './dto/update-part.dto';
+import { CreatePartDto } from './dto/create-component.dto';
+import { UpdatePartDto } from './dto/update-component.dto';
 
 @Injectable()
 export class PartService {

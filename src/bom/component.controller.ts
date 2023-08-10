@@ -1,15 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
-import { PartService } from './part.service';
-import { CreatePartDto } from './dto/create-part.dto';
-import { UpdatePartDto } from './dto/update-part.dto';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { PartService } from './component.service';
+import { CreatePartDto } from './dto/create-component.dto';
+import { UpdatePartDto } from './dto/update-component.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Part')

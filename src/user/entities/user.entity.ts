@@ -1,6 +1,7 @@
-import { generateString } from '@nestjs/typeorm';
 import { PublicEntity } from 'src/common/entity/PublicEntity';
-import { Column, Entity, Generated } from 'typeorm';
+import { Column, Entity, Generated, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { RoleEntity } from './role.entity';
+import { TenantEntity } from 'src/tenant/entities/tenant.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends PublicEntity {
@@ -13,4 +14,11 @@ export class UserEntity extends PublicEntity {
   password: string;
   @Column({ unique: true, nullable: true, length: 100 })
   email: string;
+
+  @OneToMany(() => RoleEntity, (role) => role.user)
+  roles: RoleEntity[];
+
+  @ManyToOne(() => TenantEntity, (tenant) => tenant.users)
+  @JoinColumn({ name: 'tenant_id' })
+  tenant: TenantEntity;
 }

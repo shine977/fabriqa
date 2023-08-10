@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { MouldService } from './mould.service';
+import { MouldService } from './mold.service';
 import { CreateMouldDto } from './dto/create-mould.dto';
 import { UpdateMouldDto } from './dto/update-mould.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Mould')
-@Controller('mould')
+@ApiTags('Mold')
+@Controller('mold')
 export class MouldController {
   constructor(private readonly mouldService: MouldService) {}
 

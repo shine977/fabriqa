@@ -7,15 +7,16 @@ import { CustomersModule } from './customers/customers.module';
 import { ProductsModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
 import { DeliveriesModule } from './deliveries/deliveries.module';
-import { MouldModule } from './bom/mould.module';
+import { MouldModule } from './bom/mold.module';
 import { MaterialModule } from './bom/material.module';
-import { PartModule } from './bom/part.module';
+import { PartModule } from './bom/component.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 
 import configuration from './config/configuration';
 import { RequestMiddleware } from './middleware/request.middleware';
+import { TenantModule } from './tenant/tenant.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { RequestMiddleware } from './middleware/request.middleware';
     PartModule,
     AuthModule,
     UserModule,
+    TenantModule,
   ],
   controllers: [AppController],
   providers: [AppService],

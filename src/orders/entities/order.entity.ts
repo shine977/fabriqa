@@ -1,5 +1,6 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
-import { Column, Entity, Index } from 'typeorm';
+import { TenantEntity } from 'src/tenant/entities/tenant.entity';
+import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 @Entity({ name: 'orders', orderBy: { created_at: 'DESC' } })
 export class OrderEntity extends PublicEntity {
   @Index()
@@ -47,4 +48,8 @@ export class OrderEntity extends PublicEntity {
 
   @Column({ type: 'json' })
   materials: [];
+
+  @ManyToOne(() => TenantEntity, (tenant) => tenant.orders)
+  @JoinColumn({ name: 'tenant_id' })
+  tenant: TenantEntity;
 }
