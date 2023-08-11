@@ -12,7 +12,7 @@ export class ProductEntity extends PublicEntity {
   @Column({ type: 'decimal', precision: 2, width: 50 })
   price: number;
 
-  @ManyToOne(() => TenantEntity, (tenant) => tenant.products)
+  @ManyToOne(() => TenantEntity, (tenant) => tenant.products, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'tenant_id' })
   tenant: TenantEntity;
 }

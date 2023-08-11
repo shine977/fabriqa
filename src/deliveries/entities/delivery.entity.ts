@@ -22,7 +22,7 @@ export class DeliveryEntity extends PublicEntity {
   @Column({ type: 'decimal', width: 65, precision: 2 })
   actual_quantity_received: number;
 
-  @ManyToOne(() => TenantEntity, (tenant) => tenant.deliveries)
+  @ManyToOne(() => TenantEntity, (tenant) => tenant.deliveries, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'tenant_id' })
   tenant: TenantEntity;
 }

@@ -6,26 +6,7 @@ export class OrderEntity extends PublicEntity {
   @Index()
   @Column({ type: 'varchar', length: 255, comment: '订单号' })
   no: string;
-  @Column({
-    name: 'task_no',
-    type: 'varchar',
-    length: 255,
-    comment: '任务书号',
-    nullable: true,
-  })
-  taskNo: string;
-  @Column({ type: 'varchar', length: 255, comment: '单位', default: 'pcs' })
-  unit: string;
-  @Column({ type: 'int', width: 50, comment: '数量' })
-  quantity: number;
-  @Column({
-    name: 'unit_price',
-    type: 'decimal',
-    width: 50,
-    precision: 2,
-    comment: '单价',
-  })
-  unitPrice: number;
+
   @Column({
     type: 'decimal',
     width: 50,
@@ -34,8 +15,10 @@ export class OrderEntity extends PublicEntity {
     nullable: true,
   })
   amount: number;
+
   @Column({ type: 'datetime', name: 'purchase_date', comment: '采购日期' })
   purchaseDate: number;
+
   @Column({
     type: 'varchar',
     name: 'payment_clause',
@@ -43,13 +26,14 @@ export class OrderEntity extends PublicEntity {
     comment: '付款条件',
   })
   paymentClause: string;
+
   @Column({ type: 'datetime', comment: '交期' })
   delivery: string;
 
   @Column({ type: 'json' })
   materials: [];
 
-  @ManyToOne(() => TenantEntity, (tenant) => tenant.orders)
+  @ManyToOne(() => TenantEntity, (tenant) => tenant.orders, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'tenant_id' })
   tenant: TenantEntity;
 }

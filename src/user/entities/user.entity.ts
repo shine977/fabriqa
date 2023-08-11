@@ -8,17 +8,20 @@ export class UserEntity extends PublicEntity {
   @Generated('uuid')
   @Column({ type: 'varchar', length: 64 })
   uid: string;
+
   @Column({ unique: true, length: 32 })
   username: string;
+
   @Column({ type: 'char', length: 255 })
   password: string;
+
   @Column({ unique: true, nullable: true, length: 100 })
   email: string;
 
   @OneToMany(() => RoleEntity, (role) => role.user)
   roles: RoleEntity[];
 
-  @ManyToOne(() => TenantEntity, (tenant) => tenant.users)
+  @ManyToOne(() => TenantEntity, (tenant) => tenant.users, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'tenant_id' })
   tenant: TenantEntity;
 }

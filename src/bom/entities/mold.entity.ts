@@ -20,7 +20,7 @@ export class MoldEntity extends PublicEntity {
   @OneToMany(() => ComponentEntity, (component) => component)
   components: ComponentEntity;
 
-  @ManyToOne(() => CustomerEntity, (customer) => customer.molds)
+  @ManyToOne(() => CustomerEntity, (customer) => customer.molds, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'customer_id' })
   customer: CustomerEntity;
 }

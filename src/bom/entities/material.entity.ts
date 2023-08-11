@@ -34,7 +34,7 @@ export class MaterialEntity extends PublicEntity {
   grade: string;
 
   @Column({ type: 'varchar', length: 255, comment: '厂家' })
-  vendor: string;
+  factory: string;
 
   @Column({ type: 'varchar', length: 255, comment: '照片', nullable: true })
   picture: string;

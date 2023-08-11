@@ -14,7 +14,7 @@ export class WrapResponseInterceptor implements NestInterceptor {
             response.code = 0;
           }
           if (!data.message) {
-            response.message = 'Succesfully';
+            response.message = 'Successfully';
           }
         }
 

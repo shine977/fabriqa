@@ -8,36 +8,36 @@ import { CustomerEntity } from 'src/customers/entities/customer.entity';
 export class ComponentEntity extends PublicEntity {
   @Column({
     type: 'decimal',
-    name: 'processing_fee',
+    name: 'processing_cost',
     precision: 2,
     width: 15,
     comment: '加工费',
     default: 0,
     nullable: true,
   })
-  processingFee: number;
+  processingCost: number;
 
   @Column({
     type: 'decimal',
-    name: 'mold_fee',
+    name: 'mold_cost',
     precision: 2,
     width: 15,
     comment: '模具费',
     nullable: true,
     default: 0,
   })
-  moldFee: string;
+  moldCost: string;
 
   @Column({
     type: 'decimal',
-    name: 'design_fee',
+    name: 'design_cost',
     precision: 2,
     width: 15,
     comment: '设计费',
     nullable: true,
     default: 0,
   })
-  designFee: string;
+  designCost: string;
 
   @Column({
     type: 'decimal',
@@ -50,7 +50,7 @@ export class ComponentEntity extends PublicEntity {
 
   @Column({
     type: 'decimal',
-    name: 'actual_gram_weight',
+    name: 'sample_weight',
     precision: 2,
     width: 8,
     comment: '送样克重',
@@ -60,21 +60,22 @@ export class ComponentEntity extends PublicEntity {
   @Column({
     type: 'decimal',
     name: 'gate_weight',
+    nullable: true,
     precision: 2,
     width: 8,
     comment: '浇口克重',
   })
   gateWeight: number;
 
-  @ManyToOne(() => MaterialEntity, (materail) => materail.components)
+  @ManyToOne(() => MaterialEntity, (materail) => materail.components, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'material_id' })
   material: MaterialEntity;
 
-  @ManyToOne(() => MoldEntity, (mold) => mold.components)
+  @ManyToOne(() => MoldEntity, (mold) => mold.components, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'mold_id' })
   mold: MoldEntity;
 
-  @ManyToOne(() => CustomerEntity, (customer) => customer.components)
+  @ManyToOne(() => CustomerEntity, (customer) => customer.components, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'customer_id' })
   customer: CustomerEntity;
 }

@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TenantEntity } from './entities/tenant.entity';
+import { Repository } from 'typeorm';
+import { unifyResponse } from 'src/common/utils/unifyResponse';
 
 @Injectable()
 export class TenantService {
+  constructor(@InjectRepository(TenantEntity) private readonly tenantRepo: Repository<TenantEntity>) {}
   create(createTenantDto: CreateTenantDto) {
-    return 'This action adds a new tenant';
+    return this.tenantRepo.save(createTenantDto);
   }
 
-  findAll() {
-    return `This action returns all tenant`;
+  async findAll() {
+    const [items, total] = await this.tenantRepo.findAndCount();
+    return unifyResponse({ items, total });
   }
 
   findOne(id: number) {
