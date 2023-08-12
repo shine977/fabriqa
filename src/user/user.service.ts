@@ -7,12 +7,15 @@ import { Like, Repository } from 'typeorm';
 import { encryptData } from 'src/common/utils/crypto';
 
 import { unifyResponse } from 'src/common/utils/unifyResponse';
+import { MenuEntity } from './entities/menu.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(MenuEntity)
+    private readonly menuRepository: Repository<MenuEntity>,
   ) {}
   async create(user: CreateUserDto) {
     user.password = encryptData(user.password);
@@ -44,5 +47,8 @@ export class UserService {
   }
   async findByUId(uid: string): Promise<UserEntity | null> {
     return await this.userRepository.findOneOrFail({ where: { uid } });
+  }
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    await this.userRepository.update({ uid: userId }, { refreshToken });
   }
 }

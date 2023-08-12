@@ -18,6 +18,9 @@ export class UserEntity extends PublicEntity {
   @Column({ unique: true, nullable: true, length: 100 })
   email: string;
 
+  @Column({ name: 'refresh_Token' })
+  refreshToken: string;
+
   @OneToMany(() => RoleEntity, (role) => role.user)
   roles: RoleEntity[];
 

@@ -5,22 +5,25 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 
 import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from './auth.guard';
+import { AuthenticateGuard } from '../common/guards/auth.guard';
 import { UserModule } from 'src/user/user.module';
-import { ConfigService } from '@nestjs/config';
+
+import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
 
 @Module({
   imports: [
     UserModule,
 
-    JwtModule.registerAsync({
-      useFactory: (config: ConfigService) => {
-        return config.get('jwt');
-      },
-      inject: [ConfigService],
-    }),
+    // JwtModule.registerAsync({
+    //   useFactory: (config: ConfigService) => {
+    //     return config.get('jwt');
+    //   },
+    //   inject: [ConfigService],
+    // }),
+    JwtModule.register({}),
   ],
   controllers: [AuthController],
-  providers: [AuthService, { provide: APP_GUARD, useClass: AuthGuard }],
+
+  providers: [AuthService, { provide: APP_GUARD, useClass: AuthenticateGuard }, RefreshTokenStrategy],
 })
 export class AuthModule {}

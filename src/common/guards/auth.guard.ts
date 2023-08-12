@@ -5,18 +5,19 @@ import { Request } from 'express';
 import { IS_PUBLIC_KEY } from 'src/common/decorator/public.decorator';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AuthenticateGuard implements CanActivate {
   constructor(private readonly reflector: Reflector, private readonly jwtService: JwtService) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride(IS_PUBLIC_KEY, [context.getHandler(), context.getClass()]);
+    console.log('isPublic~~~', isPublic);
     if (isPublic) return true;
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
-
+    console.log('token~~~', token);
     if (!token) throw new UnauthorizedException();
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
+        secret: process.env.JWT_ACCESS_SECRET,
       });
       console.log('AuthGuard', payload);
       const { iat, exp } = payload;
