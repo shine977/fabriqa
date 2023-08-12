@@ -17,7 +17,7 @@ export class CustomerEntity extends PublicEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
   @Column({ type: 'int', width: 50, nullable: true })
-  groud_id: number;
+  tenant_id: number;
   @Column({ type: 'char', length: 255, comment: '送货地址' })
   delivery_address: string;
   @Column({ type: 'char', length: 255, comment: '发票地址' })

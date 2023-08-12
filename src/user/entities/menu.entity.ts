@@ -22,7 +22,6 @@ export class MenuEntity extends PublicEntity {
   @Column({ type: 'enum', default: MenuType.ROUTE, enum: MenuType })
   type: MenuType;
 
-  @ManyToMany(() => RoleEntity, (role) => role.menu)
-  //   @JoinColumn({ name: 'role_id' })
+  @ManyToMany(() => RoleEntity, (role) => role.menus, { createForeignKeyConstraints: false })
   roles: RoleEntity[];
 }

@@ -1,5 +1,5 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
-import { Column, Entity, Generated, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, Generated, ManyToOne, OneToMany } from 'typeorm';
 import { RoleEntity } from './role.entity';
 import { TenantEntity } from 'src/tenant/entities/tenant.entity';
 
@@ -25,6 +25,8 @@ export class UserEntity extends PublicEntity {
   roles: RoleEntity[];
 
   @ManyToOne(() => TenantEntity, (tenant) => tenant.users, { createForeignKeyConstraints: false })
-  @JoinColumn({ name: 'tenant_id' })
   tenant: TenantEntity;
+
+  @Column({ name: 'tenant_id' })
+  tenantId: string;
 }

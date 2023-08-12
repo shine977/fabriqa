@@ -4,6 +4,11 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   username: string;
+
+  @IsNotEmpty()
+  @IsString()
+  tenantId: string;
+
   @IsNotEmpty()
   @IsString()
   password: string;

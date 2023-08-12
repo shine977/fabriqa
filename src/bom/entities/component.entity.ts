@@ -67,6 +67,9 @@ export class ComponentEntity extends PublicEntity {
   })
   gateWeight: number;
 
+  @Column({ name: 'tenant_Id' })
+  tenantId: string;
+
   @ManyToOne(() => MaterialEntity, (materail) => materail.components, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'material_id' })
   material: MaterialEntity;
