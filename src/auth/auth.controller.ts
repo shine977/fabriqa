@@ -26,6 +26,14 @@ export class AuthController {
     user = await this.userService.create(user);
     return this.authService.authenticate(user.username);
   }
+  @Post('register/tenant')
+  @Public()
+  async registerTenant(@Body() user: CreateUserDto) {
+    const usernameExists = await this.userService.findOneByUsername(user.username);
+    if (usernameExists) throw new BadRequestException(CodeTips.c1000);
+    user = await this.userService.create(user);
+    return this.authService.authenticate(user.username);
+  }
   @UseGuards(RefreshTokenGuard)
   @Public()
   @Get('refresh')
