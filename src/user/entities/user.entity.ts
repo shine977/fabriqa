@@ -3,6 +3,12 @@ import { Column, Entity, Generated, ManyToOne, OneToMany } from 'typeorm';
 import { RoleEntity } from './role.entity';
 import { TenantEntity } from 'src/tenant/entities/tenant.entity';
 
+export enum UserTypeEnum {
+  ADMIN = 'ADMIN',
+  EMPLOYEE = 'EMPLOYEE',
+  SUPPLIER = 'SUPPLIER',
+}
+
 @Entity({ name: 'users' })
 export class UserEntity extends PublicEntity {
   @Generated('uuid')
@@ -18,6 +24,9 @@ export class UserEntity extends PublicEntity {
   @Column({ unique: true, nullable: true, length: 100 })
   email: string;
 
+  @Column({ type: 'enum', enum: UserTypeEnum, default: UserTypeEnum.EMPLOYEE })
+  type: string;
+
   @Column({ name: 'refresh_Token' })
   refreshToken: string;
 
@@ -26,7 +35,4 @@ export class UserEntity extends PublicEntity {
 
   @ManyToOne(() => TenantEntity, (tenant) => tenant.users, { createForeignKeyConstraints: false })
   tenant: TenantEntity;
-
-  @Column({ name: 'tenant_id' })
-  tenantId: string;
 }

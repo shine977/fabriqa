@@ -23,7 +23,4 @@ export class MoldEntity extends PublicEntity {
   @ManyToOne(() => CustomerEntity, (customer) => customer.molds, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'customer_id' })
   customer: CustomerEntity;
-
-  @Column({ name: 'tenant_Id' })
-  tenantId: string;
 }

@@ -23,6 +23,5 @@ export class DeliveryEntity extends PublicEntity {
   actual_quantity_received: number;
 
   @ManyToOne(() => TenantEntity, (tenant) => tenant.deliveries, { createForeignKeyConstraints: false })
-  @JoinColumn({ name: 'tenant_id' })
   tenant: TenantEntity;
 }

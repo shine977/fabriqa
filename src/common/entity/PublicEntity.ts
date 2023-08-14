@@ -1,6 +1,8 @@
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
+  Generated,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -8,6 +10,11 @@ import * as dayjs from 'dayjs';
 export abstract class PublicEntity {
   @PrimaryGeneratedColumn('increment', { unsigned: true })
   id: number;
+
+  @Generated('uuid')
+  @Column({ name: 'tenant_Id' })
+  tenantId: string;
+
   @CreateDateColumn({
     name: 'created_at',
     transformer: {
@@ -16,6 +23,7 @@ export abstract class PublicEntity {
     },
   })
   createdAt: Date;
+
   @UpdateDateColumn({
     name: 'updated_at',
     transformer: {

@@ -34,6 +34,5 @@ export class OrderEntity extends PublicEntity {
   materials: [];
 
   @ManyToOne(() => TenantEntity, (tenant) => tenant.orders, { createForeignKeyConstraints: false })
-  @JoinColumn({ name: 'tenant_id' })
   tenant: TenantEntity;
 }

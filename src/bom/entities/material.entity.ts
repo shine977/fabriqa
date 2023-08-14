@@ -41,7 +41,4 @@ export class MaterialEntity extends PublicEntity {
 
   @OneToMany(() => ComponentEntity, (component) => component.material)
   components: ComponentEntity[];
-
-  @Column({ name: 'tenant_Id' })
-  tenantId: string;
 }

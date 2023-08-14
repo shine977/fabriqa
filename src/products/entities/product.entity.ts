@@ -13,6 +13,5 @@ export class ProductEntity extends PublicEntity {
   price: number;
 
   @ManyToOne(() => TenantEntity, (tenant) => tenant.products, { createForeignKeyConstraints: false })
-  @JoinColumn({ name: 'tenant_id' })
   tenant: TenantEntity;
 }

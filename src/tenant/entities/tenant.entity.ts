@@ -10,10 +10,6 @@ export class TenantEntity extends PublicEntity {
   @Column()
   name: string;
 
-  @Generated('uuid')
-  @Column({ type: 'varchar', length: 64, name: 'tenant_id' })
-  tenantId: string;
-
   @Column({ nullable: true })
   description: string;
   @OneToMany(() => UserEntity, (user) => user.tenant)

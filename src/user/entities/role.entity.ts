@@ -29,11 +29,11 @@ export class RoleEntity extends PublicEntity {
   })
   menus: MenuEntity[];
 
-  @ManyToMany(() => TenantEntity, { createForeignKeyConstraints: false })
-  @JoinTable({
-    name: 'role_tenant',
-    joinColumn: { name: 'role_id' },
-    inverseJoinColumn: { name: 'tenant_id' },
-  })
-  tenant: TenantEntity[];
+  // @ManyToMany(() => TenantEntity, { createForeignKeyConstraints: false })
+  // @JoinTable({
+  //   name: 'role_tenant',
+  //   joinColumn: { name: 'role_id' },
+  //   inverseJoinColumn: { name: 'tenant_id' },
+  // })
+  // tenant: TenantEntity[];
 }
