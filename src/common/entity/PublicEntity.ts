@@ -12,7 +12,7 @@ export abstract class PublicEntity {
   id: number;
 
   @Generated('uuid')
-  @Column({ name: 'tenant_Id' })
+  @Column({ name: 'tenant_Id', nullable: true })
   tenantId: string;
 
   @CreateDateColumn({

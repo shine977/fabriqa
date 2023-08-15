@@ -16,11 +16,14 @@ export class AuthService {
     private configServie: ConfigService,
   ) {}
 
-  async authenticate(username: string): Promise<Partial<UserEntity> | UnifySigleResponse> {
+  async login(username: string): Promise<Partial<UserEntity> | UnifySigleResponse> {
     const user = await this.userService.findOneByUsername(username);
     if (!user) {
       return unifyResponse(ErrorCode.code, CodeTips.c1001);
     }
+    return this.authenticate(user);
+  }
+  async authenticate(user: UserEntity): Promise<Partial<UserEntity> | UnifySigleResponse> {
     const { accessToken, refreshToken } = await this.getTokens(user);
     await this.userService.updateRefreshToken(user.uid, refreshToken);
     return unifyResponse({ item: { ...user, accessToken, refreshToken } }, '注册成功');
@@ -31,6 +34,7 @@ export class AuthService {
         {
           username: user.username,
           sub: user.uid,
+          tenantId: user.tenantId,
         },
         {
           secret: this.configServie.get('JWT_ACCESS_SECRET'),
@@ -41,6 +45,7 @@ export class AuthService {
         {
           username: user.username,
           sub: user.uid,
+          tenantId: user.tenantId,
         },
         {
           secret: this.configServie.get('JWT_REFRESH_SECRET'),

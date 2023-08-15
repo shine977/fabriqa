@@ -9,11 +9,12 @@ import { AuthenticateGuard } from '../common/guards/auth.guard';
 import { UserModule } from 'src/user/user.module';
 
 import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
+import { TenantModule } from 'src/tenant/tenant.module';
 
 @Module({
   imports: [
     UserModule,
-
+    TenantModule,
     // JwtModule.registerAsync({
     //   useFactory: (config: ConfigService) => {
     //     return config.get('jwt');

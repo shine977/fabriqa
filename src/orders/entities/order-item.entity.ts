@@ -18,6 +18,7 @@ export class OrderItemEntity extends PublicEntity {
   unit: string;
   @Column({ type: 'int', width: 50, comment: '数量' })
   quantity: number;
+
   @Column({
     name: 'unit_price',
     type: 'decimal',

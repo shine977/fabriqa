@@ -5,13 +5,10 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 export class ProductEntity extends PublicEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
-  @Column({ type: 'varchar', length: 255 })
-  material: string;
+
+  @Column({ name: 'material_id', nullable: true })
+  materialId: string;
+
   @Column({ type: 'varchar', length: 255 })
   color: string;
-  @Column({ type: 'decimal', precision: 2, width: 50 })
-  price: number;
-
-  @ManyToOne(() => TenantEntity, (tenant) => tenant.products, { createForeignKeyConstraints: false })
-  tenant: TenantEntity;
 }

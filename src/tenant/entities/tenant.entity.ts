@@ -14,7 +14,7 @@ export class TenantEntity extends PublicEntity {
   description: string;
   @OneToMany(() => UserEntity, (user) => user.tenant)
   users: UserEntity[];
-  @OneToMany(() => ProductEntity, (product) => product.tenant)
+  @OneToMany(() => ProductEntity, (product) => product)
   products: ProductEntity[];
 
   @OneToMany(() => OrderEntity, (order) => order.tenant)

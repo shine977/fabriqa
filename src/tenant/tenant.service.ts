@@ -19,9 +19,11 @@ export class TenantService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} tenant`;
+    return this.tenantRepo.findOne({ where: { id } });
   }
-
+  findOneByName(name: string) {
+    return this.tenantRepo.findOne({ where: { name } });
+  }
   update(id: number, updateTenantDto: UpdateTenantDto) {
     return `This action updates a #${id} tenant`;
   }

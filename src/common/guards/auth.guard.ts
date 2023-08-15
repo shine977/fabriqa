@@ -11,7 +11,7 @@ export class AuthenticateGuard implements CanActivate {
     const isPublic = this.reflector.getAllAndOverride(IS_PUBLIC_KEY, [context.getHandler(), context.getClass()]);
     console.log('isPublic~~~', isPublic);
     if (isPublic) return true;
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractTokenFromHeader(request);
     console.log('token~~~', token);
     if (!token) throw new UnauthorizedException();
@@ -25,6 +25,7 @@ export class AuthenticateGuard implements CanActivate {
         throw new UnauthorizedException('Token过期，请重新登录！');
       }
       request['user'] = payload;
+      request.params.tenantId = payload.tenantId;
     } catch {
       throw new UnauthorizedException();
     }

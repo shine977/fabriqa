@@ -27,7 +27,7 @@ export class UserEntity extends PublicEntity {
   @Column({ type: 'enum', enum: UserTypeEnum, default: UserTypeEnum.EMPLOYEE })
   type: string;
 
-  @Column({ name: 'refresh_Token' })
+  @Column({ name: 'refresh_Token', nullable: true, length: 800 })
   refreshToken: string;
 
   @OneToMany(() => RoleEntity, (role) => role.user)

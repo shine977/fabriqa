@@ -5,13 +5,31 @@ export class CreateUserDto {
   @IsString()
   username: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  tenantId: string;
+  tenantId?: string;
 
   @IsNotEmpty()
   @IsString()
   password: string;
   @IsOptional()
-  email: string;
+  email?: string;
+}
+
+export class CreateTenantUserDto {
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @IsNotEmpty()
+  @IsString()
+  username: string;
+
+  @IsOptional()
+  @IsString()
+  description: string;
+
+  @IsNotEmpty()
+  @IsString()
+  password: string;
 }
