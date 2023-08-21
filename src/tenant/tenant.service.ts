@@ -5,12 +5,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TenantEntity } from './entities/tenant.entity';
 import { Repository } from 'typeorm';
 import { unifyResponse } from 'src/common/utils/unifyResponse';
-
+import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class TenantService {
   constructor(@InjectRepository(TenantEntity) private readonly tenantRepo: Repository<TenantEntity>) {}
   create(createTenantDto: CreateTenantDto) {
-    return this.tenantRepo.save(createTenantDto);
+    return this.tenantRepo.save({ ...createTenantDto, tenantId: uuidv4().replace(/-/gi, '') });
   }
 
   async findAll() {
@@ -18,8 +18,9 @@ export class TenantService {
     return unifyResponse({ items, total });
   }
 
-  findOne(id: number) {
-    return this.tenantRepo.findOne({ where: { id } });
+  async findOne(tenantId: string) {
+    const item = await this.tenantRepo.findOne({ where: { tenantId } });
+    return unifyResponse({ item });
   }
   findOneByName(name: string) {
     return this.tenantRepo.findOne({ where: { name } });

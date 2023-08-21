@@ -13,7 +13,7 @@ export class AuthenticateGuard implements CanActivate {
     if (isPublic) return true;
     const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractTokenFromHeader(request);
-    console.log('token~~~', token);
+
     if (!token) throw new UnauthorizedException();
     try {
       const payload = await this.jwtService.verifyAsync(token, {

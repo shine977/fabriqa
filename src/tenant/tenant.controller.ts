@@ -19,7 +19,7 @@ export class TenantController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.tenantService.findOne(+id);
+    return this.tenantService.findOne(id);
   }
 
   @Patch(':id')

@@ -18,6 +18,7 @@ export class ProductsService {
   }
 
   findAll() {
+    console.log(this.request.params);
     return `This action returns all products`;
   }
 

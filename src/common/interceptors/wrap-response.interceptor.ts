@@ -7,13 +7,17 @@ export class WrapResponseInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler<UnifyResponse>): Observable<any> {
     return next.handle().pipe(
       map((data) => {
-        const response = data || ({ code: 0, message: 'Succesfully' } as UnifyResponse);
+        let response = data || ({ code: 0, message: 'Succesfully' } as UnifyResponse);
         if (data) {
-          if (!data.code) {
-            response.code = 0;
-          }
-          if (!data.message) {
-            response.message = 'Successfully';
+          if (typeof data == 'object') {
+            if (!data.code) {
+              response.code = 0;
+            }
+            if (!data.message) {
+              response.message = 'Successfully';
+            }
+          } else {
+            response = { code: 0, message: data } as unknown as UnifyResponse;
           }
         }
 

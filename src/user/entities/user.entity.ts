@@ -1,8 +1,9 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
-import { Column, Entity, Generated, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { RoleEntity } from './role.entity';
 import { TenantEntity } from 'src/tenant/entities/tenant.entity';
 
+import { UUIDTransformer } from 'src/common/utils/uuidTransformer';
 export enum UserTypeEnum {
   ADMIN = 'ADMIN',
   EMPLOYEE = 'EMPLOYEE',
@@ -11,8 +12,7 @@ export enum UserTypeEnum {
 
 @Entity({ name: 'users' })
 export class UserEntity extends PublicEntity {
-  @Generated('uuid')
-  @Column({ type: 'varchar', length: 64 })
+  @Column({ type: 'uuid', length: 64, generated: 'uuid' })
   uid: string;
 
   @Column({ unique: true, length: 32 })

@@ -19,7 +19,7 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
-  @Get(':id') 4;
+  @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);
   }

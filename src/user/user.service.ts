@@ -19,7 +19,7 @@ export class UserService {
   ) {}
   async create(user: CreateUserDto) {
     user.password = encryptData(user.password);
-    return await this.userRepository.save(this.userRepository.create(user));
+    return await this.userRepository.save(user);
   }
 
   async findAll(query) {

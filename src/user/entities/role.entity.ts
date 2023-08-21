@@ -1,13 +1,11 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
-import { Column, Entity, Generated, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { MenuEntity } from './menu.entity';
-import { TenantEntity } from 'src/tenant/entities/tenant.entity';
 
 @Entity({ name: 'roles' })
 export class RoleEntity extends PublicEntity {
-  @Generated('uuid')
-  @Column({ name: 'role_id', type: 'varchar', length: 64 })
+  @Column({ name: 'role_id', type: 'uuid', length: 64, generated: 'uuid' })
   roleId: string;
 
   @Column({ unique: true })

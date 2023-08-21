@@ -4,8 +4,8 @@ import { CreatePartDto } from './dto/create-component.dto';
 import { UpdatePartDto } from './dto/update-component.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Part')
-@Controller('part')
+@ApiTags('Component')
+@Controller('component')
 export class PartController {
   constructor(private readonly partService: PartService) {}
 
