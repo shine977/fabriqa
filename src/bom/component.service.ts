@@ -6,19 +6,21 @@ import { Request } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ComponentEntity } from './entities/component.entity';
 import { Repository } from 'typeorm';
+import { unifyResponse } from 'src/common/utils/unifyResponse';
 
 @Injectable()
 export class PartService {
   constructor(
-    @Inject(REQUEST) request: Request,
+    @Inject(REQUEST) private readonly request: Request,
     @InjectRepository(ComponentEntity) private readonly compReop: Repository<ComponentEntity>,
   ) {}
   create(createPartDto: CreatePartDto) {
-    return 'This action adds a new part';
+    return this.compReop.save({ tenantId: this.request.params.tenantId, ...createPartDto });
   }
 
-  findAll() {
-    return `This action returns all part`;
+  async findAll() {
+    const [items, total] = await this.compReop.findAndCount();
+    return unifyResponse({ items, total });
   }
 
   findOne(id: number) {
