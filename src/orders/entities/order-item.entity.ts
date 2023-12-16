@@ -1,6 +1,7 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { OrderEntity } from './order.entity';
+
 @Entity({ name: 'order_items', orderBy: { created_at: 'DESC' } })
 export class OrderItemEntity extends PublicEntity {
   @Column({ name: 'order_no' })
@@ -30,5 +31,6 @@ export class OrderItemEntity extends PublicEntity {
   unitPrice: number;
 
   @ManyToOne(() => OrderEntity, (order) => order.items)
+  @JoinColumn({ name: 'order_id' })
   order: OrderEntity;
 }

@@ -13,7 +13,10 @@ export class OrdersController {
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.ordersService.create(createOrderDto);
   }
-
+  @Get('/items')
+  findAllItems() {
+    return this.ordersService.findAllItems();
+  }
   @Get()
   findAll() {
     return this.ordersService.findAll();
