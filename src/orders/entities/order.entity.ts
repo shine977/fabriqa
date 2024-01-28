@@ -21,7 +21,7 @@ export class OrderEntity extends PublicEntity {
   amount: number;
 
   @Column({ type: 'datetime', name: 'purchase_date', comment: '采购日期' })
-  purchaseDate: number;
+  purchaseDate: Date;
 
   @Column({
     type: 'varchar',

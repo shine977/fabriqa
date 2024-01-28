@@ -5,4 +5,7 @@ export class CreateOrderDto {
 
   materials?: [];
   items: OrderItemEntity[];
+
+  amount: number;
+  purchaseDate: Date;
 }
