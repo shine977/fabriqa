@@ -3,6 +3,7 @@ import { TenantEntity } from 'src/tenant/entities/tenant.entity';
 import { ORDER } from 'src/types/Order';
 import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 import { OrderItemEntity } from './order-item.entity';
+import { DecimalColumnTransformer } from 'src/common/utils/transformer';
 
 @Entity({ name: 'orders', orderBy: { created_at: 'DESC' } })
 export class OrderEntity extends PublicEntity {
@@ -13,10 +14,11 @@ export class OrderEntity extends PublicEntity {
   type: ORDER;
   @Column({
     type: 'decimal',
-    width: 50,
-    precision: 2,
+    precision: 20,
+    scale: 3,
     comment: '金额',
     nullable: true,
+    transformer: new DecimalColumnTransformer(),
   })
   amount: number;
 

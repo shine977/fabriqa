@@ -1,7 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { ComponentEntity } from './component.entity';
 import { PublicEntity } from 'src/common/entity/PublicEntity';
-import { CustomerEntity } from 'src/customers/entities/customer.entity';
+import { FactoryEntity } from 'src/factory/entities/factory.entity';
+import { DecimalColumnTransformer } from 'src/common/utils/transformer';
 
 @Entity({ name: 'molds', orderBy: { created_at: 'DESC' } })
 export class MoldEntity extends PublicEntity {
@@ -14,13 +15,20 @@ export class MoldEntity extends PublicEntity {
   @Column({ type: 'varchar', length: 60, comment: '几出几？' })
   xoutx: string;
 
-  @Column({ type: 'decimal', precision: 2, default: 0, comment: '价格' })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 3,
+    default: 0,
+    comment: '价格',
+    transformer: new DecimalColumnTransformer(),
+  })
   price: number;
 
   @OneToMany(() => ComponentEntity, (component) => component)
   components: ComponentEntity;
 
-  @ManyToOne(() => CustomerEntity, (customer) => customer.molds, { createForeignKeyConstraints: false })
-  @JoinColumn({ name: 'customer_id' })
-  customer: CustomerEntity;
+  @ManyToOne(() => FactoryEntity, (customer) => customer.molds, { createForeignKeyConstraints: false })
+  @JoinColumn({ name: 'fac_id' })
+  factory: FactoryEntity;
 }

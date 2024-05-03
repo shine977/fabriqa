@@ -1,6 +1,7 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { OrderEntity } from './order.entity';
+import { DecimalColumnTransformer } from 'src/common/utils/transformer';
 
 @Entity({ name: 'order_items', orderBy: { created_at: 'DESC' } })
 export class OrderItemEntity extends PublicEntity {
@@ -18,15 +19,16 @@ export class OrderItemEntity extends PublicEntity {
 
   @Column({ type: 'varchar', length: 255, comment: '单位', default: 'pcs' })
   unit: string;
-  @Column({ type: 'int', width: 50, comment: '数量' })
+  @Column({ type: 'decimal', precision: 20, scale: 2, comment: '数量', transformer: new DecimalColumnTransformer() })
   quantity: number;
 
   @Column({
     name: 'unit_price',
     type: 'decimal',
-    width: 50,
-    precision: 2,
+    precision: 10,
+    scale: 3,
     comment: '单价',
+    transformer: new DecimalColumnTransformer(),
   })
   unitPrice: number;
 

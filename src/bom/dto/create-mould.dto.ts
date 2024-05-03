@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 import { ComponentEntity } from '../entities/component.entity';
-import { CustomerEntity } from 'src/customers/entities/customer.entity';
+import { FactoryEntity } from 'src/factory/entities/factory.entity';
 
 export class CreateMouldDto {
   @IsNotEmpty()
@@ -10,5 +10,5 @@ export class CreateMouldDto {
   xoutx: string;
 
   parts: Array<ComponentEntity>;
-  customer: CustomerEntity;
+  customer: FactoryEntity;
 }

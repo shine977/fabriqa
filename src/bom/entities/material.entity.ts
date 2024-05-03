@@ -1,6 +1,7 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { ComponentEntity } from './component.entity';
+import { DecimalColumnTransformer } from 'src/common/utils/transformer';
 
 export enum MATERIAL_TYPE {
   PLASTIC = 'plastic',
@@ -13,7 +14,14 @@ export class MaterialEntity extends PublicEntity {
   @Column({ type: 'varchar', length: 100, comment: '材料名称' })
   name: string;
 
-  @Column({ type: 'decimal', precision: 2, comment: '单价', default: 0 })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 3,
+    comment: '单价',
+    default: 0,
+    transformer: new DecimalColumnTransformer(),
+  })
   price: number;
 
   @Column({

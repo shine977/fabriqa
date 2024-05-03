@@ -1,4 +1,5 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
+import { DecimalColumnTransformer } from 'src/common/utils/transformer';
 import { TenantEntity } from 'src/tenant/entities/tenant.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 @Entity({ name: 'deliveries', orderBy: { created_at: 'DESC' } })
@@ -17,10 +18,16 @@ export class DeliveryEntity extends PublicEntity {
   name: string;
   @Column({ type: 'varchar', length: 255 })
   unit: string;
-  @Column({ type: 'decimal', width: 65, precision: 2 })
+  @Column({ type: 'decimal', precision: 20, scale: 3, transformer: new DecimalColumnTransformer() })
   quantity: number;
-  @Column({ type: 'decimal', width: 65, precision: 2 })
-  actual_quantity_received: number;
+  @Column({
+    name: 'actual_quantity_received',
+    type: 'decimal',
+    precision: 20,
+    scale: 3,
+    transformer: new DecimalColumnTransformer(),
+  })
+  actualQuantityReceived: number;
 
   @ManyToOne(() => TenantEntity, (tenant) => tenant.deliveries, { createForeignKeyConstraints: false })
   tenant: TenantEntity;

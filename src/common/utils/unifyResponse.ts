@@ -7,7 +7,7 @@ export interface UnifyObjectResponse {
 }
 export interface UnifyPaginationResponse {
   items: any[];
-  take?: number;
+  pageSize?: number;
   current?: number;
   total: number;
 }
@@ -45,7 +45,7 @@ export function unifyResponse(options: any, message?: string): UnifySigleRespons
     if (options.code) {
       response.code = options.code;
     }
-    response.take = options.take || 10;
+    response.pageSize = options.pageSize || 10;
     response.current = options.current || 1;
 
     response.total = options.total;

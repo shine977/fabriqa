@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CustomersModule } from './customers/customers.module';
 import { ProductsModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
 import { DeliveriesModule } from './deliveries/deliveries.module';
@@ -17,6 +16,8 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { RequestMiddleware } from './middleware/request.middleware';
 import { TenantModule } from './tenant/tenant.module';
+import { FactoryModule } from './factory/factory.module';
+import { StatementModule } from './statement/statement.module';
 
 @Module({
   imports: [
@@ -30,8 +31,9 @@ import { TenantModule } from './tenant/tenant.module';
       database: 'injecting_factory',
       synchronize: true,
       autoLoadEntities: true,
+      logging: true,
+      // logger: 'debug',
     }),
-    CustomersModule,
     ProductsModule,
     OrdersModule,
     DeliveriesModule,
@@ -41,6 +43,8 @@ import { TenantModule } from './tenant/tenant.module';
     AuthModule,
     UserModule,
     TenantModule,
+    FactoryModule,
+    StatementModule,
   ],
   controllers: [AppController],
   providers: [AppService],

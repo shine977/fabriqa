@@ -3,7 +3,7 @@ import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { RoleEntity } from './role.entity';
 import { TenantEntity } from 'src/tenant/entities/tenant.entity';
 
-import { UUIDTransformer } from 'src/common/utils/uuidTransformer';
+import { UUIDTransformer } from 'src/common/utils/transformer';
 export enum UserTypeEnum {
   ADMIN = 'ADMIN',
   EMPLOYEE = 'EMPLOYEE',

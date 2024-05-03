@@ -10,12 +10,8 @@ export class WrapResponseInterceptor implements NestInterceptor {
         let response = data || ({ code: 0, message: 'Succesfully' } as UnifyResponse);
         if (data) {
           if (typeof data == 'object') {
-            if (!data.code) {
-              response.code = 0;
-            }
-            if (!data.message) {
-              response.message = 'Successfully';
-            }
+            response.code ||= 0;
+            response.message ||= 'Successfully';
           } else {
             response = { code: 0, message: data } as unknown as UnifyResponse;
           }
