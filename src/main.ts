@@ -3,8 +3,8 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 // import { ValidationPipe } from './common/pipe/validation.pipe';
 import 'dotenv';
-import { HttpExceptionFilter } from './common/filters/http-exception/http-exception.filter';
-import { WrapResponseInterceptor } from './common/interceptors/wrap-response.interceptor';
+import { HttpExceptionFilter } from './filters/http-exception/http-exception.filter';
+import { WrapResponseInterceptor } from './interceptors/wrap-response.interceptor';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
