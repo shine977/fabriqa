@@ -15,6 +15,9 @@ export class RolePermissionEnitity {
     @PrimaryColumn()
     resourceId: number;
 
+    @PrimaryColumn()
+    menuId: number
+
     @ManyToOne(() => RoleEntity, role => role.rolePermissions, { createForeignKeyConstraints: false })
     @JoinColumn({ name: 'roleId' })
     role: RoleEntity;
@@ -26,4 +29,8 @@ export class RolePermissionEnitity {
     @ManyToOne(() => ResourceEntity, resource => resource.rolePermissions, { createForeignKeyConstraints: false })
     @JoinColumn({ name: 'resourceId' })
     resource: ResourceEntity;
+
+    @ManyToOne(() => ResourceEntity, resource => resource.rolePermissions, { createForeignKeyConstraints: false })
+    @JoinColumn({ name: 'meunId' })
+    menu: ResourceEntity;
 }

@@ -1,11 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { RoleEntity } from './entities/role.entity';
+import { Repository } from 'typeorm';
+import { RolePermissionEnitity } from './entities/rolePermission.entity';
 
 @Injectable()
 export class RoleService {
+  constructor(
+    @InjectRepository(RoleEntity) private readonly roleRepo: Repository<RoleEntity>,
+    @InjectRepository(RolePermissionEnitity) private readonly rolePerRepo: Repository<RolePermissionEnitity>) { }
   create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
+    return this.roleRepo.save(createRoleDto)
   }
 
   findAll() {
