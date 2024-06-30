@@ -1,12 +1,12 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne } from 'typeorm';
 import { MaterialEntity } from './material.entity';
 import { MoldEntity } from './mold.entity';
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { DecimalColumnTransformer } from 'src/common/utils/transformer';
 import { FactoryEntity } from 'src/module/factory/entities/factory.entity';
 
-@Entity({ name: 'plastic_parts', orderBy: { created_at: 'DESC' } })
-export class PlasticPartsEntity extends PublicEntity {
+@Entity({ name: 'components', orderBy: { created_at: 'DESC' } })
+export class ComponentEntity extends PublicEntity {
   @Column({
     type: 'decimal',
     name: 'processing_cost',
@@ -27,13 +27,14 @@ export class PlasticPartsEntity extends PublicEntity {
     precision: 20,
     scale: 3,
     nullable: true,
-    default: 0,
+
     transformer: new DecimalColumnTransformer(),
   })
-  moldCost: string;
+  moldCost: number;
   @Column({
     type: 'varchar',
     length: 500,
+    nullable: true
   })
   images: string;
 
@@ -44,10 +45,10 @@ export class PlasticPartsEntity extends PublicEntity {
     scale: 3,
     comment: '设计费',
     nullable: true,
-    default: 0,
+
     transformer: new DecimalColumnTransformer(),
   })
-  designCost: string;
+  designCost: number;
 
   @Column({
     type: 'decimal',
@@ -59,15 +60,6 @@ export class PlasticPartsEntity extends PublicEntity {
   })
   gramWeight: number;
 
-  @Column({
-    type: 'decimal',
-    name: 'sample_weight',
-    precision: 10,
-    scale: 3,
-    comment: '样品克重',
-    transformer: new DecimalColumnTransformer(),
-  })
-  sampleWeight: number;
 
   @Column({
     type: 'decimal',
@@ -80,15 +72,15 @@ export class PlasticPartsEntity extends PublicEntity {
   })
   gateWeight: number;
 
-  @ManyToOne(() => MaterialEntity, (materail) => materail.plasticPart, { createForeignKeyConstraints: false })
+  @ManyToOne(() => MaterialEntity, (materail) => materail.component, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'material_id' })
   material: MaterialEntity;
 
-  @ManyToOne(() => MoldEntity, (mold) => mold.plasticPart, { createForeignKeyConstraints: false })
+  @ManyToOne(() => MoldEntity, (mold) => mold.component, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'mold_id' })
   mold: MoldEntity;
 
-  @ManyToOne(() => FactoryEntity, (factory) => factory.plasticPart, { createForeignKeyConstraints: false })
+  @ManyToOne(() => FactoryEntity, (factory) => factory.components, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'factory_id' })
-  factory: FactoryEntity;
+  factory: FactoryEntity[];
 }

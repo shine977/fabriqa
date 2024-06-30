@@ -5,7 +5,7 @@ import { UpdateStatementDto } from './dto/update-statement.dto';
 
 @Controller('statement')
 export class StatementController {
-  constructor(private readonly statementService: StatementService) {}
+  constructor(private readonly statementService: StatementService) { }
 
   @Post()
   create(@Body() createStatementDto: CreateStatementDto) {
@@ -14,7 +14,6 @@ export class StatementController {
 
   @Get()
   findAll(@Query() query) {
-    console.log(query);
     return this.statementService.findAll(query);
   }
 

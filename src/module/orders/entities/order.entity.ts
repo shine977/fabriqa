@@ -1,17 +1,16 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { TenantEntity } from 'src/module/tenant/entities/tenant.entity';
-import { ORDER } from 'src/types/Order';
-import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
+
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { OrderItemEntity } from './order-item.entity';
 import { DecimalColumnTransformer } from 'src/common/utils/transformer';
+export enum ORDER {
+  'sales' = 'sales',
+  'purchase' = 'purchase',
+}
 
 @Entity({ name: 'orders', orderBy: { created_at: 'DESC' } })
 export class OrderEntity extends PublicEntity {
-  @Index()
-  @Column({ type: 'varchar', length: 255, comment: '订单号' })
-  no: string;
-  @Column()
-  type: ORDER;
   @Column({
     type: 'decimal',
     precision: 20,
@@ -21,6 +20,10 @@ export class OrderEntity extends PublicEntity {
     transformer: new DecimalColumnTransformer(),
   })
   amount: number;
+
+  @Column()
+  orderNo: string
+
 
   @Column({ type: 'datetime', name: 'purchase_date', comment: '采购日期' })
   purchaseDate: Date;
@@ -33,13 +36,19 @@ export class OrderEntity extends PublicEntity {
   })
   paymentClause: string;
 
-  @Column({ type: 'datetime', comment: '交期' })
+  @Column({
+    name: 'task_order_no',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  taskOrderNo: string;
+
+  @Column({ type: 'datetime', nullable: true })
   delivery: Date;
 
-  @Column({ type: 'json' })
-  materials: [];
-
-  @ManyToOne(() => TenantEntity, (tenant) => tenant.orders, { createForeignKeyConstraints: false })
+  @ManyToOne(() => TenantEntity, (tenant) => tenant.orders)
+  @JoinColumn({ name: 'tenant_id' })
   tenant: TenantEntity;
 
   @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.order)

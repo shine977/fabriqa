@@ -6,28 +6,31 @@ import { StatementEntity } from './entities/statement.entity';
 import { Repository } from 'typeorm';
 import { unifyResponse } from 'src/common/utils/unifyResponse';
 import { round, multiply } from 'mathjs';
+import { ContextService } from 'src/service/context.service';
 
 
 @Injectable()
 export class StatementService {
-  constructor(@InjectRepository(StatementEntity) private readonly StateRepo: Repository<StatementEntity>) { }
-  create(createStatementDto: CreateStatementDto) {
-    return this.StateRepo.save(createStatementDto);
+  constructor(
+    private context: ContextService,
+    @InjectRepository(StatementEntity) private readonly StateRepo: Repository<StatementEntity>) { }
+  async create(createStatementDto: CreateStatementDto) {
+    const criteria = await this.context.buildTenantCriteria()
+    console.log(createStatementDto)
+    const { unitPrice, quantity } = createStatementDto
+    const item = await this.StateRepo.save({ ...criteria, amount: round(multiply(unitPrice, quantity), 3), ...createStatementDto })
+    return unifyResponse({ item })
   }
   async findAll(query) {
-    const [results, total] = await this.StateRepo.createQueryBuilder('state')
+    const [items, total] = await this.StateRepo.createQueryBuilder('state')
 
       .leftJoinAndSelect('state.factory', 'factory')
       // .addSelect(`ROUND(state.unit_price * state.quantity, 2)`, `state.amount`)
       .offset((query.current - 1) * query.pageSize)
       .limit(query.pageSize)
       .getManyAndCount();
-    console.log('results', results)
-    const items = results.map((product) => ({
-      ...product,
-      // amount: Math.round((product.unitPrice * product.quantity + Number.EPSILON) * 100) / 100,
-      amount: round(multiply(product.unitPrice, product.quantity), 3),
-    }));
+
+
     return unifyResponse({ items, total });
 
   }

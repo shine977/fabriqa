@@ -18,19 +18,19 @@ export class RolePermissionEnitity {
     @PrimaryColumn()
     menuId: number
 
-    @ManyToOne(() => RoleEntity, role => role.rolePermissions, { createForeignKeyConstraints: false })
-    @JoinColumn({ name: 'roleId' })
-    role: RoleEntity;
+    // @ManyToOne(() => RoleEntity, role => role.rolePermissions, { createForeignKeyConstraints: false })
+    // @JoinColumn({ name: 'roleId' })
+    // role: RoleEntity;
 
-    @ManyToOne(() => PermissioEntity, permission => permission.rolePermissions, { createForeignKeyConstraints: false })
-    @JoinColumn({ name: 'permissionId' })
-    permission: PermissioEntity;
+    // @ManyToOne(() => PermissioEntity, permission => permission.rolePermissions, { createForeignKeyConstraints: false })
+    // @JoinColumn({ name: 'permissionId' })
+    // permission: PermissioEntity;
 
-    @ManyToOne(() => ResourceEntity, resource => resource.rolePermissions, { createForeignKeyConstraints: false })
-    @JoinColumn({ name: 'resourceId' })
-    resource: ResourceEntity;
+    // @ManyToOne(() => ResourceEntity, resource => resource.rolePermissions, { createForeignKeyConstraints: false })
+    // @JoinColumn({ name: 'resourceId' })
+    // resource: ResourceEntity;
 
-    @ManyToOne(() => ResourceEntity, resource => resource.rolePermissions, { createForeignKeyConstraints: false })
-    @JoinColumn({ name: 'meunId' })
-    menu: ResourceEntity;
+    // @ManyToOne(() => ResourceEntity, resource => resource.rolePermissions, { createForeignKeyConstraints: false })
+    // @JoinColumn({ name: 'meunId' })
+    // menu: ResourceEntity;
 }

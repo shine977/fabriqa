@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { PlasticPartsEntity } from './plasticParts.entity';
+import { ComponentEntity } from './component.entity';
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { FactoryEntity } from 'src/module/factory/entities/factory.entity';
 import { DecimalColumnTransformer } from 'src/common/utils/transformer';
@@ -25,9 +25,9 @@ export class MoldEntity extends PublicEntity {
   })
   price: number;
 
-  @OneToMany(() => PlasticPartsEntity, (component) => component, { createForeignKeyConstraints: false })
-  @JoinColumn({ name: 'plastic_parts' })
-  plasticPart: PlasticPartsEntity;
+  @OneToMany(() => ComponentEntity, (component) => component, { createForeignKeyConstraints: false })
+  @JoinColumn({ name: 'component_id' })
+  component: ComponentEntity;
 
   @ManyToOne(() => FactoryEntity, (customer) => customer.molds, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'fac_id' })

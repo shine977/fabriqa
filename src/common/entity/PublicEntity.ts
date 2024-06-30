@@ -5,6 +5,9 @@ export abstract class PublicEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'varchar', length: 32, nullable: true })
+  uid: string;
+
   @Column({ type: 'uuid', name: 'tenant_id', nullable: true })
   tenantId: string;
 

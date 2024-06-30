@@ -3,21 +3,17 @@ import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 export class CreatePartDto {
   @IsNotEmpty()
   @IsNumber()
-  processingFee: number;
+  processingCost: number;
 
   @IsOptional()
   @IsNumber()
-  moldFee: number;
+  moldCost: number;
 
   @IsOptional()
   @IsNumber()
-  designFee: number;
+  designCost: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   gramWeight: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  sampleWeight: number;
 }

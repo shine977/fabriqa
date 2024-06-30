@@ -4,10 +4,11 @@ import { MaterialController } from './material.controller';
 import { PartModule } from './component.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MaterialEntity } from './entities/material.entity';
+import { ContextService } from 'src/service/context.service';
 
 @Module({
   controllers: [MaterialController],
-  providers: [MaterialService],
+  providers: [MaterialService, ContextService],
   imports: [PartModule, TypeOrmModule.forFeature([MaterialEntity])],
 })
-export class MaterialModule {}
+export class MaterialModule { }

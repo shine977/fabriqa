@@ -1,4 +1,4 @@
-import { Controller, Post, Body, BadRequestException, Req, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, Req, Get, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -8,6 +8,7 @@ import { UserService } from 'src/module/user/user.service';
 import { CodeTips } from 'src/config/code';
 import { RefreshTokenGuard } from 'src/guards/refreshToken.guard';
 import { TenantService } from 'src/module/tenant/tenant.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -19,9 +20,10 @@ export class AuthController {
   ) { }
 
   @Post('login')
+  @UseGuards(AuthGuard('local'))
   @Public()
-  login(@Body() user: CreateUserDto) {
-    return this.authService.login(user.username);
+  login(@Request() req) {
+    return this.authService.login(req.username);
   }
   @Post('register/user')
   @Public()

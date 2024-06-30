@@ -29,6 +29,7 @@ export class AuthService {
     return unifyResponse({ item: { ...user, accessToken, refreshToken } }, '注册成功');
   }
   async getTokens(user: UserEntity) {
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
@@ -58,16 +59,19 @@ export class AuthService {
       refreshToken,
     };
   }
-  async validateUser(uid: string) {
-    return await this.userService.findByUId(uid);
+  async validateUser(username: string, pass: string) {
+    const user = await this.userService.findOneByUsername(username)
+    console.log('validateUser', user)
+    if (user && user.password === pass) return user
+    return null
   }
+
   async refreshToken(userId: string, refreshToken: string) {
     const user = await this.userService.findByUId(userId);
 
     if (!user || !user.refreshToken) {
       throw new ForbiddenException('Access Denied');
     }
-    console.log('refreshToken == user.refreshToken', refreshToken == user.refreshToken);
     if (refreshToken !== user.refreshToken) throw new ForbiddenException('Access Denied');
     const token = await this.getTokens(user);
     await this.userService.updateRefreshToken(userId, token.refreshToken);

@@ -1,6 +1,7 @@
+import { RoleEntity } from 'src/module/role/entities/role.entity';
 import { RolePermissionEnitity } from 'src/module/role/entities/rolePermission.entity';
 import { TenantEntity } from 'src/module/tenant/entities/tenant.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 
 @Entity({ name: 'resource', orderBy: { created_at: 'DESC' } })
 export class ResourceEntity {
@@ -20,6 +21,7 @@ export class ResourceEntity {
     @JoinColumn({ name: 'tenant_id', },)
     tenant: TenantEntity;
 
-    @OneToMany(() => RolePermissionEnitity, rolePermission => rolePermission.resource, { createForeignKeyConstraints: false })
-    rolePermissions: TenantEntity[];
+    @ManyToMany(() => RoleEntity, role => role.menus, { createForeignKeyConstraints: false })
+    @JoinTable()
+    roles: RoleEntity[];
 }

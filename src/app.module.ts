@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod, Scope } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -23,6 +23,11 @@ import { ResourceModule } from './module/resource/resource.module';
 import { MenuModule } from './module/menu/menu.module';
 import { RoleModule } from './module/role/role.module';
 import { PermissionModule } from './module/permission/permission.module';
+import { PolicyModule } from './module/policy/policy.module';
+
+import { REQ_USER_CONTEXT } from './common/utils/constant';
+import { ReceivingModule } from './module/receiving/receiving.module';
+import { FileUploadModule } from './module/file-upload/file-upload.module';
 
 
 @Module({
@@ -54,7 +59,10 @@ import { PermissionModule } from './module/permission/permission.module';
     PermissionModule,
     ResourceModule,
     MenuModule,
-    TenantModule
+    TenantModule,
+    PolicyModule,
+    ReceivingModule,
+    FileUploadModule
   ],
   controllers: [AppController],
   providers: [AppService],

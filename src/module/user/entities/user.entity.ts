@@ -1,9 +1,6 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
-
 import { TenantEntity } from 'src/module/tenant/entities/tenant.entity';
-
-import { UUIDTransformer } from 'src/common/utils/transformer';
 import { UserRoleEntity } from './userRole.entity';
 export enum UserTypeEnum {
   ROOT = 'ROOT',
@@ -29,7 +26,6 @@ export class UserEntity extends PublicEntity {
 
   @Column({ name: 'refresh_Token', nullable: true, length: 800 })
   refreshToken: string;
-
 
   @ManyToOne(() => TenantEntity, (tenant) => tenant.users, { createForeignKeyConstraints: false })
   tenant: TenantEntity;

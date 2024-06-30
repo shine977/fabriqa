@@ -5,21 +5,33 @@ import { DecimalColumnTransformer } from 'src/common/utils/transformer';
 
 @Entity({ name: 'order_items', orderBy: { created_at: 'DESC' } })
 export class OrderItemEntity extends PublicEntity {
-  @Column({ name: 'order_no' })
+  @Column({ name: 'order_no', nullable: true })
   orderNo: string;
 
+  @Column()
+  name: string;
+
+  @Column({ name: 'material_no', })
+  materialNo: string;
+
+  @Column({ name: 'material_code', nullable: true })
+  materialCode: string;
+
+  @Column({ nullable: true })
+  specification: string;
   @Column({
-    name: 'task_no',
+    name: 'task_order_no',
     type: 'varchar',
     length: 255,
-    comment: '任务书号',
     nullable: true,
   })
-  taskNo: string;
+  taskOrderNo: string;
 
   @Column({ type: 'varchar', length: 255, comment: '单位', default: 'pcs' })
   unit: string;
-  @Column({ type: 'decimal', precision: 20, scale: 2, comment: '数量', transformer: new DecimalColumnTransformer() })
+  @Column({ type: 'datetime', nullable: true })
+  delivery: Date;
+  @Column({ type: 'decimal', precision: 20, scale: 2, nullable: true, transformer: new DecimalColumnTransformer() })
   quantity: number;
 
   @Column({

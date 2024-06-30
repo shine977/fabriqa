@@ -3,7 +3,9 @@ import { MoldEntity } from 'src/module/bom/entities/mold.entity';
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { DecimalColumnTransformer } from 'src/common/utils/transformer';
 import { StatementEntity } from 'src/module/statement/entities/statement.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
+import { MaterialEntity } from 'src/module/bom/entities/material.entity';
+import { ComponentEntity } from 'src/module/bom/entities/component.entity';
 
 export enum CURRENCY {
   RMB = 'RMB',
@@ -23,10 +25,9 @@ export enum FactoryType {
 export class FactoryEntity extends PublicEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
-
-  @Column({ name: 'delivery_address', type: 'char', length: 255, nullable: true, comment: '送货地址' })
+  @Column({ name: 'delivery_address', type: 'varchar', length: 255, nullable: true, comment: '送货地址' })
   deliveryAddress: string;
-  @Column({ name: 'invoice_address', type: 'char', length: 255, nullable: true, comment: '发票地址' })
+  @Column({ name: 'invoice_address', type: 'varchar', length: 255, nullable: true, comment: '发票地址' })
   invoiceAddress: string;
   @Column({ type: 'varchar', length: 60, comment: '联系人', nullable: true })
   contact: string;
@@ -52,27 +53,25 @@ export class FactoryEntity extends PublicEntity {
   @Column({ type: 'enum', enum: TAXES, comment: '税种', default: TAXES.VAT })
   taxes: TAXES;
 
-
-
   @OneToMany(() => MoldEntity, (molds) => molds.factory)
   molds: MoldEntity[];
 
   @OneToMany(() => StatementEntity, (state) => state.factory)
   statements: StatementEntity[];
+
   @Column({
     type: 'enum',
     enum: FactoryType,
-    comment: '货币',
     default: FactoryType.VENDOR,
   })
   fac_type: FactoryType;
 
-  @Column()
-  tenantId: string;
+  @OneToMany(() => MaterialEntity, material => material.factory)
+  @JoinColumn({ name: 'material_id' })
+  materials: MaterialEntity
 
-  @JoinColumn({
-    name: 'plastic_part_id'
-  })
-  @OneToMany(() => FactoryEntity, factory => factory.plasticPart, { createForeignKeyConstraints: false })
-  plasticPart: FactoryEntity
+
+  @OneToMany(() => ComponentEntity, component => component.factory)
+  @JoinColumn({ name: 'component_id' })
+  components: ComponentEntity[]
 }

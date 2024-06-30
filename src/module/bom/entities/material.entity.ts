@@ -1,12 +1,13 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
-import { Column, Entity, OneToMany } from 'typeorm';
-import { PlasticPartsEntity } from './plasticParts.entity';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany } from 'typeorm';
+import { ComponentEntity } from './component.entity';
 import { DecimalColumnTransformer } from 'src/common/utils/transformer';
+import { FactoryEntity } from 'src/module/factory/entities/factory.entity';
 
 export enum MATERIAL_TYPE {
-  PLASTIC = 'plastic',
-  RUBBER = 'rubber',
-  METAL = 'metal',
+  PLASTIC = 'PLASTIC',
+  RUBBER = 'RUBBER',
+  METAL = 'METAL',
 }
 
 @Entity({ name: 'materials', orderBy: { created_at: 'DESC' } })
@@ -19,7 +20,7 @@ export class MaterialEntity extends PublicEntity {
     precision: 10,
     scale: 3,
     comment: '单价',
-    default: 0,
+    nullable: true,
     transformer: new DecimalColumnTransformer(),
   })
   price: number;
@@ -33,7 +34,7 @@ export class MaterialEntity extends PublicEntity {
   type: string;
 
   @Column({ type: 'varchar', name: 'code', length: 100, comment: '料号', nullable: true })
-  code: string;
+  no: string;
 
   @Column({ type: 'varchar', length: 30, comment: '颜色', nullable: true })
   color: string;
@@ -42,11 +43,15 @@ export class MaterialEntity extends PublicEntity {
   grade: string;
 
   @Column({ type: 'varchar', length: 255, comment: '厂家' })
-  factory: string;
+  vendor: string;
 
   @Column({ type: 'varchar', length: 255, comment: '照片', nullable: true })
   picture: string;
 
-  @OneToMany(() => PlasticPartsEntity, (plastciPart) => plastciPart.material)
-  plasticPart: PlasticPartsEntity[];
+  @OneToMany(() => ComponentEntity, (component) => component.material)
+  component: ComponentEntity[];
+
+  @ManyToMany(() => FactoryEntity, (factory) => factory.materials, { createForeignKeyConstraints: false })
+  @JoinColumn({ name: 'factory_id' })
+  factory: FactoryEntity[];
 }

@@ -5,29 +5,46 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FactoryEntity } from './entities/factory.entity';
 import { Repository } from 'typeorm';
 import { unifyResponse } from 'src/common/utils/unifyResponse';
+import { ContextService } from 'src/service/context.service';
 
 @Injectable()
 export class FactoryService {
-  constructor(@InjectRepository(FactoryEntity) private readonly facRepo: Repository<FactoryEntity>) {}
-  create(createFactoryDto: CreateFactoryDto) {
-    console.log('CreateFactoryDto');
-    return this.facRepo.save(createFactoryDto);
+  constructor(private context: ContextService, @InjectRepository(FactoryEntity) private readonly facRepo: Repository<FactoryEntity>) { }
+  async create(createFactoryDto: CreateFactoryDto) {
+    const item = this.facRepo.save({ ...await this.context.buildTenantCriteria(), ...createFactoryDto })
+    return unifyResponse({ item });
   }
 
-  async findAll() {
-    const [items, total] = await this.facRepo.findAndCount({ take: 10, skip: 1 });
+  async findAll(query) {
+    const criteria = await this.context.buildTenantCriteria()
+    const qb = this.facRepo.createQueryBuilder('factory')
+
+    qb.andWhere("factory.tenant_id =:tenantId", { tenantId: criteria.tenantId })
+    const [items, total] = await qb
+      .offset((query.current - 1) * query.pageSize)
+      .limit(query.take)
+
+      .getManyAndCount();
+
     return unifyResponse({ items, total });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} factory`;
+  async findOne(id: number) {
+    console.log('findOne', await this.context.buildTenantCriteria(id))
+    const item = await this.facRepo.find({
+      relations: {
+        components: true
+      }, where: { ...await this.context.buildTenantCriteria(id) }
+    });
+    console.log(item)
+    return unifyResponse({ item })
   }
 
-  update(id: number, updateFactoryDto: UpdateFactoryDto) {
-    return this.facRepo.update(id, updateFactoryDto);
+  async update(id: number, updateFactoryDto: UpdateFactoryDto) {
+    return this.facRepo.update(await this.context.buildTenantCriteria(id), updateFactoryDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} factory`;
+  async remove(id: number) {
+    return this.facRepo.softDelete(await this.context.buildTenantCriteria(id))
   }
 }

@@ -1,21 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { FactoryService } from './factory.service';
 import { CreateFactoryDto } from './dto/create-factory.dto';
 import { UpdateFactoryDto } from './dto/update-factory.dto';
 
 @Controller('factory')
 export class FactoryController {
-  constructor(private readonly factoryService: FactoryService) {}
+  constructor(private readonly factoryService: FactoryService) { }
 
   @Post()
   create(@Body() createFactoryDto: CreateFactoryDto) {
-    console.log('factory');
+    console.log('factory', createFactoryDto);
     return this.factoryService.create(createFactoryDto);
   }
 
   @Get()
-  findAll() {
-    return this.factoryService.findAll();
+  findAll(@Query() query) {
+    return this.factoryService.findAll(query);
   }
 
   @Get(':id')
