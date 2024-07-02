@@ -24,7 +24,7 @@ export type UnifyResponse =
 export type UnifySigleResponse = BaseResponse | UnifyObjectResponse | UnifyPaginationResponse | UnifyRawValueResponse;
 
 /* @description: 原始值返回 */
-export function unifyResponse(raw: boolean, message?: string): UnifyRawValueResponse;
+export function unifyResponse(message: string): UnifyRawValueResponse;
 /* @description: 提示类型消息返回 */
 export function unifyResponse(code: number, message?: string): BaseResponse;
 /* @description: 分页返回 */
@@ -36,8 +36,8 @@ export function unifyResponse(options: any, message?: string): UnifySigleRespons
   const response = {
     code: 0,
   } as any;
-  if (typeof options == 'boolean') {
-    (response as UnifyRawValueResponse).item = message;
+  if (typeof options == 'string') {
+    (response as UnifyRawValueResponse).item = options;
   } else if (typeof options == 'number') {
     response.code = options;
     response.message = message;

@@ -28,6 +28,7 @@ import { PolicyModule } from './module/policy/policy.module';
 import { REQ_USER_CONTEXT } from './common/utils/constant';
 import { ReceivingModule } from './module/receiving/receiving.module';
 import { FileUploadModule } from './module/file-upload/file-upload.module';
+import { CryptoController } from './crypto.controller';
 
 
 @Module({
@@ -64,7 +65,7 @@ import { FileUploadModule } from './module/file-upload/file-upload.module';
     ReceivingModule,
     FileUploadModule
   ],
-  controllers: [AppController],
+  controllers: [AppController, CryptoController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {

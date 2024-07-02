@@ -7,6 +7,7 @@ import { CodeTips, ErrorCode } from 'src/config/code';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/module/user/user.service';
 import { ConfigService } from '@nestjs/config';
+import { decryptDynamicKeyAESData, encryptAESData } from 'src/common/utils/crypto';
 
 @Injectable()
 export class AuthService {
@@ -59,10 +60,11 @@ export class AuthService {
       refreshToken,
     };
   }
-  async validateUser(username: string, pass: string) {
+  async validateUser(key: string, username: string, pass: string) {
     const user = await this.userService.findOneByUsername(username)
-    console.log('validateUser', user)
-    if (user && user.password === pass) return user
+    const decryptedPass = decryptDynamicKeyAESData(pass, key)
+
+    if (user && user.password === encryptAESData(decryptedPass)) return user
     return null
   }
 

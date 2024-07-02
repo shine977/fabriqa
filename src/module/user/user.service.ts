@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Like, Repository } from 'typeorm';
-import { encryptData } from 'src/common/utils/crypto';
+import { encryptAESData } from 'src/common/utils/crypto';
 
 import { unifyResponse } from 'src/common/utils/unifyResponse';
 
@@ -17,7 +17,7 @@ export class UserService {
 
   ) { }
   async create(user: CreateUserDto) {
-    user.password = encryptData(user.password);
+    user.password = encryptAESData(user.password);
     return await this.userRepository.save(user);
   }
 

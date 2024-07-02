@@ -20,11 +20,12 @@ interface Order {
     items: OrderItem[],
     paymentClause: string,
     taskOrderNo: string
-    delivery: string
+    delivery: string,
+    customer: string
 }
 
 
-export function cleanAndExtractData(fileBuffer: Buffer, range = { s: { c: 0, r: 4 }, e: { c: 10, r: 20 } }) {
+export function cleanAndExtractData(fileBuffer: Buffer, range = { s: { c: 0, r: 0 }, e: { c: 10, r: 20 } }) {
     const workbook = XLSX.read(fileBuffer, { type: 'buffer', cellDates: true });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     sheet['!ref'] = XLSX.utils.encode_range(range);
@@ -46,16 +47,19 @@ export function splitColon(str: string) {
 }
 
 export function calculateOrderData(data): Order {
-    let orderNumber: string, purchaseDate: string, paymentClause: string, delivery: string, taskOrderNo: string
+    let orderNumber: string, purchaseDate: string, paymentClause: string, delivery: string, taskOrderNo: string, customer: string
     const items = data.reduce((memo: OrderItem[], next: string[], index) => {
-        if (index == 0) {
+        if (index == 1 && next[0]) {
+            customer = next[0]
+        } else if (index == 4 && next[0]) {
+            console.log(next[0])
             const str = splitColon(next[0])
             if (/[0-9]/.test(str)) {
                 orderNumber = str
             }
             purchaseDate = splitColon(next[next.length - 1])
 
-        } else if (index == 1) {
+        } else if (index == 5) {
             paymentClause = splitColon(next[next.length - 1])
         } else if (next[3] && !/[\u4e00-\u9fff]/.test(next[1])) {
             if (orderNumber == null) {
@@ -87,6 +91,7 @@ export function calculateOrderData(data): Order {
         items,
         paymentClause,
         taskOrderNo,
-        delivery
+        delivery,
+        customer
     } as Order
 }

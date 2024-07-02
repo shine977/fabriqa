@@ -12,7 +12,7 @@ import { RefreshStrategy } from './strategies/refresh.strategy';
 import { TenantModule } from 'src/module/tenant/tenant.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/guards/jwtAuth.guard';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { AuthGuard } from '@nestjs/passport';
 
   providers: [AuthService, LocalStrategy, RefreshStrategy, JwtStrategy, {
     provide: APP_GUARD,
-    useClass: AuthGuard('jwt')
+    useClass: JwtAuthGuard
   }],
 })
 export class AuthModule { }

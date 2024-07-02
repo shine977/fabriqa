@@ -5,14 +5,16 @@ import { Strategy } from 'passport-local';
 
 
 import { AuthService } from '../auth.service';
+import { Request } from 'express';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
-    super();
+    super({
+      passReqToCallback: true
+    });
   }
-  async validate(username: string, pass: string) {
-
-    return await this.authService.validateUser(username, pass);
+  async validate(req: Request, username: string, pass: string) {
+    return await this.authService.validateUser(req.body.key, username, pass);
   }
 }

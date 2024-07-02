@@ -1,7 +1,7 @@
 import { PublicEntity } from 'src/common/entity/PublicEntity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { OrderEntity } from './order.entity';
-import { DecimalColumnTransformer } from 'src/common/utils/transformer';
+import { DateTransformer, DecimalColumnTransformer } from 'src/common/utils/transformer';
 
 @Entity({ name: 'order_items', orderBy: { created_at: 'DESC' } })
 export class OrderItemEntity extends PublicEntity {
@@ -29,7 +29,7 @@ export class OrderItemEntity extends PublicEntity {
 
   @Column({ type: 'varchar', length: 255, comment: '单位', default: 'pcs' })
   unit: string;
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'datetime', nullable: true, transformer: new DateTransformer() })
   delivery: Date;
   @Column({ type: 'decimal', precision: 20, scale: 2, nullable: true, transformer: new DecimalColumnTransformer() })
   quantity: number;
@@ -44,7 +44,7 @@ export class OrderItemEntity extends PublicEntity {
   })
   unitPrice: number;
 
-  @ManyToOne(() => OrderEntity, (order) => order.items)
+  @ManyToOne(() => OrderEntity, (order) => order.children)
   @JoinColumn({ name: 'order_id' })
   order: OrderEntity;
 }

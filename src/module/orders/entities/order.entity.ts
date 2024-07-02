@@ -3,7 +3,7 @@ import { TenantEntity } from 'src/module/tenant/entities/tenant.entity';
 
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { OrderItemEntity } from './order-item.entity';
-import { DecimalColumnTransformer } from 'src/common/utils/transformer';
+import { DateTransformer, DecimalColumnTransformer } from 'src/common/utils/transformer';
 export enum ORDER {
   'sales' = 'sales',
   'purchase' = 'purchase',
@@ -24,8 +24,11 @@ export class OrderEntity extends PublicEntity {
   @Column()
   orderNo: string
 
+  @Column()
+  customer: string
 
-  @Column({ type: 'datetime', name: 'purchase_date', comment: '采购日期' })
+
+  @Column({ type: 'datetime', name: 'purchase_date', transformer: new DateTransformer() })
   purchaseDate: Date;
 
   @Column({
@@ -44,7 +47,7 @@ export class OrderEntity extends PublicEntity {
   })
   taskOrderNo: string;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'datetime', nullable: true, transformer: new DateTransformer() })
   delivery: Date;
 
   @ManyToOne(() => TenantEntity, (tenant) => tenant.orders)
@@ -52,5 +55,5 @@ export class OrderEntity extends PublicEntity {
   tenant: TenantEntity;
 
   @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.order)
-  items: OrderItemEntity[];
+  children: OrderItemEntity[];
 }

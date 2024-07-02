@@ -26,7 +26,8 @@ export class OrdersService {
     const criteria = await this.context.buildTenantCriteria()
     const amount = createOrderDto.items.reduce((memo, next) => add(memo, next.amount || 0), 0)
     const hasExistedOrder = await this.orderRepository.find({ where: { taskOrderNo: createOrderDto.taskOrderNo } })
-    if (hasExistedOrder) {
+    console.log('hasExistedOrder', hasExistedOrder)
+    if (hasExistedOrder.length) {
       return unifyResponse(-1, '订单已存在，请不要重复导入！')
     }
     const queryRunner = this.dataSource.createQueryRunner()
@@ -40,6 +41,7 @@ export class OrdersService {
         taskOrderNo: createOrderDto.taskOrderNo,
         amount,
         delivery: createOrderDto.delivery,
+        customer: createOrderDto.customer,
         ...criteria,
 
       })
@@ -69,7 +71,7 @@ export class OrdersService {
     const criteria = await this.context.buildTenantCriteria()
     const qb = await this.orderRepository.createQueryBuilder('order')
 
-    await qb.leftJoinAndSelect('order.items', 'item')
+    await qb.leftJoinAndSelect('order.children', 'item')
     qb.andWhere("order.tenant_id= :tenantId", { tenantId: criteria.tenantId })
     const [items, total] = await qb.offset((query.current - 1) * query.pageSize)
       .limit(query.pageSize)
@@ -88,7 +90,7 @@ export class OrdersService {
     const item = await this.orderRepository.find(
       {
         relations: {
-          items: true,
+          children: true,
         },
         where: { ...await this.context.buildTenantCriteria(id) }
       }

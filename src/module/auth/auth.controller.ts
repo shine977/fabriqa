@@ -10,6 +10,7 @@ import { RefreshTokenGuard } from 'src/guards/refreshToken.guard';
 import { TenantService } from 'src/module/tenant/tenant.service';
 import { AuthGuard } from '@nestjs/passport';
 
+
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -21,7 +22,6 @@ export class AuthController {
 
   @Post('login')
   @UseGuards(AuthGuard('local'))
-  @Public()
   login(@Request() req) {
     return this.authService.login(req.username);
   }
@@ -34,7 +34,6 @@ export class AuthController {
     return this.authService.authenticate(user);
   }
   @Post('register/tenant')
-  @Public()
   async registerTenant(@Body() userDto: CreateTenantUserDto) {
     const tenantExists = await this.tenantService.findOneByName(userDto.name);
     if (tenantExists) throw new BadRequestException(CodeTips.c1000);

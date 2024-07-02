@@ -22,4 +22,5 @@ export class CreateOrderDto {
   paymentClause: string
   taskOrderNo: string
   delivery: string
+  customer: string
 }
