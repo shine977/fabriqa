@@ -26,7 +26,7 @@ export class OrdersService {
     const criteria = await this.context.buildTenantCriteria()
     const amount = createOrderDto.items.reduce((memo, next) => add(memo, next.amount || 0), 0)
     const hasExistedOrder = await this.orderRepository.find({ where: { taskOrderNo: createOrderDto.taskOrderNo } })
-    console.log('hasExistedOrder', hasExistedOrder)
+
     if (hasExistedOrder.length) {
       return unifyResponse(-1, '订单已存在，请不要重复导入！')
     }

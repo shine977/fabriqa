@@ -2,9 +2,11 @@ import { IsNotEmpty } from 'class-validator';
 import { OrderItemEntity } from '../entities/order-item.entity';
 
 export class OrderItemDto {
+
   taskOrderNo?: string
   quantity: number
   amount: number
+
   unitPrice: number
   specification: string
   @IsNotEmpty()
@@ -13,6 +15,7 @@ export class OrderItemDto {
   materialCode: string
   delivery: string
   orderId?: number
+
 }
 
 export class CreateOrderDto {
@@ -23,4 +26,5 @@ export class CreateOrderDto {
   taskOrderNo: string
   delivery: string
   customer: string
+
 }

@@ -22,6 +22,7 @@ export class AuthController {
 
   @Post('login')
   @UseGuards(AuthGuard('local'))
+  @Public()
   login(@Request() req) {
     return this.authService.login(req.username);
   }

@@ -63,7 +63,6 @@ export class AuthService {
   async validateUser(key: string, username: string, pass: string) {
     const user = await this.userService.findOneByUsername(username)
     const decryptedPass = decryptDynamicKeyAESData(pass, key)
-
     if (user && user.password === encryptAESData(decryptedPass)) return user
     return null
   }

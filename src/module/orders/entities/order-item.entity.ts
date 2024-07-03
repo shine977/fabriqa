@@ -9,7 +9,7 @@ export class OrderItemEntity extends PublicEntity {
   orderNo: string;
 
   @Column()
-  name: string;
+  name: string
 
   @Column({ name: 'material_no', })
   materialNo: string;
@@ -29,8 +29,10 @@ export class OrderItemEntity extends PublicEntity {
 
   @Column({ type: 'varchar', length: 255, comment: '单位', default: 'pcs' })
   unit: string;
+
   @Column({ type: 'datetime', nullable: true, transformer: new DateTransformer() })
   delivery: Date;
+
   @Column({ type: 'decimal', precision: 20, scale: 2, nullable: true, transformer: new DecimalColumnTransformer() })
   quantity: number;
 
