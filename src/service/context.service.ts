@@ -12,14 +12,14 @@ interface TenantCriteria {
 export class ContextService {
     constructor(@Inject(REQUEST) private request: Request) { }
     get reqUser() {
-        return this.request.user
+        return this.request.user as RequestUser
     }
     shouldUseTenantId() {
-        return new Promise(resolve => resolve(this.request.user.tenantId))
+        return new Promise(resolve => resolve((this.request.user as RequestUser).tenantId))
     }
-    buildTenantCriteria(id: number): Promise<TenantCriteria>;
+    // buildTenantCriteria(id: number): Promise<TenantCriteria>;
     buildTenantCriteria(id?: number): Promise<Pick<TenantCriteria, 'tenantId'>>
-    buildTenantCriteria(id: number): Promise<Pick<TenantCriteria, 'tenantId'> | TenantCriteria | {}> {
+    buildTenantCriteria(id?: number): Promise<Pick<TenantCriteria, 'tenantId'> | TenantCriteria | {}> {
         return this.shouldUseTenantId().then((tenant: string) => {
             return id ? { tenantId: tenant, id } : { tenantId: tenant }
         })

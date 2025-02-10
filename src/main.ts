@@ -1,11 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-// import { ValidationPipe } from './common/pipe/validation.pipe';
 import 'dotenv';
-import { HttpExceptionFilter } from './filters/http-exception/http-exception.filter';
-import { WrapResponseInterceptor } from './interceptors/wrap-response.interceptor';
 import { ValidationPipe } from '@nestjs/common';
+import { HttpExceptionFilter } from './shared/filters';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,7 +17,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalInterceptors(new WrapResponseInterceptor());
 
   await app.listen(3000);
 }

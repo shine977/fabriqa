@@ -10,6 +10,12 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "paths": {
+      "@core/*": ["src/core/*"],
+      "@shared/*": ["src/shared/*"],
+      "@modules/*": ["src/modules/*"],
+      "@common/*": ["src/common/*"]
+    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
@@ -21,5 +27,5 @@
 
     "typeRoots": ["./node_modules/@types", "./src/types"],
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "src/core/plugin/entities", "src/core/plugin/decorators"]
 }
