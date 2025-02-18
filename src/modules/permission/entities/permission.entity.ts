@@ -54,7 +54,7 @@ export class PermissionEntity extends BaseEntity {
   @TreeParent()
   parent: PermissionEntity;
 
-  @ManyToMany(() => RoleEntity, role => role.permissions)
+  @ManyToMany(() => RoleEntity, role => role.permissions, { createForeignKeyConstraints: false })
   roles: RoleEntity[];
 
   // 元数据，用于存储额外的配置信息

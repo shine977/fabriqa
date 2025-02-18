@@ -75,7 +75,7 @@ export class PluginRegistry {
       this.registry.delete(pluginId);
 
       // 更新数据库状态
-      await this.pluginRepository.update({ id: pluginId }, { status: PluginStatus.DISABLED });
+      await this.pluginRepository.update({ pluginId }, { status: PluginStatus.DISABLED });
 
       // 发出注销事件
       await this.eventBus.emit('unregistered', { pluginId });
@@ -95,16 +95,18 @@ export class PluginRegistry {
 
     if (entity) {
       // 更新现有记录
-      await this.pluginRepository.update(entity.id, {
-        name,
-        version,
-        type,
-        description,
-        author,
-        dependencies,
-        status: PluginStatus.INSTALLED,
-        updatedAt: new Date(),
-      });
+      await this.pluginRepository.update(
+        { pluginId },
+        {
+          name,
+          version,
+          type,
+          description,
+          author,
+          dependencies,
+          status: PluginStatus.INSTALLED,
+        },
+      );
     } else {
       // 创建新记录
       await this.pluginRepository.save({

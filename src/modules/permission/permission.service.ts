@@ -10,11 +10,6 @@ import { BaseService, CacheService } from 'src/core/cache';
 import { PluginService } from '@core/plugin';
 
 @Injectable()
-@PluginService({
-  name: 'PermissionService',
-  description: 'Provides permission management functionality',
-  version: '1.0.0',
-})
 export class PermissionService extends BaseService {
   private treeRepository: TreeRepository<PermissionEntity>;
 

@@ -1,12 +1,10 @@
 // src/core/plugin/entities/plugin.entity.ts
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { PluginType, PluginStatus } from '../types/plugin.type';
+import { BaseEntity } from '@core/database/entities';
 
 @Entity('plugins')
-export class PluginEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class PluginEntity extends BaseEntity {
   @Column({ length: 36, nullable: false })
   pluginId: string;
 
@@ -39,15 +37,6 @@ export class PluginEntity {
 
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;
-
-  @Column({ name: 'tenant_id', nullable: true })
-  tenantId?: string;
-
-  @CreateDateColumn({ name: 'created_at', precision: 0 })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updated_at', precision: 0 })
-  updatedAt: Date;
 
   @Column({ name: 'last_enabled_at', nullable: true, precision: 0 })
   lastEnabledAt?: Date;

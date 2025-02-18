@@ -4,11 +4,35 @@ import { ApplicationPlugin } from '../interfaces/plugin.interface';
 
 import { PluginDependencyException } from '../exceptions/plugin.exception';
 import { PluginDependencyNode } from '../types/dependency.type';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PluginEntity } from '../entities/plugin.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class PluginDependencyResolver {
   private readonly logger = new Logger(PluginDependencyResolver.name);
+  constructor(
+    @InjectRepository(PluginEntity)
+    private readonly pluginRepository: Repository<PluginEntity>,
+  ) {}
 
+  /**
+   * 查找依赖于指定插件的其他插件
+   * @param pluginId 插件ID
+   * @returns 依赖于该插件的插件ID列表
+   */
+  async findDependents(pluginId: string): Promise<string[]> {
+    // 获取所有已安装的插件
+    const plugins = await this.pluginRepository.find();
+
+    // 查找依赖于指定插件的其他插件
+    return plugins
+      .filter(plugin => {
+        const dependencies = plugin.dependencies || [];
+        return dependencies.includes(pluginId);
+      })
+      .map(plugin => plugin.pluginId);
+  }
   resolveDependencies(plugins: ApplicationPlugin[]): string[] {
     const graph = new Map<string, PluginDependencyNode>();
 

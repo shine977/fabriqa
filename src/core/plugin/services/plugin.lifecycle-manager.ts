@@ -1,143 +1,130 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ApplicationPlugin, PluginContext, PluginState } from '../interfaces/plugin.interface';
-import { PluginEventBus } from './plugin.event-bus';
-import { PluginConfigManager } from './plugin.config-manager';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ApplicationPlugin, PluginContext } from '../interfaces/plugin.interface';
+import { PluginException } from '../exceptions/plugin.exception';
 
 @Injectable()
 export class PluginLifecycleManager {
   private readonly logger = new Logger(PluginLifecycleManager.name);
 
-  // 生命周期方法和对应的状态映射
-  private readonly lifecycleStateMap = new Map<string, PluginState>([
-    ['onLoad', PluginState.LOADING],
-    ['onInit', PluginState.INITIALIZED],
-    ['onBeforeInstall', PluginState.INSTALLING],
-    ['onInstall', PluginState.INSTALLED],
-    ['onBeforeEnable', PluginState.ENABLING],
-    ['onEnable', PluginState.ENABLED],
-    ['onBeforeDisable', PluginState.DISABLING],
-    ['onDisable', PluginState.DISABLED],
-    ['onBeforeUpgrade', PluginState.UPGRADING],
-    ['onUpgrade', PluginState.UPGRADED],
-    ['onBeforeUninstall', PluginState.UNINSTALLING],
-    ['onUninstall', PluginState.UNINSTALLED],
-    ['onBeforeRegister', PluginState.REGISTERING],
-    ['onRegister', PluginState.REGISTERED],
-  ]);
+  constructor(private readonly eventEmitter: EventEmitter2) {}
 
-  private readonly lifecycleMethods = Array.from(this.lifecycleStateMap.keys()).concat([
-    'onAfterInstall',
-    'onAfterEnable',
-    'onAfterDisable',
-    'onAfterUpgrade',
-    'onAfterUninstall',
-    'onAfterRegister',
-    'onError',
-  ]);
-
-  constructor(
-    private readonly eventBus: PluginEventBus,
-    private readonly configManager: PluginConfigManager,
-  ) {}
-
-  private async executeLifecycleMethod(
-    plugin: ApplicationPlugin,
-    method: string,
-    context: PluginContext,
-    ...args: any[]
-  ): Promise<void> {
+  async installPlugin(plugin: ApplicationPlugin, context: PluginContext): Promise<void> {
     try {
-      // 更新插件状态
-      const newState = this.lifecycleStateMap.get(method);
-      if (newState) {
-        context.state = newState;
-        await this.eventBus.emit('plugin.state.change', {
-          pluginId: plugin.metadata.pluginId,
-          oldState: context.state,
-          newState,
-        });
+      // 1. 发出安装开始事件
+      await this.emitLifecycleEvent('installing', plugin, context);
+
+      // 2. 执行安装生命周期方法
+      if (typeof plugin.onInstall == 'function') {
+        await plugin.onInstall(context);
       }
-      if (typeof plugin[method] === 'function') {
-        this.logger.debug(`Executing ${method} for plugin ${plugin.metadata.pluginId}`);
-        await plugin[method](context, ...args);
-        await this.eventBus.emit(`plugin.lifecycle.${method}`, {
-          pluginId: plugin.metadata.pluginId,
-          method,
-          success: true,
-        });
-      }
+
+      // 3. 发出安装完成事件
+      await this.emitLifecycleEvent('installed', plugin, context);
     } catch (error) {
-      this.logger.error(`Error executing ${method} for plugin ${plugin.metadata.pluginId}: ${error.message}`);
-      await this.handleError(plugin, context, error);
+      await this.handleLifecycleError('install', plugin, error, context);
       throw error;
     }
   }
 
-  private async handleError(plugin: ApplicationPlugin, context: PluginContext, error: Error): Promise<void> {
+  async enablePlugin(plugin: ApplicationPlugin, context: PluginContext): Promise<void> {
     try {
-      const oldState = context.state;
-      context.state = PluginState.ERROR;
+      // 1. 发出启用开始事件
+      await this.emitLifecycleEvent('enabling', plugin, context);
 
-      // 发送状态变更事件
-      await this.eventBus.emit('plugin.state.change', {
-        pluginId: plugin.metadata.pluginId,
-        oldState,
-        newState: PluginState.ERROR,
-        error: error.message,
-      });
-
-      if (typeof plugin.onError === 'function') {
-        await plugin.onError(context, error);
+      // 2. 执行初始化（如果存在）
+      if (typeof plugin.onInit === 'function') {
+        await plugin.onInit(context);
       }
 
-      await this.eventBus.emit('plugin.error', {
-        pluginId: plugin.metadata.pluginId,
-        error: error.message,
-        state: context.state,
-      });
-    } catch (handlerError) {
-      this.logger.error(`Error handling error for plugin ${plugin.metadata.pluginId}: ${handlerError.message}`);
+      // 3. 执行启用生命周期方法
+      await plugin.onEnable(context);
+
+      // 4. 发出启用完成事件
+      await this.emitLifecycleEvent('enabled', plugin, context);
+    } catch (error) {
+      await this.handleLifecycleError('enable', plugin, error, context);
+      throw error;
     }
   }
 
-  async registerPlugin(plugin: ApplicationPlugin, context: PluginContext): Promise<void> {
-    await this.executeLifecycleMethod(plugin, 'onBeforeRegister', context);
-    await this.executeLifecycleMethod(plugin, 'onRegister', context);
-    await this.executeLifecycleMethod(plugin, 'onAfterRegister', context);
-  }
-
-  async loadPlugin(plugin: ApplicationPlugin, context: PluginContext): Promise<void> {
-    await this.executeLifecycleMethod(plugin, 'onLoad', context);
-    await this.executeLifecycleMethod(plugin, 'onInit', context);
-  }
-
-  async installPlugin(plugin: ApplicationPlugin, context: PluginContext): Promise<void> {
-    await this.executeLifecycleMethod(plugin, 'onBeforeInstall', context);
-    await this.executeLifecycleMethod(plugin, 'onInstall', context);
-    await this.executeLifecycleMethod(plugin, 'onAfterInstall', context);
-  }
-
-  async enablePlugin(plugin: ApplicationPlugin, context: PluginContext): Promise<void> {
-    await this.executeLifecycleMethod(plugin, 'onBeforeEnable', context);
-    await this.executeLifecycleMethod(plugin, 'onEnable', context);
-    await this.executeLifecycleMethod(plugin, 'onAfterEnable', context);
-  }
-
   async disablePlugin(plugin: ApplicationPlugin, context: PluginContext): Promise<void> {
-    await this.executeLifecycleMethod(plugin, 'onBeforeDisable', context);
-    await this.executeLifecycleMethod(plugin, 'onDisable', context);
-    await this.executeLifecycleMethod(plugin, 'onAfterDisable', context);
-  }
+    try {
+      // 1. 发出禁用开始事件
+      await this.emitLifecycleEvent('disabling', plugin, context);
 
-  async upgradePlugin(plugin: ApplicationPlugin, context: PluginContext, fromVersion: string): Promise<void> {
-    await this.executeLifecycleMethod(plugin, 'onBeforeUpgrade', context, fromVersion);
-    await this.executeLifecycleMethod(plugin, 'onUpgrade', context, fromVersion);
-    await this.executeLifecycleMethod(plugin, 'onAfterUpgrade', context, fromVersion);
+      // 2. 执行禁用生命周期方法
+      await plugin.onDisable(context);
+
+      // 3. 发出禁用完成事件
+      await this.emitLifecycleEvent('disabled', plugin, context);
+    } catch (error) {
+      await this.handleLifecycleError('disable', plugin, error, context);
+      throw error;
+    }
   }
 
   async uninstallPlugin(plugin: ApplicationPlugin, context: PluginContext): Promise<void> {
-    await this.executeLifecycleMethod(plugin, 'onBeforeUninstall', context);
-    await this.executeLifecycleMethod(plugin, 'onUninstall', context);
-    await this.executeLifecycleMethod(plugin, 'onAfterUninstall', context);
+    try {
+      // 1. 发出卸载开始事件
+      await this.emitLifecycleEvent('uninstalling', plugin, context);
+
+      // 2. 执行卸载生命周期方法
+      if (typeof plugin.onUninstall === 'function') {
+        await plugin.onUninstall(context);
+      }
+
+      // 3. 发出卸载完成事件
+      await this.emitLifecycleEvent('uninstalled', plugin, context);
+    } catch (error) {
+      await this.handleLifecycleError('uninstall', plugin, error, context);
+      throw error;
+    }
+  }
+
+  async handleError(plugin: ApplicationPlugin, context: PluginContext, error: Error): Promise<void> {
+    try {
+      // 1. 发出错误处理开始事件
+      await this.emitLifecycleEvent('error', plugin, context);
+
+      // 2. 执行错误处理生命周期方法
+      if (typeof plugin.onError === 'function') {
+        await plugin.onError(context, error);
+      }
+      await this.emitLifecycleEvent('error', plugin, { ...context, error });
+    } catch (error) {
+      this.logger.error(`Error handling error for plugin ${plugin.metadata.pluginId}:`, error);
+    }
+  }
+
+  private async emitLifecycleEvent(event: string, plugin: ApplicationPlugin, context: PluginContext): Promise<void> {
+    const eventName = `plugin.lifecycle.${event}`;
+    const eventData = {
+      pluginId: plugin.metadata.pluginId,
+      pluginName: plugin.metadata.name,
+      context,
+      timestamp: new Date(),
+    };
+
+    await this.eventEmitter.emit(eventName, eventData);
+  }
+
+  private async handleLifecycleError(
+    operation: string,
+    plugin: ApplicationPlugin,
+    error: Error,
+    context: PluginContext,
+  ): Promise<void> {
+    const errorContext = {
+      ...context,
+      error,
+      operation,
+      timestamp: new Date(),
+    };
+
+    this.logger.error(`Plugin ${plugin.metadata.pluginId} ${operation} failed:`, error);
+
+    await this.handleError(plugin, errorContext, error);
+    throw new PluginException(`PLUGIN_${operation.toUpperCase()}_FAILED`, error.message);
   }
 }

@@ -62,12 +62,20 @@ export class PluginInitializer {
 })
 export class PluginModule {
   static forRoot(options: PluginOptions = {}): DynamicModule {
-    const providers = this.createProviders(options);
-
+    const defaultConfig: PluginConfig = {
+      pluginDir: 'plugins',
+      maxConcurrentLoads: 5,
+      autoDiscovery: true,
+      maxRetries: 3,
+      retryDelay: 1000,
+      timeout: 30000,
+      systemPlugins: [],
+    };
+    const config = { ...defaultConfig, ...options };
     return {
       module: PluginModule,
       imports: [DiscoveryModule, TypeOrmModule.forFeature([PluginEntity]), EventEmitterModule.forRoot()],
-      providers: [...providers],
+      providers: [...this.createProviders(config)],
       exports: [
         PluginManager,
         PluginRegistry,
@@ -80,15 +88,15 @@ export class PluginModule {
     };
   }
 
-  private static createProviders(options: PluginOptions): Provider[] {
+  private static createProviders(config: PluginConfig): Provider[] {
     return [
       {
         provide: 'PLUGIN_CONFIG',
         useValue: {
-          pluginDir: options.pluginDir || 'plugins',
-          systemPlugins: options.systemPlugins || [],
-          maxConcurrentLoads: options.maxConcurrentLoads || 5,
-          ...options,
+          pluginDir: config.pluginDir || 'plugins',
+          systemPlugins: config.systemPlugins || [],
+          maxConcurrentLoads: config.maxConcurrentLoads || 5,
+          ...config,
         } as PluginConfig,
       },
     ];

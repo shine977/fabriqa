@@ -41,7 +41,7 @@ export interface PluginContext {
   [key: string]: any;
 }
 
-export interface PluginLifecycle {
+export abstract class PluginLifecycle {
   // 注册阶段
   onBeforeRegister?(context: PluginContext): Promise<void>; // 注册前
   onRegister?(context: PluginContext): Promise<void>; // 注册时
@@ -75,7 +75,7 @@ export interface PluginLifecycle {
   onAfterUninstall?(context: PluginContext): Promise<void>; // 卸载后
 
   // 错误处理
-  onError(context: PluginContext, error: Error): Promise<void>; // 发生错误时
+  onError?(context: PluginContext, error: Error): Promise<void>; // 发生错误时
 }
 
 export interface BasePlugin extends PluginLifecycle {
@@ -146,7 +146,7 @@ export class ServiceMetadataProvider implements MetadataProvider {
   }
 }
 
-export abstract class ApplicationPlugin implements PluginLifecycle {
+export abstract class ApplicationPlugin extends PluginLifecycle {
   private static readonly metadataProviders: MetadataProvider[] = [
     new InstanceMetadataProvider(),
     new StaticMetadataProvider(),

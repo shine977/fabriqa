@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, OnModuleInit, UnauthorizedException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 
@@ -8,7 +8,7 @@ import { AuthService } from '../services/auth.service';
 import { AdvancedLog } from 'src/shared/decorators/advanced-logger.decorator';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') implements OnModuleInit {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     @Inject(forwardRef(() => AuthService)) private readonly authService: AuthService,
     private config: ConfigService,
@@ -23,9 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') implements On
       secretOrKey: config.get('JWT_ACCESS_SECRET'),
     });
   }
-  onModuleInit() {
-    console.log('JwtStrategy initialized');
-  }
+
   @AdvancedLog({
     context: 'JWT validate Payload',
     // logParams: {

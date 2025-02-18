@@ -1,89 +1,71 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Param, Delete, Put, Get, Query, HttpStatus, HttpCode } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PluginManager } from '../services/plugin.manager';
-import { PluginConfigManager } from '../services/plugin.config-manager';
-import { PluginRegistry } from '../services/plugin.registry';
-import { AuthGuard } from '@nestjs/passport';
+import { PluginDto, InstallPluginDto } from '../dto/plugin.dto';
+import { PluginStatus } from '../types/plugin.type';
 
+@ApiTags('Plugins')
 @Controller('plugins')
-@UseGuards(AuthGuard('jwt'))
 export class PluginController {
-  constructor(
-    private readonly pluginManager: PluginManager,
-    private readonly configManager: PluginConfigManager,
-    private readonly pluginRegistry: PluginRegistry,
-  ) {}
+  constructor(private readonly pluginManager: PluginManager) {}
 
   @Get()
-  async listPlugins(@Query('tenantId') tenantId?: string) {
-    const plugins = await this.pluginRegistry.listPlugins();
-    return plugins.map(plugin => ({
-      id: plugin.metadata.pluginId,
-      name: plugin.metadata.name,
-      version: plugin.metadata.version,
-      description: plugin.metadata.description,
-      author: plugin.metadata.author,
-      state: plugin.getState?.() || 'unknown',
-    }));
+  @ApiOperation({ summary: '获取所有插件' })
+  @ApiResponse({ status: 200, type: [PluginDto] })
+  async getAllPlugins(@Query('status') status?: PluginStatus) {
+    const plugins = await this.pluginManager.getAllPluginInfos();
+    return status ? plugins.filter(p => p.status === status) : plugins;
   }
 
-  @Post(':id/install')
-  async installPlugin(@Param('id') id: string, @Query('tenantId') tenantId?: string) {
-    const context = { tenantId };
-    await this.pluginManager.installPlugin(id, context);
-    return { success: true };
+  @Get(':id')
+  @ApiOperation({ summary: '获取插件详情' })
+  @ApiResponse({ status: 200, type: PluginDto })
+  async getPlugin(@Param('id') id: string) {
+    return this.pluginManager.getPluginInfo(id);
   }
 
-  @Post(':id/uninstall')
-  async uninstallPlugin(@Param('id') id: string, @Query('tenantId') tenantId?: string) {
-    const context = { tenantId };
-    await this.pluginManager.uninstallPlugin(id, context);
+  @Put(':id/install')
+  @ApiOperation({ summary: '安装插件' })
+  @HttpCode(HttpStatus.OK)
+  async installPlugin(@Param('id') id: string, @Body() installDto: InstallPluginDto) {
+    await this.pluginManager.installPlugin(id, {
+      config: installDto.config,
+      triggeredBy: 'api',
+      timestamp: new Date(),
+    });
     return { success: true };
   }
 
   @Post(':id/enable')
-  async enablePlugin(@Param('id') id: string, @Query('tenantId') tenantId?: string) {
-    const context = { tenantId };
-    await this.pluginManager.enablePlugin(id, context);
+  @ApiOperation({ summary: '启用插件' })
+  @HttpCode(HttpStatus.OK)
+  async enablePlugin(@Param('id') id: string) {
+    await this.pluginManager.enablePlugin(id, {
+      triggeredBy: 'api',
+      timestamp: new Date(),
+    });
     return { success: true };
   }
 
   @Post(':id/disable')
-  async disablePlugin(@Param('id') id: string, @Query('tenantId') tenantId?: string) {
-    const context = { tenantId };
-    await this.pluginManager.disablePlugin(id, context);
+  @ApiOperation({ summary: '禁用插件' })
+  @HttpCode(HttpStatus.OK)
+  async disablePlugin(@Param('id') id: string) {
+    await this.pluginManager.disablePlugin(id, {
+      triggeredBy: 'api',
+      timestamp: new Date(),
+    });
     return { success: true };
   }
 
-  @Get(':id/config')
-  async getPluginConfig(@Param('id') id: string, @Query('tenantId') tenantId?: string) {
-    const plugin = await this.pluginRegistry.getPlugin(id);
-    if (!plugin) {
-      throw new Error(`Plugin not found: ${id}`);
-    }
-    return await this.configManager.getConfig(plugin);
-  }
-
-  @Put(':id/config')
-  async updatePluginConfig(
-    @Param('id') id: string,
-    @Body() config: Record<string, any>,
-    @Query('tenantId') tenantId?: string,
-  ) {
-    const plugin = await this.pluginRegistry.getPlugin(id);
-    if (!plugin) {
-      throw new Error(`Plugin not found: ${id}`);
-    }
-    await this.configManager.updateConfig(plugin, config);
-    return { success: true };
-  }
-
-  @Delete(':id/config')
-  async deletePluginConfig(@Param('id') id: string, @Query('tenantId') tenantId?: string) {
-    const plugin = await this.pluginRegistry.getPlugin(id);
-    if (!plugin) {
-      throw new Error(`Plugin not found: ${id}`);
-    }
-    await this.configManager.deleteConfig(plugin);
+  @Delete(':id')
+  @ApiOperation({ summary: '卸载插件' })
+  @HttpCode(HttpStatus.OK)
+  async uninstallPlugin(@Param('id') id: string) {
+    await this.pluginManager.uninstallPlugin(id, {
+      triggeredBy: 'api',
+      timestamp: new Date(),
+    });
     return { success: true };
   }
 }

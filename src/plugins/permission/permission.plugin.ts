@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { PermissionService } from '@modules/permission/permission.service';
 import { RoleService } from '@modules/role/role.service';
 import {
@@ -34,11 +34,9 @@ export class PermissionPlugin extends ApplicationPlugin {
     @Inject('PluginRegistry') private readonly pluginRegistry: PluginRegistry,
   ) {
     super();
-    // console.log(this.pluginRegistry);
     // 自注册到插件注册表
   }
 
-  onBeforeRegister(context: PluginContext) {}
   // 插件生命周期方法
   async onInstall(context: PluginContext): Promise<void> {
     try {
@@ -156,6 +154,7 @@ export class PermissionPlugin extends ApplicationPlugin {
           type: PermissionType.FEATURE,
           scope: PermissionScope.GLOBAL,
           description: '管理系统权限的权限',
+          orderNum: 1,
         },
         {
           name: '权限查看',
@@ -163,6 +162,7 @@ export class PermissionPlugin extends ApplicationPlugin {
           type: PermissionType.PAGE,
           scope: PermissionScope.GLOBAL,
           description: '查看权限列表的权限',
+          orderNum: 2,
         },
         {
           name: '数据权限管理',
@@ -170,13 +170,27 @@ export class PermissionPlugin extends ApplicationPlugin {
           type: PermissionType.DATA,
           scope: PermissionScope.GLOBAL,
           description: '管理数据级别的权限',
+          orderNum: 3,
         },
       ];
 
       for (const permission of basePermissions) {
-        this.logger.debug(`Creating permission: ${permission.code}`);
-        await this.permissionService.create(permission);
+        try {
+          this.logger.debug(`Initializing permission: ${permission.code}`);
+          await this.permissionService.create(permission);
+          this.logger.debug(`Permission ${permission.code} initialized successfully`);
+        } catch (error) {
+          // 如果权限已存在，继续处理下一个
+          if (error instanceof BadRequestException && error.message.includes('already exists')) {
+            this.logger.debug(`Permission ${permission.code} already exists, skipping`);
+            continue;
+          }
+          // 其他错误则抛出
+          throw error;
+        }
       }
+
+      this.logger.debug('Base permissions initialized successfully');
     } catch (error) {
       this.logger.error(`Failed to initialize base permissions: ${error.message}`, error.stack);
       throw error;

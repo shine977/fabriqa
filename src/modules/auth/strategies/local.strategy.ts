@@ -1,11 +1,11 @@
-import { forwardRef, Inject, Injectable, OnModuleInit, UnauthorizedException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { AuthService } from '../services/auth.service';
 import { Request } from 'express';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy, 'local') implements OnModuleInit {
+export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   constructor(
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
@@ -16,11 +16,8 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') implement
       passReqToCallback: true,
     });
   }
-  onModuleInit() {
-    console.log('LocalStrategy initialized');
-  }
+
   async validate(req: Request, username: string, password: string): Promise<any> {
-    console.log('[LocalStrategy] Validate called:', { username, hasKey: !!req.body?.key });
     try {
       const user = await this.authService.validateUser(req.body?.key, username, password);
       if (!user) {
