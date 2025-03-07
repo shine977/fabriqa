@@ -1,0 +1,85 @@
+{
+  "appName": "Fabriqa Admin",
+  "welcome": "Welcome to Fabriqa Admin",
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "title": "Theme"
+  },
+  "language": {
+    "title": "Language",
+    "en-US": "English",
+    "zh-CN": "Chinese"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "tables": "Tables",
+    "forms": "Forms",
+    "charts": "Charts",
+    "settings": "Settings",
+    "users": "Users",
+    "profile": "Profile"
+  },
+  "action": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "apply": "Apply",
+    "confirm": "Confirm"
+  },
+  "messages": {
+    "welcome": "Welcome back",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Operation successful",
+    "confirmDelete": "Are you sure you want to delete this item?",
+    "noData": "No data available"
+  },
+  "sidebar": {
+    "toggle": "Toggle sidebar"
+  },
+  "user": {
+    "logout": "Logout",
+    "settings": "Settings",
+    "help": "Help"
+  },
+  "login": {
+    "signIn": "Sign In",
+    "email": "Email Address",
+    "username": "Username",
+    "usernameOrEmail": "Username or Email",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "signInButton": "Sign In",
+    "signingIn": "Signing in...",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Create an account",
+    "success": "Login Successful",
+    "failed": "Login Failed",
+    "invalidCredentials": "Invalid username/email or password",
+    "welcomeBack": "Welcome back to Fabriqa Admin",
+    "enterCredentials": "Please enter your credentials to access your account",
+    "welcomeMessage": "Your comprehensive administration platform for modern web applications",
+    "poweredBy": "Powered by",
+    "or": "OR",
+    "userType": "User Type",
+    "userTypes": {
+      "supplier": "Supplier",
+      "employee": "Internal Employee"
+    },
+    "selectUserType": "Please select user type"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "passwordMismatch": "Passwords do not match",
+    "invalidUsername": "Username should be 3-20 characters and contain only letters, numbers and underscore"
+  }
+}

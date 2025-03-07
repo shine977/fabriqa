@@ -5,7 +5,7 @@
  */
 
 import React, { createContext, useContext } from 'react';
-import { Plugin, HookHandler } from '../types';
+import { Plugin } from '../types';
 
 // 插件系统实现
 export class PluginSystemImpl {

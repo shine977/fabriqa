@@ -13,15 +13,19 @@ import {
   FiBarChart2,
   FiLayers,
   FiBox,
-  FiShield
+  FiShield,
+  FiTable,
+  FiGrid
 } from 'react-icons/fi';
 import { Route } from '../types';
 
 // 页面组件（使用懒加载提高性能）
 const Dashboard = React.lazy(() => import('../pages/Dashboard'));
-const UserManagement = React.lazy(() => import('../pages/UserManagement'));
 const ContentManagement = React.lazy(() => import('../pages/ContentManagement'));
 const Settings = React.lazy(() => import('../pages/Settings'));
+const TableDemo = React.lazy(() => import('../pages/TableDemo'));
+// 用户管理组件
+const UserManagement = React.lazy(() => import('../pages/user/UserManagement'));
 
 // 示例的未实现页面（使用占位符组件）
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
@@ -68,6 +72,24 @@ const routes: Route[] = [
     menu: {
       title: '数据分析',
       icon: <FiBarChart2 />,
+    },
+  },
+  {
+    path: '/components',
+    component: () => null, // 父级路由不需要组件渲染
+    menu: {
+      title: '组件示例',
+      icon: <FiGrid />,
+      children: [
+        {
+          path: '/components/table',
+          component: TableDemo,
+          menu: {
+            title: '数据表格',
+            icon: <FiTable />,
+          },
+        },
+      ],
     },
   },
   {
