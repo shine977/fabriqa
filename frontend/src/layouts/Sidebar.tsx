@@ -10,22 +10,18 @@ import { NavLink as RouterLink, useLocation } from 'react-router-dom';
 import {
   Icon,
   Tooltip,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import {
   SettingsIcon,
   StarIcon,
   ViewIcon,
-  CalendarIcon,
   InfoIcon,
   EditIcon,
-  LockIcon,
-  BellIcon,
-  SearchIcon,
+
   ChevronRightIcon,
   ChevronDownIcon,
 } from '@chakra-ui/icons';
-import { pluginSystem } from '../plugins';
+import { appPlugin } from '../plugins';
 
 // 菜单项定义
 const menuItems = [
@@ -70,7 +66,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   // 使用插件系统处理菜单项
-  const enhancedMenuItems = pluginSystem.applyHooks('layout:menuItems', menuItems);
+  const enhancedMenuItems = appPlugin.applyHooks('layout:menuItems', menuItems);
   const location = useLocation();
   
   // 跟踪打开的子菜单

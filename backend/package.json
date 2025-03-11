@@ -61,6 +61,7 @@
     "csv-stringify": "^6.5.2",
     "dataloader": "^2.2.3",
     "dayjs": "^1.11.13",
+    "dotenv": "^16.4.7",
     "elastic-apm-node": "^4.11.0",
     "eventemitter2": "^6.4.9",
     "glob": "^11.0.1",

@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
-import { useAuth } from './authService';
+import { useAuth } from './useAuth';
 
 /**
  * 路由守卫组件，保护需要认证的路由
@@ -18,9 +18,9 @@ const ProtectedRoute: React.FC = () => {
   const location = useLocation();
   
   // 如果用户未认证，重定向到登录页面，并在状态中保存当前路径
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/login" state={{ from: location }} replace />;
-  // }
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
   
   // 用户已认证，渲染子路由
   return <Outlet />;

@@ -9,7 +9,6 @@ import {
   FiHome, 
   FiUsers, 
   FiFileText, 
-  FiSettings, 
   FiBarChart2,
   FiLayers,
   FiBox,

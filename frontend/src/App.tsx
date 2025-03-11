@@ -6,15 +6,15 @@
 
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { PluginSystemProvider } from './plugins/pluginSystem';
+import { ApplicationPluginProvider } from './plugins';
 import AppRoutes from './routes';
 
 const App: React.FC = () => {
   return (
     <BrowserRouter basename="/">
-      <PluginSystemProvider>
+      <ApplicationPluginProvider>
         <AppRoutes />
-      </PluginSystemProvider>
+      </ApplicationPluginProvider>
     </BrowserRouter>
   );
 };

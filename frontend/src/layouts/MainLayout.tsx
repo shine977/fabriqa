@@ -58,10 +58,10 @@ import {
 } from '@chakra-ui/icons';
 import { FiGlobe, FiMonitor, FiLogOut } from 'react-icons/fi';
 import Sidebar from './Sidebar';
-import { pluginSystem } from '../plugins';
+import { appPlugin } from '../plugins';
 import { ThemeMode } from '../plugins/themePlugin';
 import { useTranslation, useLanguage, Language, languageOptions } from '../plugins/i18nPlugin';
-import { useAuth, authService } from '../auth/authService';
+import { useAuth } from '../auth/useAuth';
 
 interface MainLayoutProps {
   breadcrumbs?: { label: string; path: string }[];
@@ -82,25 +82,25 @@ const MainLayout: React.FC<MainLayoutProps> = ({ breadcrumbs = [] }) => {
   const { user } = useAuth();
 
   // 获取主题控制器
-  const themeController = pluginSystem.applyHooks('theme:get', null);
+  const themeController = appPlugin.applyHooks('theme:get', null);
   const [themeMode, setThemeMode] = useState<ThemeMode>(
-    pluginSystem.applyHooks('theme:getCurrentTheme', 'system')
+    appPlugin.applyHooks('theme:getCurrentTheme', 'system')
   );
   
   // 监听主题变化
   useEffect(() => {
-    const unsubscribe = pluginSystem.addHook('theme:changed', (mode: ThemeMode) => {
-      setThemeMode(mode);
-    });
-    return unsubscribe;
+    // const unsubscribe = appPlugin.applyHooks('theme:changed', (mode: ThemeMode) => {
+    //   setThemeMode(mode);
+    // });
+    // return unsubscribe;
   }, []);
 
   // 使用插件系统处理面包屑
-  const enhancedBreadcrumbs = pluginSystem.applyHooks('layout:breadcrumbs', breadcrumbs);
+  const enhancedBreadcrumbs = appPlugin.applyHooks('layout:breadcrumbs', breadcrumbs);
 
   // 切换主题的处理函数
   const handleThemeChange = (value: ThemeMode) => {
-    pluginSystem.applyHooks('theme:set', value, value);
+    appPlugin.applyHooks('theme:set', value, value);
   };
 
   // 切换语言的处理函数
@@ -110,7 +110,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ breadcrumbs = [] }) => {
 
   // 处理用户登出
   const handleLogout = () => {
-    authService.logout();
+    // authService.logout();
     
     toast({
       title: t('user.logoutSuccess'),
@@ -130,7 +130,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ breadcrumbs = [] }) => {
   const textColor = useColorModeValue('gray.800', 'white');
   
   // 获取当前可用的语言选项
-  const availableLanguages = pluginSystem.applyHooks('language:getOptions', languageOptions);
+  const availableLanguages = appPlugin.applyHooks('language:getOptions', languageOptions);
 
   return (
     <Box minH="100vh" className="dark:bg-neutral-900 bg-white">

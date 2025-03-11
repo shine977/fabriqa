@@ -11,7 +11,7 @@ import { Box, Spinner, Center } from '@chakra-ui/react';
 import routes from './routes';
 import MainLayout from '../layouts/MainLayout';
 import { flattenRoutes } from '../utils/routes';
-import { usePluginSystem } from '../plugins/pluginSystem';
+import { useAppPlugin } from '../plugins';
 import ProtectedRoute from '../auth/ProtectedRoute';
 
 // 懒加载登录页面
@@ -32,7 +32,7 @@ const LoadingComponent: React.FC = () => (
 
 // 路由组件
 const AppRoutes: React.FC = () => {
-  const pluginSystem = usePluginSystem();
+  const pluginSystem = useAppPlugin();
   
   // 通过插件系统处理路由配置
   const processedRoutes = pluginSystem.applyHooks('routes:process', routes);

@@ -1,19 +1,13 @@
 /**
  * Auth Hooks
- * 
+ *
  * This file contains React hooks for authentication using React Query.
- * It provides a complete authentication solution with loading states, 
+ * It provides a complete authentication solution with loading states,
  * error handling, and proper data fetching.
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { 
-  useQuery, 
-  useMutation, 
-  useQueryClient,
-  UseQueryResult,
-  UseMutationResult  
-} from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryResult, UseMutationResult } from '@tanstack/react-query';
 import { authApi, LoginRequest, LoginResponse, User, tokenStorage } from './auth.api';
 import { useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +28,7 @@ export function useAuth() {
   const toast = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  
+
   // Local state for authentication status
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -50,7 +44,7 @@ export function useAuth() {
       if (tokenStorage.getAccessToken()) {
         tokenStorage.clearAll();
       }
-    }
+    },
   });
 
   // Initialize authentication state
@@ -68,10 +62,10 @@ export function useAuth() {
       // Save auth data
       tokenStorage.saveTokens(data.accessToken, data.refreshToken);
       tokenStorage.saveUser(data.user);
-      
+
       // Invalidate queries to refetch user data
-      queryClient.invalidateQueries(authKeys.profile());
-      
+      // queryClient.invalidateQueries(authKeys.profile());
+
       // Show success message
       toast({
         title: t('login.success'),
@@ -79,7 +73,7 @@ export function useAuth() {
         status: 'success',
         duration: 3000,
         isClosable: true,
-        position: 'top-right'
+        position: 'top-right',
       });
     },
     onError: (error: any) => {
@@ -90,9 +84,9 @@ export function useAuth() {
         status: 'error',
         duration: 3000,
         isClosable: true,
-        position: 'top-right'
+        position: 'top-right',
       });
-    }
+    },
   });
 
   // Logout mutation
@@ -101,34 +95,34 @@ export function useAuth() {
     onSettled: () => {
       // Always clear local storage, even if the server call fails
       tokenStorage.clearAll();
-      
+
       // Reset auth state
       queryClient.resetQueries(authKeys.all);
-      
+
       // Redirect to login
       navigate('/login');
-      
+
       // Show success message
       toast({
         title: t('logout.success'),
         status: 'success',
         duration: 3000,
         isClosable: true,
-        position: 'top-right'
+        position: 'top-right',
       });
-    }
+    },
   });
 
   // Refresh token mutation
   const refreshTokenMutation = useMutation({
     mutationFn: authApi.refreshToken,
-    onSuccess: (data) => {
+    onSuccess: data => {
       // Update access token
       const refreshToken = tokenStorage.getRefreshToken();
       if (refreshToken) {
         tokenStorage.saveTokens(data.accessToken, refreshToken);
       }
-      
+
       // Refetch user profile with new token
       queryClient.invalidateQueries(authKeys.profile());
     },
@@ -137,7 +131,7 @@ export function useAuth() {
       tokenStorage.clearAll();
       queryClient.resetQueries(authKeys.all);
       navigate('/login');
-    }
+    },
   });
 
   /**
@@ -145,13 +139,16 @@ export function useAuth() {
    * @param credentials User credentials
    * @param redirectPath Path to redirect after successful login
    */
-  const login = useCallback((credentials: LoginRequest, redirectPath: string = '/') => {
-    loginMutation.mutate(credentials, {
-      onSuccess: () => {
-        navigate(redirectPath, { replace: true });
-      }
-    });
-  }, [loginMutation, navigate]);
+  const login = useCallback(
+    (credentials: LoginRequest, redirectPath: string = '/') => {
+      loginMutation.mutate(credentials, {
+        onSuccess: () => {
+          navigate(redirectPath, { replace: true });
+        },
+      });
+    },
+    [loginMutation, navigate]
+  );
 
   /**
    * Logout handler
@@ -170,27 +167,27 @@ export function useAuth() {
     user: profileQuery.data,
     isLoading: profileQuery.isLoading,
     isAuthenticated,
-    
+
     // Auth operations
     login,
     logout,
     refreshToken: refreshTokenMutation.mutate,
-    
+
     // Detailed status for operations
     loginStatus: {
       isLoading: loginMutation.isPending,
-      error: loginMutation.error
+      error: loginMutation.error,
     },
     logoutStatus: {
       isLoading: logoutMutation.isPending,
-      error: logoutMutation.error
+      error: logoutMutation.error,
     },
-    
+
     // Raw query/mutation results for advanced usage
     profileQuery,
     loginMutation,
     logoutMutation,
-    refreshTokenMutation
+    refreshTokenMutation,
   };
 }
 
@@ -224,6 +221,6 @@ export function useRedirectAuthenticated(redirectPath = '/') {
       navigate(redirectPath, { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate, redirectPath]);
-  
+
   return { isAuthenticated, isLoading };
 }
