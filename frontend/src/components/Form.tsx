@@ -1,6 +1,6 @@
 /**
  * Form Component
- * 
+ *
  * 通用表单组件，支持多种字段类型和验证
  */
 
@@ -28,7 +28,7 @@ import {
   Divider,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { pluginSystem } from '../plugins';
+import { appPlugin } from '../plugins';
 import { FormField } from '../types';
 
 interface FormProps {
@@ -55,22 +55,22 @@ const Form: React.FC<FormProps> = ({
   className = '',
 }) => {
   // 使用插件系统处理字段
-  const fields = pluginSystem.applyHooks('form:fields', propFields);
-  
+  const fields = appPlugin.applyHooks('form:fields', propFields);
+
   // 表单状态
   const [values, setValues] = React.useState<Record<string, any>>(initialValues);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [touched, setTouched] = React.useState<Record<string, boolean>>({});
-  
+
   // 表单变更处理
   const handleChange = (name: string, value: any) => {
     setValues(prev => ({ ...prev, [name]: value }));
-    
+
     // 标记为已触碰
     if (!touched[name]) {
       setTouched(prev => ({ ...prev, [name]: true }));
     }
-    
+
     // 清除错误
     if (errors[name]) {
       setErrors(prev => {
@@ -80,54 +80,54 @@ const Form: React.FC<FormProps> = ({
       });
     }
   };
-  
+
   // 验证表单
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     fields.forEach(field => {
       if (field.required && !values[field.name]) {
         newErrors[field.name] = `${field.label}是必填项`;
       }
-      
+
       // 可以在这里添加更多验证规则
     });
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
+
   // 表单提交
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // 标记所有字段为已触碰
     const allTouched: Record<string, boolean> = {};
     fields.forEach(field => {
       allTouched[field.name] = true;
     });
     setTouched(allTouched);
-    
+
     // 验证表单
     if (validate()) {
       // 使用插件系统处理表单数据
-      const processedData = pluginSystem.applyHooks('form:beforeSubmit', values);
+      const processedData = appPlugin.applyHooks('form:beforeSubmit', values);
       onSubmit(processedData);
     }
   };
-  
+
   // 渲染表单字段
   const renderField = (field: FormField) => {
     // 如果字段隐藏，则不渲染
     if (field.hidden) return null;
-    
+
     // 自定义渲染
     if (field.customRender) {
       return field.customRender(field);
     }
-    
+
     const hasError = !!errors[field.name] && touched[field.name];
-    
+
     // 基础属性
     const commonProps = {
       id: field.name,
@@ -137,40 +137,31 @@ const Form: React.FC<FormProps> = ({
       isInvalid: hasError,
       ...field.fieldProps,
     };
-    
+
     switch (field.type) {
       case 'input':
         return (
           <FormControl isInvalid={hasError} isRequired={field.required}>
             <FormLabel htmlFor={field.name}>{field.label}</FormLabel>
-            <Input
-              {...commonProps}
-              onChange={(e) => handleChange(field.name, e.target.value)}
-            />
+            <Input {...commonProps} onChange={e => handleChange(field.name, e.target.value)} />
             {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
           </FormControl>
         );
-        
+
       case 'textarea':
         return (
           <FormControl isInvalid={hasError} isRequired={field.required}>
             <FormLabel htmlFor={field.name}>{field.label}</FormLabel>
-            <Textarea
-              {...commonProps}
-              onChange={(e) => handleChange(field.name, e.target.value)}
-            />
+            <Textarea {...commonProps} onChange={e => handleChange(field.name, e.target.value)} />
             {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
           </FormControl>
         );
-        
+
       case 'select':
         return (
           <FormControl isInvalid={hasError} isRequired={field.required}>
             <FormLabel htmlFor={field.name}>{field.label}</FormLabel>
-            <Select
-              {...commonProps}
-              onChange={(e) => handleChange(field.name, e.target.value)}
-            >
+            <Select {...commonProps} onChange={e => handleChange(field.name, e.target.value)}>
               {!field.required && <option value="">请选择</option>}
               {field.options?.map((option, index) => (
                 <option key={index} value={option.value}>
@@ -181,15 +172,12 @@ const Form: React.FC<FormProps> = ({
             {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
           </FormControl>
         );
-        
+
       case 'radio':
         return (
           <FormControl isInvalid={hasError} isRequired={field.required}>
             <FormLabel htmlFor={field.name}>{field.label}</FormLabel>
-            <RadioGroup
-              {...commonProps}
-              onChange={(value) => handleChange(field.name, value)}
-            >
+            <RadioGroup {...commonProps} onChange={value => handleChange(field.name, value)}>
               <Stack direction="row">
                 {field.options?.map((option, index) => (
                   <Radio key={index} value={String(option.value)}>
@@ -201,7 +189,7 @@ const Form: React.FC<FormProps> = ({
             {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
           </FormControl>
         );
-        
+
       case 'checkbox':
         return (
           <FormControl isInvalid={hasError} isRequired={field.required}>
@@ -209,14 +197,14 @@ const Form: React.FC<FormProps> = ({
             <Checkbox
               {...commonProps}
               isChecked={!!values[field.name]}
-              onChange={(e) => handleChange(field.name, e.target.checked)}
+              onChange={e => handleChange(field.name, e.target.checked)}
             >
               {field.label}
             </Checkbox>
             {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
           </FormControl>
         );
-        
+
       case 'switch':
         return (
           <FormControl isInvalid={hasError} isRequired={field.required}>
@@ -224,37 +212,34 @@ const Form: React.FC<FormProps> = ({
             <Switch
               {...commonProps}
               isChecked={!!values[field.name]}
-              onChange={(e) => handleChange(field.name, e.target.checked)}
+              onChange={e => handleChange(field.name, e.target.checked)}
             />
             {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
           </FormControl>
         );
-        
+
       case 'number':
         return (
           <FormControl isInvalid={hasError} isRequired={field.required}>
             <FormLabel htmlFor={field.name}>{field.label}</FormLabel>
-            <NumberInput
-              {...commonProps}
-              onChange={(_, valueAsNumber) => handleChange(field.name, valueAsNumber)}
-            >
+            <NumberInput {...commonProps} onChange={(_, valueAsNumber) => handleChange(field.name, valueAsNumber)}>
               <NumberInputField />
             </NumberInput>
             {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
           </FormControl>
         );
-        
+
       default:
         return null;
     }
   };
-  
+
   const formBg = useColorModeValue('white', 'gray.800');
   const formBorderColor = useColorModeValue('gray.200', 'gray.700');
-  
+
   // 计算列宽
   const colSpan = 12 / columnCount;
-  
+
   return (
     <Box
       className={`form-container ${className}`}
@@ -272,7 +257,7 @@ const Form: React.FC<FormProps> = ({
           </Box>
         </>
       )}
-      
+
       <Box p={6}>
         <form onSubmit={handleSubmit}>
           <Stack spacing={6} direction="column">
@@ -280,18 +265,12 @@ const Form: React.FC<FormProps> = ({
               // 单列布局
               <VStack spacing={4} align="stretch">
                 {fields.map((field, index) => (
-                  <Box key={field.name || index}>
-                    {renderField(field)}
-                  </Box>
+                  <Box key={field.name || index}>{renderField(field)}</Box>
                 ))}
               </VStack>
             ) : (
               // 多列布局
-              <Stack
-                spacing={6}
-                direction={{ base: 'column', md: 'row' }}
-                wrap="wrap"
-              >
+              <Stack spacing={6} direction={{ base: 'column', md: 'row' }} wrap="wrap">
                 {fields.map((field, index) => (
                   <Box
                     key={field.name || index}
@@ -303,15 +282,11 @@ const Form: React.FC<FormProps> = ({
                 ))}
               </Stack>
             )}
-            
+
             <Divider />
-            
+
             <Box textAlign="right">
-              <Button
-                type="submit"
-                colorScheme="blue"
-                isLoading={isLoading}
-              >
+              <Button type="submit" colorScheme="blue" isLoading={isLoading}>
                 {submitButtonText}
               </Button>
             </Box>

@@ -1,6 +1,6 @@
 /**
  * Table Component
- * 
+ *
  * 通用表格组件，支持排序、筛选和分页，与插件系统深度集成
  */
 
@@ -30,17 +30,17 @@ import {
   HStack,
   Select,
 } from '@chakra-ui/react';
-import { 
-  ChevronLeftIcon, 
-  ChevronRightIcon, 
-  ChevronDownIcon, 
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronDownIcon,
   ChevronUpIcon,
   SearchIcon,
   SettingsIcon,
   ArrowUpIcon,
-  ArrowDownIcon
+  ArrowDownIcon,
 } from '@chakra-ui/icons';
-import { pluginSystem } from '../plugins';
+import { appPlugin } from '../plugins';
 import { TableColumn } from '../types';
 
 // 表格配置接口
@@ -104,41 +104,42 @@ const Table: React.FC<TableProps> = ({
     showBorders: defaultSettings?.showBorders !== undefined ? defaultSettings.showBorders : false,
     highlightOnHover: defaultSettings?.highlightOnHover !== undefined ? defaultSettings.highlightOnHover : true,
   });
-  
+
   // 应用插件系统处理设置
   const finalSettings = useMemo(() => {
-    return pluginSystem.applyHooks('dataTable:settings', settings);
+    return appPlugin.applyHooks('dataTable:settings', settings);
   }, [settings]);
-  
+
   // 使用插件系统处理列定义
   const columns = useMemo(() => {
-    return pluginSystem.applyHooks('table:columns', propColumns);
+    return appPlugin.applyHooks('table:columns', propColumns);
   }, [propColumns]);
-  
+
   // 排序状态
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
-  
+
   // 过滤状态
   const [filterConfig, setFilterConfig] = useState<FilterConfig>({});
-  
+
   // 搜索状态
   const [searchTerm, setSearchTerm] = useState<string>('');
-  
+
   // 处理排序后的数据
   const sortedData = useMemo(() => {
     let sortableData = [...propData];
-    
+
     // 如果有排序配置
     if (sortConfig !== null) {
       const { key, direction } = sortConfig;
-      
+
       // 使用插件系统处理排序
-      sortableData = pluginSystem.applyHooks('dataTable:sorter', 
+      sortableData = appPlugin.applyHooks(
+        'dataTable:sorter',
         (data: any[], config: SortConfig) => {
           return data.sort((a, b) => {
             const aValue = a[config.key];
             const bValue = b[config.key];
-            
+
             if (aValue < bValue) {
               return config.direction === 'asc' ? -1 : 1;
             }
@@ -147,23 +148,24 @@ const Table: React.FC<TableProps> = ({
             }
             return 0;
           });
-        }, 
-        sortableData, 
+        },
+        sortableData,
         sortConfig
       );
     }
-    
+
     return sortableData;
   }, [propData, sortConfig]);
-  
+
   // 处理过滤后的数据
   const filteredData = useMemo(() => {
     let filteredData = sortedData;
-    
+
     // 应用筛选条件
     if (Object.keys(filterConfig).length > 0) {
       // 使用插件系统处理过滤
-      filteredData = pluginSystem.applyHooks('dataTable:filterProcessor',
+      filteredData = appPlugin.applyHooks(
+        'dataTable:filterProcessor',
         (data: any[], config: FilterConfig) => {
           return data.filter(item => {
             for (const key in config) {
@@ -178,7 +180,7 @@ const Table: React.FC<TableProps> = ({
         filterConfig
       );
     }
-    
+
     // 应用搜索
     if (searchTerm) {
       filteredData = filteredData.filter(item => {
@@ -189,126 +191,107 @@ const Table: React.FC<TableProps> = ({
         });
       });
     }
-    
+
     return filteredData;
   }, [sortedData, filterConfig, searchTerm, columns]);
-  
+
   // 使用插件系统处理数据
   const data = useMemo(() => {
-    return pluginSystem.applyHooks('table:data', filteredData);
+    return appPlugin.applyHooks('table:data', filteredData);
   }, [filteredData]);
-  
+
   // 处理排序请求
   const handleSort = (columnKey: string) => {
     let direction: 'asc' | 'desc' = 'asc';
-    
+
     if (sortConfig && sortConfig.key === columnKey) {
       direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
     }
-    
+
     setSortConfig({ key: columnKey, direction });
   };
-  
+
   // 处理行选择
-  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>(
-    rowSelection?.selectedRowKeys || []
-  );
-  
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>(rowSelection?.selectedRowKeys || []);
+
   useEffect(() => {
     if (rowSelection) {
       setSelectedRowKeys(rowSelection.selectedRowKeys);
     }
   }, [rowSelection?.selectedRowKeys]);
-  
+
   const handleRowSelect = (record: any) => {
     if (!rowSelection) return;
-    
+
     const key = String(record[rowKey]);
     const isSelected = selectedRowKeys.includes(key);
-    
+
     // 使用插件系统处理行选择
-    const newSelection = pluginSystem.applyHooks('dataTable:rowSelection',
+    const newSelection = appPlugin.applyHooks(
+      'dataTable:rowSelection',
       (current: boolean, rec: any, idx: number) => !current,
       isSelected,
       record,
       propData.indexOf(record)
     );
-    
-    const newSelectedRowKeys = newSelection
-      ? [...selectedRowKeys, key]
-      : selectedRowKeys.filter(k => k !== key);
-    
+
+    const newSelectedRowKeys = newSelection ? [...selectedRowKeys, key] : selectedRowKeys.filter(k => k !== key);
+
     setSelectedRowKeys(newSelectedRowKeys);
     rowSelection.onChange(
       newSelectedRowKeys,
       data.filter(item => newSelectedRowKeys.includes(String(item[rowKey])))
     );
   };
-  
+
   // 计算样式
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const headerBg = useColorModeValue('gray.50', 'gray.800');
   const hoverBg = useColorModeValue('gray.50', 'gray.700');
   const stripedBg = useColorModeValue('gray.50', 'gray.700');
-  
+
   // 行高样式
   const densityStyles = {
     compact: { px: 2, py: 1 },
     comfortable: { px: 4, py: 3 },
     spacious: { px: 6, py: 4 },
   };
-  
+
   return (
     <Box className={className}>
       {/* 工具栏 */}
       {(showSearch || showSettings) && (
-        <Flex 
-          justify="space-between" 
-          align="center" 
-          mb={4} 
-          p={2} 
-          borderWidth={finalSettings.showBorders ? "1px" : 0}
-          borderRadius="md" 
+        <Flex
+          justify="space-between"
+          align="center"
+          mb={4}
+          p={2}
+          borderWidth={finalSettings.showBorders ? '1px' : 0}
+          borderRadius="md"
           borderColor={borderColor}
         >
           {/* 搜索框 */}
           {showSearch && (
             <Flex maxW="300px">
-              <Input
-                placeholder="搜索..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                size="sm"
-              />
-              <IconButton
-                ml={2}
-                aria-label="搜索"
-                icon={<SearchIcon />}
-                size="sm"
-              />
+              <Input placeholder="搜索..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} size="sm" />
+              <IconButton ml={2} aria-label="搜索" icon={<SearchIcon />} size="sm" />
             </Flex>
           )}
-          
+
           {/* 设置菜单 */}
           {showSettings && (
             <Menu>
               <Tooltip label="表格设置">
-                <MenuButton 
-                  as={IconButton} 
-                  icon={<SettingsIcon />} 
-                  variant="outline" 
-                  size="sm"
-                  aria-label="表格设置"
-                />
+                <MenuButton as={IconButton} icon={<SettingsIcon />} variant="outline" size="sm" aria-label="表格设置" />
               </Tooltip>
               <MenuList>
                 <MenuItem closeOnSelect={false}>
                   <Flex w="100%" justify="space-between" align="center">
                     <Text>密度</Text>
-                    <Select 
-                      size="xs" 
+                    <Select
+                      size="xs"
                       value={finalSettings.density}
-                      onChange={(e) => setSettings({...settings, density: e.target.value as any})}
+                      onChange={e => setSettings({ ...settings, density: e.target.value as any })}
                       width="120px"
                     >
                       <option value="compact">紧凑</option>
@@ -317,54 +300,45 @@ const Table: React.FC<TableProps> = ({
                     </Select>
                   </Flex>
                 </MenuItem>
-                <MenuItem closeOnSelect={false} onClick={() => 
-                  setSettings({...settings, stripedRows: !settings.stripedRows})
-                }>
-                  <Checkbox isChecked={finalSettings.stripedRows}>
-                    条纹行
-                  </Checkbox>
+                <MenuItem
+                  closeOnSelect={false}
+                  onClick={() => setSettings({ ...settings, stripedRows: !settings.stripedRows })}
+                >
+                  <Checkbox isChecked={finalSettings.stripedRows}>条纹行</Checkbox>
                 </MenuItem>
-                <MenuItem closeOnSelect={false} onClick={() => 
-                  setSettings({...settings, showBorders: !settings.showBorders})
-                }>
-                  <Checkbox isChecked={finalSettings.showBorders}>
-                    显示边框
-                  </Checkbox>
+                <MenuItem
+                  closeOnSelect={false}
+                  onClick={() => setSettings({ ...settings, showBorders: !settings.showBorders })}
+                >
+                  <Checkbox isChecked={finalSettings.showBorders}>显示边框</Checkbox>
                 </MenuItem>
-                <MenuItem closeOnSelect={false} onClick={() => 
-                  setSettings({...settings, highlightOnHover: !settings.highlightOnHover})
-                }>
-                  <Checkbox isChecked={finalSettings.highlightOnHover}>
-                    悬停高亮
-                  </Checkbox>
+                <MenuItem
+                  closeOnSelect={false}
+                  onClick={() => setSettings({ ...settings, highlightOnHover: !settings.highlightOnHover })}
+                >
+                  <Checkbox isChecked={finalSettings.highlightOnHover}>悬停高亮</Checkbox>
                 </MenuItem>
               </MenuList>
             </Menu>
           )}
         </Flex>
       )}
-      
+
       {/* 加载中状态 */}
       {loading && (
         <Flex justify="center" align="center" h="20" w="full">
-          <Spinner
-            thickness="4px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            color="blue.500"
-            size="md"
-          />
+          <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="md" />
         </Flex>
       )}
-      
+
       {/* 表格 */}
-      <Box 
-        overflowX="auto" 
-        borderWidth={finalSettings.showBorders ? "1px" : 0}
+      <Box
+        overflowX="auto"
+        borderWidth={finalSettings.showBorders ? '1px' : 0}
         borderRadius="md"
         borderColor={borderColor}
       >
-        <ChakraTable variant={finalSettings.showBorders ? "simple" : "unstyled"} size="md">
+        <ChakraTable variant={finalSettings.showBorders ? 'simple' : 'unstyled'} size="md">
           <Thead bg={headerBg}>
             <Tr>
               {/* 选择框 */}
@@ -375,12 +349,10 @@ const Table: React.FC<TableProps> = ({
                     isIndeterminate={selectedRowKeys.length > 0 && selectedRowKeys.length < data.length}
                     onChange={() => {
                       if (!rowSelection) return;
-                      
+
                       const newSelectedRowKeys =
-                        selectedRowKeys.length === data.length
-                          ? []
-                          : data.map(item => String(item[rowKey]));
-                      
+                        selectedRowKeys.length === data.length ? [] : data.map(item => String(item[rowKey]));
+
                       setSelectedRowKeys(newSelectedRowKeys);
                       rowSelection.onChange(
                         newSelectedRowKeys,
@@ -390,7 +362,7 @@ const Table: React.FC<TableProps> = ({
                   />
                 </Th>
               )}
-              
+
               {/* 列头 */}
               {columns.map((column, index) => (
                 <Th
@@ -418,7 +390,7 @@ const Table: React.FC<TableProps> = ({
               ))}
             </Tr>
           </Thead>
-          
+
           <Tbody>
             {data.length === 0 ? (
               <Tr>
@@ -444,34 +416,33 @@ const Table: React.FC<TableProps> = ({
                     <Td {...densityStyles[finalSettings.density]} width="1%">
                       <Checkbox
                         isChecked={selectedRowKeys.includes(String(record[rowKey]))}
-                        onChange={(e) => {
+                        onChange={e => {
                           e.stopPropagation();
                           handleRowSelect(record);
                         }}
                       />
                     </Td>
                   )}
-                  
+
                   {/* 数据单元格 */}
                   {columns.map((column, columnIndex) => {
                     // 获取列值
                     const value = record[column.dataIndex];
-                    
+
                     // 自定义渲染或默认渲染
-                    let cellContent = column.render
-                      ? column.render(value, record, recordIndex)
-                      : value;
-                    
+                    let cellContent = column.render ? column.render(value, record, recordIndex) : value;
+
                     // 应用插件系统处理单元格渲染
                     if (column.dataIndex === 'status' || column.key === 'status') {
-                      cellContent = pluginSystem.applyHooks('dataTable:statusCellRenderer', 
-                        cellContent, 
-                        value, 
-                        record, 
+                      cellContent = appPlugin.applyHooks(
+                        'dataTable:statusCellRenderer',
+                        cellContent,
+                        value,
+                        record,
                         recordIndex
                       );
                     }
-                    
+
                     return (
                       <Td
                         key={`${column.dataIndex || column.key}-${columnIndex}`}
@@ -495,7 +466,7 @@ const Table: React.FC<TableProps> = ({
           </Tbody>
         </ChakraTable>
       </Box>
-      
+
       {/* 分页 */}
       {pagination && pagination.total > 0 && (
         <Flex
@@ -504,16 +475,15 @@ const Table: React.FC<TableProps> = ({
           px={4}
           py={3}
           mt={4}
-          borderWidth={finalSettings.showBorders ? "1px" : 0}
+          borderWidth={finalSettings.showBorders ? '1px' : 0}
           borderRadius="md"
           borderColor={borderColor}
         >
           <Text fontSize="sm" color="gray.600">
             显示 {(pagination.currentPage - 1) * pagination.pageSize + 1} 到{' '}
-            {Math.min(pagination.currentPage * pagination.pageSize, pagination.total)} 条，
-            共 {pagination.total} 条
+            {Math.min(pagination.currentPage * pagination.pageSize, pagination.total)} 条， 共 {pagination.total} 条
           </Text>
-          
+
           <ButtonGroup size="sm" variant="outline" spacing={2}>
             <IconButton
               aria-label="上一页"
@@ -521,18 +491,16 @@ const Table: React.FC<TableProps> = ({
               onClick={() => pagination.onChange(pagination.currentPage - 1, pagination.pageSize)}
               isDisabled={pagination.currentPage === 1}
             />
-            
+
             <Button variant="solid" colorScheme="blue">
               {pagination.currentPage} / {Math.ceil(pagination.total / pagination.pageSize)}
             </Button>
-            
+
             <IconButton
               aria-label="下一页"
               icon={<ChevronRightIcon boxSize={4} />}
               onClick={() => pagination.onChange(pagination.currentPage + 1, pagination.pageSize)}
-              isDisabled={
-                pagination.currentPage === Math.ceil(pagination.total / pagination.pageSize)
-              }
+              isDisabled={pagination.currentPage === Math.ceil(pagination.total / pagination.pageSize)}
             />
           </ButtonGroup>
         </Flex>

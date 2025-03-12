@@ -1,19 +1,12 @@
 /**
  * Page Component
- * 
+ *
  * 通用页面组件，提供标准化的页面结构
  */
 
 import React, { useEffect } from 'react';
-import {
-  Box,
-  Heading,
-  Divider,
-  Spinner,
-  Flex,
-  useColorModeValue,
-} from '@chakra-ui/react';
-import { pluginSystem } from '../plugins';
+import { Box, Heading, Divider, Spinner, Flex, useColorModeValue } from '@chakra-ui/react';
+import { appPlugin } from '../plugins';
 
 interface PageProps {
   title?: string;
@@ -35,14 +28,14 @@ const Page: React.FC<PageProps> = ({
   useEffect(() => {
     // 使用插件系统处理标题
     if (title) {
-      const modifiedTitle = pluginSystem.applyHooks('page:title', title);
+      const modifiedTitle = appPlugin.applyHooks('page:title', title);
       document.title = modifiedTitle;
     }
   }, [title]);
 
   // 应用page:content钩子
-  const content = pluginSystem.applyHooks('page:content', children);
-  
+  const content = appPlugin.applyHooks('page:content', children);
+
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
@@ -68,13 +61,7 @@ const Page: React.FC<PageProps> = ({
       <Box p={6}>
         {loading ? (
           <Flex justify="center" align="center" h="40">
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="blue.500"
-              size="xl"
-            />
+            <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />
           </Flex>
         ) : (
           content

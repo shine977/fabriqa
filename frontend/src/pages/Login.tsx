@@ -1,6 +1,6 @@
 /**
  * Login Page Component
- * 
+ *
  * 登录页面组件，提供用户认证入口
  * 采用现代科技风格设计，注重用户体验与视觉美感
  * 融合光效、动画与优雅过渡，打造沉浸式登录体验
@@ -36,20 +36,18 @@ import {
   Icon,
   VStack,
   Image,
-  Select
+  Select,
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
-import { ViewIcon, ViewOffIcon, LockIcon, EmailIcon, ArrowForwardIcon } from '@chakra-ui/icons';
-import { FiUser, FiLogIn, FiKey } from 'react-icons/fi';
+import { ViewIcon, ViewOffIco, EmailIcon } from '@chakra-ui/icons';
+import { FiUser, FiLogIn } from 'react-icons/fi';
 import { useTranslation } from '../plugins/i18nPlugin';
 import { ThemeMode } from '../plugins/themePlugin';
 import { appPlugin } from '../plugins';
 import { useAuth } from '../services/auth';
-import { encryptData, generateBase64Key, stringToCryptoKey } from '../utils/crypto';
+import { encryptData } from '../utils/crypto';
 
 // 背景图案 SVG
-const patternBg = `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E")`;
-
 // 光效动画
 const glowAnimation = keyframes`
   0% { box-shadow: 0 0 10px 2px rgba(79, 209, 197, 0.3); }
@@ -77,23 +75,21 @@ const Login: React.FC = () => {
   const { login, loginStatus } = useAuth();
   const [identifier, setIdentifier] = useState(''); // 用户名或邮箱
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{identifier?: string, password?: string}>({});
+  const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [userType, setUserType] = useState<UserType>('employee'); // 默认为内部员工
   const [credentialType, setCredentialType] = useState<LoginCredentialType>('email'); // 默认使用邮箱登录
-  
+
   // 获取当前主题
-  const [themeMode, setThemeMode] = useState<ThemeMode>(
-    appPlugin.applyHooks('theme:getCurrentTheme', 'system')
-  );
-  
+  const [themeMode, setThemeMode] = useState<ThemeMode>(appPlugin.applyHooks('theme:getCurrentTheme', 'system'));
+
   // 动画控制
   const { isOpen, onOpen } = useDisclosure();
-  
+
   // Toast通知
   const toast = useToast();
-  
+
   // 在组件挂载时启动入场动画
   useEffect(() => {
     onOpen();
@@ -107,8 +103,8 @@ const Login: React.FC = () => {
   const isValidUsername = (value: string) => /^[a-zA-Z0-9_]{3,20}$/.test(value);
 
   const validateForm = () => {
-    const newErrors: {identifier?: string, password?: string} = {};
-    
+    const newErrors: { identifier?: string; password?: string } = {};
+
     if (!identifier) {
       newErrors.identifier = t('validation.required');
     } else if (credentialType === 'email' && !isEmail(identifier)) {
@@ -116,13 +112,13 @@ const Login: React.FC = () => {
     } else if (credentialType === 'username' && !isValidUsername(identifier)) {
       newErrors.identifier = t('validation.invalidUsername');
     }
-    
+
     if (!password) {
       newErrors.password = t('validation.required');
     } else if (password.length < 6) {
       newErrors.password = t('validation.passwordTooShort');
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -130,31 +126,31 @@ const Login: React.FC = () => {
   // 登录处理
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     // 确定登录凭证
-    const credentials= {
-      password: await encryptData(password,'e3a74e3c7599f3ab4601d587bd2cc768' )
+    const credentials = {
+      password: await encryptData(password, 'e3a74e3c7599f3ab4601d587bd2cc768'),
     };
-    
+
     // 根据登录类型设置用户名或邮箱
     if (credentialType === 'email') {
       credentials['email'] = identifier;
     } else {
       credentials['username'] = identifier;
     }
-    
+
     // 设置用户类型
     credentials.type = userType;
-    
+
     // 调用登录API，登录成功后会自动跳转
     login(credentials, from);
   };
 
   // 切换凭证类型（邮箱/用户名）
   const toggleCredentialType = () => {
-    setCredentialType(prev => prev === 'email' ? 'username' : 'email');
+    setCredentialType(prev => (prev === 'email' ? 'username' : 'email'));
     setIdentifier(''); // 清空输入
     setErrors({}); // 清空错误
   };
@@ -168,21 +164,18 @@ const Login: React.FC = () => {
 
   // 品牌颜色
   const brandColor = useColorModeValue('primary.600', 'primary.500');
-  const bgGradient = useColorModeValue(
-    'linear(to-br, primary.600, cyan.600)',
-    'linear(to-br, primary.700, cyan.800)'
-  );
+  const bgGradient = useColorModeValue('linear(to-br, primary.600, cyan.600)', 'linear(to-br, primary.700, cyan.800)');
   const cardBg = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.700', 'gray.100');
   const borderColor = useColorModeValue('gray.100', 'gray.700');
-  
+
   // 动画样式
   const glowStyle = {
-    animation: `${glowAnimation} 3s infinite ease-in-out`
+    animation: `${glowAnimation} 3s infinite ease-in-out`,
   };
-  
+
   const floatStyle = {
-    animation: `${floatAnimation} 6s infinite ease-in-out`
+    animation: `${floatAnimation} 6s infinite ease-in-out`,
   };
 
   return (
@@ -191,7 +184,9 @@ const Login: React.FC = () => {
       align="center"
       justify="center"
       position="relative"
-      className={`bg-gradient-to-br from-slate-50 to-slate-100 dark:from-neutral-900 dark:to-neutral-800 ${themeMode === 'dark' ? 'dark' : ''}`}
+      className={`bg-gradient-to-br from-slate-50 to-slate-100 dark:from-neutral-900 dark:to-neutral-800 ${
+        themeMode === 'dark' ? 'dark' : ''
+      }`}
       overflow="hidden"
     >
       {/* 背景装饰元素 */}
@@ -208,7 +203,7 @@ const Login: React.FC = () => {
         zIndex="0"
         sx={floatStyle}
       />
-      
+
       <Box
         position="absolute"
         bottom="10%"
@@ -222,13 +217,13 @@ const Login: React.FC = () => {
         zIndex="0"
         sx={floatStyle}
       />
-      
+
       <ScaleFade initialScale={0.9} in={isOpen}>
         <Flex
           direction={{ base: 'column', md: 'row' }}
           overflow="hidden"
           maxW="1200px"
-          w={{ base: "95%", md: "90%" }}
+          w={{ base: '95%', md: '90%' }}
           mx="auto"
           boxShadow="2xl"
           borderRadius="2xl"
@@ -238,8 +233,8 @@ const Login: React.FC = () => {
         >
           {/* 左侧设计区域 */}
           <Box
-            w={{ base: "100%", md: "50%" }}
-            h={{ base: "250px", md: "auto" }}
+            w={{ base: '100%', md: '50%' }}
+            h={{ base: '250px', md: 'auto' }}
             bg="primary.600"
             color="white"
             p={{ base: 8, md: 10 }}
@@ -252,16 +247,8 @@ const Login: React.FC = () => {
             className="bg-gradient-to-br from-primary-600 to-primary-700 dark:from-primary-700 dark:to-primary-800"
           >
             {/* 背景图案 */}
-            <Box 
-              position="absolute"
-              top="0"
-              left="0"
-              right="0"
-              bottom="0"
-              opacity="0.1"
-              backgroundImage={patternBg}
-            />
-            
+            <Box position="absolute" top="0" left="0" right="0" bottom="0" opacity="0.1" className="gradient-mesh" />
+
             {/* 装饰光圈 */}
             <Box
               position="absolute"
@@ -273,7 +260,7 @@ const Login: React.FC = () => {
               bg="whiteAlpha.100"
               sx={glowStyle}
             />
-            
+
             <Box
               position="absolute"
               top="-100px"
@@ -284,10 +271,10 @@ const Login: React.FC = () => {
               bg="whiteAlpha.100"
               sx={glowStyle}
             />
-            
+
             {/* 主内容 */}
             <Box zIndex="1" textAlign="center" sx={floatStyle}>
-              <Box 
+              <Box
                 display="inline-flex"
                 alignItems="center"
                 justifyContent="center"
@@ -299,12 +286,7 @@ const Login: React.FC = () => {
                 sx={glowStyle}
                 className="shadow-glow"
               >
-                <Box 
-                  as="span" 
-                  color="primary.600"
-                  fontSize="4xl"
-                  fontWeight="bold"
-                >
+                <Box as="span" color="primary.600" fontSize="4xl" fontWeight="bold">
                   F
                 </Box>
               </Box>
@@ -318,12 +300,7 @@ const Login: React.FC = () => {
           </Box>
 
           {/* 右侧表单区域 */}
-          <Box 
-            w={{ base: "100%", md: "50%" }}
-            p={{ base: 8, md: 10 }}
-            bg={cardBg}
-            color={currentThemeStyles.textColor}
-          >
+          <Box w={{ base: '100%', md: '50%' }} p={{ base: 8, md: 10 }} bg={cardBg} color={currentThemeStyles.textColor}>
             <Heading
               as="h2"
               size="lg"
@@ -335,29 +312,26 @@ const Login: React.FC = () => {
             >
               {t('login.signIn')}
             </Heading>
-            <Text 
-              fontSize="sm" 
-              textAlign="center"
-              color={useColorModeValue('gray.600', 'gray.400')}
-              mb="8"
-            >
+            <Text fontSize="sm" textAlign="center" color={useColorModeValue('gray.600', 'gray.400')} mb="8">
               {t('login.enterCredentials')}
             </Text>
 
             {/* 用户类型选择 */}
             <FormControl mb={6}>
-              <FormLabel fontWeight="medium" fontSize="sm">{t('login.userType')}</FormLabel>
+              <FormLabel fontWeight="medium" fontSize="sm">
+                {t('login.userType')}
+              </FormLabel>
               <Select
                 value={userType}
-                onChange={(e) => setUserType(e.target.value as UserType)}
+                onChange={e => setUserType(e.target.value as UserType)}
                 size="lg"
                 borderRadius="lg"
                 bg={currentThemeStyles.inputBgColor}
                 borderColor={borderColor}
                 _hover={{ borderColor: brandColor }}
-                _focus={{ 
-                  borderColor: brandColor, 
-                  boxShadow: `0 0 0 1px ${brandColor}` 
+                _focus={{
+                  borderColor: brandColor,
+                  boxShadow: `0 0 0 1px ${brandColor}`,
                 }}
               >
                 <option value="employee">{t('login.userTypes.employee')}</option>
@@ -367,16 +341,14 @@ const Login: React.FC = () => {
 
             <form onSubmit={handleLogin}>
               {/* 用户标识（邮箱或用户名）*/}
-              <FormControl
-                id="identifier"
-                mb="5"
-                isInvalid={!!errors.identifier}
-              >
+              <FormControl id="identifier" mb="5" isInvalid={!!errors.identifier}>
                 <Flex justifyContent="space-between" alignItems="center">
-                  <FormLabel fontWeight="medium" fontSize="sm">{credentialType === 'email' ? t('login.email') : t('login.username')}</FormLabel>
-                  <Button 
-                    variant="link" 
-                    size="sm" 
+                  <FormLabel fontWeight="medium" fontSize="sm">
+                    {credentialType === 'email' ? t('login.email') : t('login.username')}
+                  </FormLabel>
+                  <Button
+                    variant="link"
+                    size="sm"
                     onClick={toggleCredentialType}
                     mb={2}
                     color={brandColor}
@@ -390,15 +362,15 @@ const Login: React.FC = () => {
                   <Input
                     type="text"
                     value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
+                    onChange={e => setIdentifier(e.target.value)}
                     placeholder={credentialType === 'email' ? 'example@company.com' : 'username'}
                     borderRadius="lg"
                     bg={currentThemeStyles.inputBgColor}
                     borderColor={borderColor}
                     _hover={{ borderColor: 'primary.300' }}
-                    _focus={{ 
-                      borderColor: brandColor, 
-                      boxShadow: `0 0 0 1px ${brandColor}` 
+                    _focus={{
+                      borderColor: brandColor,
+                      boxShadow: `0 0 0 1px ${brandColor}`,
                     }}
                     fontSize="md"
                   />
@@ -406,31 +378,27 @@ const Login: React.FC = () => {
                     {credentialType === 'email' ? <EmailIcon /> : <Box as={FiUser} />}
                   </InputRightElement>
                 </InputGroup>
-                {errors.identifier && (
-                  <FormErrorMessage>{errors.identifier}</FormErrorMessage>
-                )}
+                {errors.identifier && <FormErrorMessage>{errors.identifier}</FormErrorMessage>}
               </FormControl>
 
               {/* 密码 */}
-              <FormControl
-                id="password"
-                mb="6"
-                isInvalid={!!errors.password}
-              >
-                <FormLabel fontWeight="medium" fontSize="sm">{t('login.password')}</FormLabel>
+              <FormControl id="password" mb="6" isInvalid={!!errors.password}>
+                <FormLabel fontWeight="medium" fontSize="sm">
+                  {t('login.password')}
+                </FormLabel>
                 <InputGroup size="lg">
                   <Input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
                     borderRadius="lg"
                     bg={currentThemeStyles.inputBgColor}
                     borderColor={borderColor}
                     _hover={{ borderColor: 'primary.300' }}
-                    _focus={{ 
-                      borderColor: brandColor, 
-                      boxShadow: `0 0 0 1px ${brandColor}` 
+                    _focus={{
+                      borderColor: brandColor,
+                      boxShadow: `0 0 0 1px ${brandColor}`,
                     }}
                     fontSize="md"
                   />
@@ -446,24 +414,22 @@ const Login: React.FC = () => {
                     />
                   </InputRightElement>
                 </InputGroup>
-                {errors.password && (
-                  <FormErrorMessage>{errors.password}</FormErrorMessage>
-                )}
+                {errors.password && <FormErrorMessage>{errors.password}</FormErrorMessage>}
               </FormControl>
 
               {/* 记住我和忘记密码 */}
               <Flex justify="space-between" mb="6" align="center">
                 <Checkbox
                   isChecked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
+                  onChange={e => setRememberMe(e.target.checked)}
                   colorScheme="primary"
                   size="md"
                 >
                   <Text fontSize="sm">{t('login.rememberMe')}</Text>
                 </Checkbox>
-                <Button 
-                  variant="link" 
-                  size="sm" 
+                <Button
+                  variant="link"
+                  size="sm"
                   colorScheme="primary"
                   fontWeight="medium"
                   _hover={{ textDecoration: 'none' }}
