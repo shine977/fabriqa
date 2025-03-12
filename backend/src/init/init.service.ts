@@ -1,6 +1,6 @@
 import { Injectable, OnApplicationBootstrap, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { encryptAESData } from '@shared/utils/crypto';
+import { encryptData } from '@shared/utils/crypto';
 
 import { Repository } from 'typeorm';
 import { InitRoleService } from './init.role.service';
@@ -105,7 +105,7 @@ export class InitService implements OnApplicationBootstrap {
       // create super admin user entity instance
       const superAdmin = this.userRepository.create({
         username: 'root',
-        password: encryptAESData('Admin@4734081'),
+        password: encryptData('Admin@4734081', process.env.ENCRYPTION_KEY),
         email: 'admin@example.com',
         type: UserTypeEnum.ROOT,
         isEnabled: true,

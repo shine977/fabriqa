@@ -2,7 +2,7 @@
 import { ForbiddenException, Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { TokenService } from './token.service';
 import { UserEntity } from '../../user/entities/user.entity';
-import { decryptDynamicKeyAESData, encryptAESData } from '@shared/utils/crypto';
+import { decryptData, decryptFrontendData, encryptData } from '@shared/utils/crypto';
 import { UnifyObjectResponse } from '@shared/utils/unifyResponse';
 import { ErrorCode, createErrorResponse } from 'src/core/config/error-code';
 
@@ -27,9 +27,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const decryptedPass = decryptDynamicKeyAESData(pass, key);
-    if (user.password !== encryptAESData(decryptedPass)) {
-      throw new UnauthorizedException('Invalid credentials');
+    const decryptedPassword = decryptFrontendData(pass, 'e3a74e3c7599f3ab4601d587bd2cc768');
+
+    const isValid = await bcrypt.compare(decryptedPassword, user.password);
+
+    if (!isValid) {
+      return null;
     }
 
     const { password, ...result } = user;
@@ -51,10 +54,10 @@ export class AuthService {
   async logout(userId: string) {
     // 1. Clear the user's refresh token in the database
     await this.userService.updateRefreshToken(userId, null);
-    
+
     // 2. Add the user's token to the blacklist
     await this.tokenService.addToBlacklist(userId);
-    
+
     return { success: true, message: 'Logged out successfully' };
   }
 

@@ -1,28 +1,25 @@
 /**
- * Cryptographic utility functions
- *
- * Provides encryption and decryption functionality for secure data handling
- * using the Web Crypto API with AES-CBC algorithm
+ * 使用指定的密钥对数据进行加密
+ * @param data 要加密的数据
+ * @param keyString 密钥字符串
+ * @returns Base64编码的加密数据(前16字节是IV)
  */
+export async function encryptData(data: string, keyString: string): Promise<string> {
+  // 对密钥进行标准化处理，确保长度为32字节
+  const normalizedKey = normalizeKeyTo32Bytes(keyString);
 
-/**
- * 生成随机的Base64格式密钥，等同于Node.js中的crypto.randomBytes(32).toString('base64')
- * @returns Base64格式的32字节随机密钥
- */
-export function generateBase64Key(): string {
-  // 创建32字节的随机数
-  const randomBytes = window.crypto.getRandomValues(new Uint8Array(32));
+  // 导入密钥
+  const cryptoKey = await window.crypto.subtle.importKey('raw', normalizedKey, { name: 'AES-CBC' }, false, ['encrypt']);
 
-  // 转换为Base64字符串
-  return btoa(String.fromCharCode.apply(null, [...randomBytes]));
-}
+  // 生成随机IV
+  const iv = window.crypto.getRandomValues(new Uint8Array(16));
 
-export async function encryptData(data: string, aesKey: CryptoKey) {
-  const iv = window.crypto.getRandomValues(new Uint8Array(16)); // 生成随机 IV
+  // 编码数据
   const encoder = new TextEncoder();
   const encodedData = encoder.encode(data);
 
-  const encryptedData = await window.crypto.subtle.encrypt({ name: 'AES-CBC', iv }, aesKey, encodedData);
+  // 加密
+  const encryptedData = await window.crypto.subtle.encrypt({ name: 'AES-CBC', iv }, cryptoKey, encodedData);
 
   // 将 ArrayBuffer 转换为 Uint8Array
   const encryptedDataArray = new Uint8Array(encryptedData);
@@ -32,39 +29,36 @@ export async function encryptData(data: string, aesKey: CryptoKey) {
   fullData.set(iv, 0); // 设置 IV
   fullData.set(encryptedDataArray, iv.length); // 设置加密数据
 
-  // 转换为 Base64 字符串以便传输
-  const base64EncryptedData = btoa(String.fromCharCode(...fullData));
-
-  return base64EncryptedData;
+  // 转换为 Base64 字符串
+  return btoa(String.fromCharCode(...fullData));
 }
 
-export async function stringToCryptoKey(str: string): Promise<CryptoKey> {
-  const rawKey = base64ToArrayBuffer(str);
-  return await window.crypto.subtle.importKey('raw', rawKey, { name: 'AES-CBC', length: 256 }, true, [
-    'encrypt',
-    'decrypt',
-  ]);
-}
-export async function decryptData(encryptedDataWithIvBase64: string, aesKey: CryptoKey) {
-  // 将 Base64 字符串转换为 Uint8Array
-  const encryptedDataWithIv = Uint8Array.from(atob(encryptedDataWithIvBase64), c => c.charCodeAt(0));
+/**
+ * 将任意长度的字符串规范化为32字节(256位)的Uint8Array
+ * @param key 任意长度的字符串
+ * @returns 32字节的Uint8Array
+ */
+function normalizeKeyTo32Bytes(key: string): Uint8Array {
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(key);
 
-  // 提取 IV 和加密数据
-  const iv = encryptedDataWithIv.slice(0, 16);
-  const encryptedData = encryptedDataWithIv.slice(16);
-
-  // 解密
-  const decryptedData = await window.crypto.subtle.decrypt({ name: 'AES-CBC', iv }, aesKey, encryptedData);
-
-  return new TextDecoder().decode(decryptedData);
-}
-
-export function base64ToArrayBuffer(base64: string) {
-  const binaryString = window.atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
+  // 如果密钥长度正好是32字节，直接返回
+  if (keyData.length === 32) {
+    return keyData;
   }
-  return bytes.buffer;
+
+  // 创建一个32字节的数组
+  const normalizedKey = new Uint8Array(32);
+
+  if (keyData.length < 32) {
+    // 如果密钥太短，重复填充直到达到32字节
+    for (let i = 0; i < 32; i++) {
+      normalizedKey[i] = keyData[i % keyData.length];
+    }
+  } else {
+    // 如果密钥太长，取前32字节
+    normalizedKey.set(keyData.slice(0, 32));
+  }
+
+  return normalizedKey;
 }

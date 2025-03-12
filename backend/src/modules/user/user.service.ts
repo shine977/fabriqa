@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { RoleEntity } from '../role/entities/role.entity';
 import { ICreateUserDTO, IUpdateUserDTO, IUserQuery, IPaginatedUserQuery } from './interfaces/user.interface';
-import { encryptAESData } from '@shared/utils/crypto';
+import { encryptData } from '@shared/utils/crypto';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -27,7 +27,7 @@ export class UserService {
 
     const user = this.userRepository.create({
       ...createUserDto,
-      password: encryptAESData(createUserDto.password),
+      password: encryptData(createUserDto.password, process.env.ENCRYPTION_KEY),
     });
 
     if (createUserDto.roleIds?.length) {
@@ -85,7 +85,7 @@ export class UserService {
     const user = await this.findById(id);
 
     if (updateUserDto.password) {
-      updateUserDto.password = encryptAESData(updateUserDto.password);
+      updateUserDto.password = encryptData(updateUserDto.password, process.env.ENCRYPTION_KEY);
     }
 
     if (updateUserDto.roleIds) {
@@ -108,7 +108,7 @@ export class UserService {
       relations: ['roles'],
     });
 
-    if (user && user.password === encryptAESData(password)) {
+    if (user && user.password === encryptData(password, process.env.ENCRYPTION_KEY)) {
       return user;
     }
     return null;

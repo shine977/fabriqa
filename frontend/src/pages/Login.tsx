@@ -135,7 +135,7 @@ const Login: React.FC = () => {
     
     // 确定登录凭证
     const credentials= {
-      password: await encryptData(password, await stringToCryptoKey(generateBase64Key()))
+      password: await encryptData(password,'e3a74e3c7599f3ab4601d587bd2cc768' )
     };
     
     // 根据登录类型设置用户名或邮箱
