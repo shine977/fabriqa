@@ -5,7 +5,7 @@ import { UserEntity } from '../../user/entities/user.entity';
 import { decryptData, decryptFrontendData, encryptData } from '@shared/utils/crypto';
 import { UnifyObjectResponse } from '@shared/utils/unifyResponse';
 import { ErrorCode, createErrorResponse } from 'src/core/config/error-code';
-
+import * as bcrypt from 'bcrypt';
 import { CodeTips } from 'src/core/config/code.config';
 import { UserService } from '@modules/user/user.service';
 import { CreateTenantUserDto, CreateUserDto } from '@modules/user/dto/create-user.dto';
@@ -28,15 +28,12 @@ export class AuthService {
     }
 
     const decryptedPassword = decryptFrontendData(pass, 'e3a74e3c7599f3ab4601d587bd2cc768');
-
     const isValid = await bcrypt.compare(decryptedPassword, user.password);
-
     if (!isValid) {
       return null;
     }
 
-    const { password, ...result } = user;
-    return result;
+    return user;
   }
 
   async login(user: UserEntity) {

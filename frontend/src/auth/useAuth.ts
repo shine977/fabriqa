@@ -45,23 +45,22 @@ export function useAuth() {
   const login = useCallback(
     async (credentials: LoginRequest, redirectTo?: string): Promise<LoginResponse> => {
       setLoading(true);
-
       try {
         const response = await loginApi(credentials);
-
-        if (response.success && response.token && response.user) {
+        debugger;
+        if (response) {
           // Store auth data
-          tokenStorage.setAuthData(response.token, response.user);
+          tokenStorage.setAuthData(response.item.accessToken, response.item);
 
           // Update state
           setAuthState({
             isAuthenticated: true,
-            token: response.token,
-            user: response.user,
+            token: response.item.accessToken,
+            user: response.item,
           });
 
           // Trigger login success event
-          appPlugin.applyHooks('auth:loginSuccess', response.user);
+          appPlugin.applyHooks('auth:loginSuccess', response.item);
 
           // Success notification
           toast({

@@ -12,6 +12,7 @@ import { authApi, LoginRequest, LoginResponse, User, tokenStorage } from './auth
 import { useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { ApiResponse } from '../../types';
 
 // Auth query keys
 export const authKeys = {
@@ -50,7 +51,7 @@ export function useAuth() {
   // Initialize authentication state
   useEffect(() => {
     if (!isInitialized) {
-      queryClient.invalidateQueries(authKeys.profile());
+      // queryClient.invalidateQueries(authKeys.profile());
       setIsInitialized(true);
     }
   }, [isInitialized, queryClient]);
@@ -58,10 +59,11 @@ export function useAuth() {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: authApi.login,
-    onSuccess: (data: LoginResponse) => {
+    onSuccess: (data: ApiResponse<LoginResponse>) => {
+      debugger;
       // Save auth data
-      tokenStorage.saveTokens(data.accessToken, data.refreshToken);
-      tokenStorage.saveUser(data.user);
+      tokenStorage.saveTokens(data.item.accessToken, data.item.refreshToken);
+      // tokenStorage.saveUser(data.item);
 
       // Invalidate queries to refetch user data
       // queryClient.invalidateQueries(authKeys.profile());
@@ -97,7 +99,7 @@ export function useAuth() {
       tokenStorage.clearAll();
 
       // Reset auth state
-      queryClient.resetQueries(authKeys.all);
+      // queryClient.resetQueries(authKeys.all);
 
       // Redirect to login
       navigate('/login');

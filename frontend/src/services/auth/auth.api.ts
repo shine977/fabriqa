@@ -1,11 +1,12 @@
 /**
  * Auth API
- * 
+ *
  * This file contains the core API functions for authentication.
  * These are pure API call functions without state management.
  */
 
 import { httpService } from '../http';
+import { ApiResponse } from '../types';
 
 const API_ENDPOINT = '/auth';
 
@@ -48,7 +49,7 @@ export const authApi = {
    * @returns Login response with tokens and user info
    */
   login: (credentials: LoginRequest) => {
-    return httpService.post<LoginResponse>(`${API_ENDPOINT}/login`, credentials);
+    return httpService.post<ApiResponse<LoginResponse>>(`${API_ENDPOINT}/login`, credentials);
   },
 
   /**
@@ -64,16 +65,16 @@ export const authApi = {
    * @returns New access token
    */
   refreshToken: () => {
-    return httpService.post<{accessToken: string}>(`${API_ENDPOINT}/refresh`);
+    return httpService.post<{ accessToken: string }>(`${API_ENDPOINT}/refresh`);
   },
-  
+
   /**
    * Get current user profile
    * @returns User profile data
    */
   getProfile: () => {
     return httpService.get<User>(`${API_ENDPOINT}/profile`);
-  }
+  },
 };
 
 // Helper functions for token management
@@ -110,5 +111,5 @@ export const tokenStorage = {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
-  }
+  },
 };

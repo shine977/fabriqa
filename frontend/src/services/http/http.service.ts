@@ -1,10 +1,10 @@
 /**
  * HTTP Service
- * 
+ *
  * This service provides a unified interface for making HTTP requests.
  * It combines straightforward axios-based CRUD operations for simple cases
  * and rxjs-powered requests for more complex scenarios.
- * 
+ *
  * Features:
  * - Simple promise-based API for basic CRUD operations
  * - Observable-based API for complex scenarios
@@ -48,15 +48,11 @@ class HttpService {
   /**
    * Standard GET request - Promise based
    */
-  async get<T = any>(
-    url: string, 
-    params?: any, 
-    config?: AxiosRequestConfig
-  ): Promise<T> {
+  async get<T = any>(url: string, params?: any, config?: AxiosRequestConfig): Promise<T> {
     try {
-      const response = await axiosInstance.get<T>(url, { 
-        params, 
-        ...config 
+      const response = await axiosInstance.get<T>(url, {
+        params,
+        ...config,
       });
       return response.data;
     } catch (error) {
@@ -68,11 +64,7 @@ class HttpService {
   /**
    * Standard POST request - Promise based
    */
-  async post<T = any>(
-    url: string, 
-    data?: any, 
-    config?: AxiosRequestConfig
-  ): Promise<T> {
+  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
     try {
       const response = await axiosInstance.post<T>(url, data, config);
       return response.data;
@@ -85,11 +77,7 @@ class HttpService {
   /**
    * Standard PUT request - Promise based
    */
-  async put<T = any>(
-    url: string, 
-    data?: any, 
-    config?: AxiosRequestConfig
-  ): Promise<T> {
+  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
     try {
       const response = await axiosInstance.put<T>(url, data, config);
       return response.data;
@@ -102,11 +90,7 @@ class HttpService {
   /**
    * Standard PATCH request - Promise based
    */
-  async patch<T = any>(
-    url: string, 
-    data?: any, 
-    config?: AxiosRequestConfig
-  ): Promise<T> {
+  async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
     try {
       const response = await axiosInstance.patch<T>(url, data, config);
       return response.data;
@@ -119,10 +103,7 @@ class HttpService {
   /**
    * Standard DELETE request - Promise based
    */
-  async delete<T = any>(
-    url: string, 
-    config?: AxiosRequestConfig
-  ): Promise<T> {
+  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
     try {
       const response = await axiosInstance.delete<T>(url, config);
       return response.data;
@@ -151,9 +132,9 @@ class HttpService {
       // Combine pagination and filter params
       const params = {
         ...paginationParams,
-        ...filterParams
+        ...filterParams,
       };
-      
+
       const response = await axiosInstance.get<{
         data: T[];
         total: number;
@@ -161,7 +142,7 @@ class HttpService {
         pageSize: number;
         totalPages: number;
       }>(url, { params, ...config });
-      
+
       return response.data;
     } catch (error) {
       this.handleError(error);
@@ -180,26 +161,26 @@ class HttpService {
   ): Promise<T> {
     try {
       const formData = new FormData();
-      
+
       // Append files
       files.forEach((file, index) => {
         formData.append(`file${index}`, file);
       });
-      
+
       // Append additional data if provided
       if (additionalData) {
         Object.entries(additionalData).forEach(([key, value]) => {
           formData.append(key, value as string);
         });
       }
-      
+
       const response = await axiosInstance.post<T>(url, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
         },
-        ...config
+        ...config,
       });
-      
+
       return response.data;
     } catch (error) {
       this.handleError(error);
@@ -210,17 +191,13 @@ class HttpService {
   /**
    * Download file - Promise based
    */
-  async downloadFile(
-    url: string,
-    filename?: string,
-    config?: AxiosRequestConfig
-  ): Promise<Blob> {
+  async downloadFile(url: string, filename?: string, config?: AxiosRequestConfig): Promise<Blob> {
     try {
       const response = await axiosInstance.get(url, {
         responseType: 'blob',
-        ...config
+        ...config,
       });
-      
+
       // Create a download link and trigger download if filename is provided
       if (filename) {
         const blob = new Blob([response.data]);
@@ -231,7 +208,7 @@ class HttpService {
         link.click();
         window.URL.revokeObjectURL(downloadUrl);
       }
-      
+
       return response.data;
     } catch (error) {
       this.handleError(error);
@@ -247,67 +224,42 @@ class HttpService {
    * RxJS-powered GET request
    * For complex scenarios like cancellation, retries, caching
    */
-  getWithRx<T = any>(
-    url: string,
-    params?: any,
-    options?: HttpRequestOptions
-  ): Observable<T> {
+  getWithRx<T = any>(url: string, params?: any, options?: HttpRequestOptions): Observable<T> {
     return rxjsHttpService.request<T>('GET', url, params, options);
   }
 
   /**
    * RxJS-powered POST request
    */
-  postWithRx<T = any>(
-    url: string,
-    data?: any,
-    options?: HttpRequestOptions
-  ): Observable<T> {
+  postWithRx<T = any>(url: string, data?: any, options?: HttpRequestOptions): Observable<T> {
     return rxjsHttpService.request<T>('POST', url, data, options);
   }
 
   /**
    * RxJS-powered PUT request
    */
-  putWithRx<T = any>(
-    url: string,
-    data?: any,
-    options?: HttpRequestOptions
-  ): Observable<T> {
+  putWithRx<T = any>(url: string, data?: any, options?: HttpRequestOptions): Observable<T> {
     return rxjsHttpService.request<T>('PUT', url, data, options);
   }
 
   /**
    * RxJS-powered PATCH request
    */
-  patchWithRx<T = any>(
-    url: string,
-    data?: any,
-    options?: HttpRequestOptions
-  ): Observable<T> {
+  patchWithRx<T = any>(url: string, data?: any, options?: HttpRequestOptions): Observable<T> {
     return rxjsHttpService.request<T>('PATCH', url, data, options);
   }
 
   /**
    * RxJS-powered DELETE request
    */
-  deleteWithRx<T = any>(
-    url: string,
-    params?: any,
-    options?: HttpRequestOptions
-  ): Observable<T> {
+  deleteWithRx<T = any>(url: string, params?: any, options?: HttpRequestOptions): Observable<T> {
     return rxjsHttpService.request<T>('DELETE', url, params, options);
   }
 
   /**
    * Unified request method with RxJS
    */
-  requestWithRx<T = any>(
-    method: HttpMethod,
-    url: string,
-    data?: any,
-    options?: HttpRequestOptions
-  ): Observable<T> {
+  requestWithRx<T = any>(method: HttpMethod, url: string, data?: any, options?: HttpRequestOptions): Observable<T> {
     return rxjsHttpService.request<T>(method, url, data, options);
   }
 

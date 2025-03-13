@@ -4,8 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { RoleEntity } from '../role/entities/role.entity';
 import { ICreateUserDTO, IUpdateUserDTO, IUserQuery, IPaginatedUserQuery } from './interfaces/user.interface';
-import { encryptData } from '@shared/utils/crypto';
+import { decryptData, encryptData } from '@shared/utils/crypto';
 import { Repository } from 'typeorm';
+
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -24,10 +26,10 @@ export class UserService {
     if (existingUser) {
       throw new ConflictException('Username already exists');
     }
-
+    const decryptedPassword = decryptData(createUserDto.password, process.env.ENCRYPTION_KEY);
     const user = this.userRepository.create({
       ...createUserDto,
-      password: encryptData(createUserDto.password, process.env.ENCRYPTION_KEY),
+      password: bcrypt.hashSync(decryptedPassword, 10),
     });
 
     if (createUserDto.roleIds?.length) {
@@ -75,6 +77,7 @@ export class UserService {
 
   async findOneByUsername(username: string): Promise<UserEntity> {
     const user = await this.userRepository.findOne({ where: { username } });
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -138,7 +141,7 @@ export class UserService {
 
     const permissions = new Set<string>();
     user.roles.forEach(role => {
-      role.permissions.forEach(permission => {
+      (role.permissions || []).forEach(permission => {
         permissions.add(permission.name);
       });
     });

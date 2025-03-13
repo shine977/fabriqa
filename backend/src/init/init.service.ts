@@ -1,7 +1,7 @@
 import { Injectable, OnApplicationBootstrap, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { encryptData } from '@shared/utils/crypto';
-
+import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { InitRoleService } from './init.role.service';
 import { InitPermissionService } from './init.permission.service';
@@ -101,11 +101,10 @@ export class InitService implements OnApplicationBootstrap {
         this.logger.log('super admin already exists, skip creation');
         return;
       }
-
       // create super admin user entity instance
       const superAdmin = this.userRepository.create({
         username: 'root',
-        password: encryptData('Admin@4734081', process.env.ENCRYPTION_KEY),
+        password: await bcrypt.hash('Admin@4734081', 10),
         email: 'admin@example.com',
         type: UserTypeEnum.ROOT,
         isEnabled: true,

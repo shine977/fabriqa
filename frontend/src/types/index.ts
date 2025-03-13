@@ -1,6 +1,6 @@
 /**
  * Types
- * 
+ *
  * 类型定义文件，包含系统中使用的所有类型定义
  */
 
@@ -83,7 +83,20 @@ export interface FormFieldOption {
 export interface FormField {
   id: string;
   label: string;
-  type: 'text' | 'email' | 'password' | 'number' | 'textarea' | 'select' | 'radio' | 'checkbox' | 'switch' | 'date' | 'time' | 'datetime' | 'file';
+  type:
+    | 'text'
+    | 'email'
+    | 'password'
+    | 'number'
+    | 'textarea'
+    | 'select'
+    | 'radio'
+    | 'checkbox'
+    | 'switch'
+    | 'date'
+    | 'time'
+    | 'datetime'
+    | 'file';
   placeholder?: string;
   helper?: string;
   required?: boolean;
@@ -132,18 +145,20 @@ export interface Plugin {
 // API相关类型
 // ==============================
 
-/**
- * API响应结构
- */
-export interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  error?: {
-    code: string;
-    message: string;
-    details?: string | string[];
-  };
+export interface SingleItemResponse<T> {
+  code: number;
+  item: T;
+  message: string;
 }
+
+export interface MultiItemsResponse<T> {
+  code: number;
+  message: string;
+  items: T[];
+}
+export type ApiResponse<T, IsArray extends boolean = false> = IsArray extends true
+  ? MultiItemsResponse<T>
+  : SingleItemResponse<T>;
 
 // ==============================
 // 用户相关类型

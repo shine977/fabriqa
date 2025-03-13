@@ -4,6 +4,7 @@
  * Contains pure API functions for authentication operations
  */
 import { appPlugin } from '../plugins';
+import { ApiResponse } from '../types';
 
 // Types
 export interface User {
@@ -25,12 +26,45 @@ export interface LoginRequest {
   password: string;
   remember?: boolean;
 }
-
+export interface Role {
+  tenantId: string;
+  createdBy: Date;
+  updatedBy: Date;
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
+  deletedBy: string;
+  isEnabled: boolean;
+  orderNum: number;
+  name: string;
+  description: string;
+  isSystem: boolean;
+  code: string;
+}
 export interface LoginResponse {
-  success: boolean;
-  token?: string;
-  user?: User;
-  message?: string;
+  tenantId: string;
+  createdBy: Date;
+  updatedBy: Date;
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
+  deletedBy: string;
+  isEnabled: boolean;
+  orderNum: number;
+  username: string;
+  password: string;
+  email: string;
+  phone: string;
+  avatar: string;
+  type: string;
+  isActive: boolean;
+  refreshToken: string;
+  lastLoginAt: Date;
+  lastLoginIp: string;
+  roles: Role[];
+  accessToken: string;
 }
 
 // Storage keys
@@ -76,24 +110,13 @@ export const tokenStorage = {
 /**
  * Login API function
  */
-export async function loginApi(credentials: LoginRequest): Promise<LoginResponse> {
+export async function loginApi(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
   try {
+    console.log('Login request:', credentials);
     // This should be an actual API call
     // For demo purposes, using a mock login process
-    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Mock successful login response
-    const loginResponse: LoginResponse = {
-      success: true,
-      token: 'demo_token_' + Math.random().toString(36).substring(2),
-      user: {
-        id: 1,
-        name: 'Admin User',
-        email: credentials.email,
-        role: 'admin',
-        avatar: 'https://i.pravatar.cc/150?u=' + credentials.email,
-      },
-    };
 
     // Allow plugins to process login response
     const processedResponse = appPlugin.applyHooks('auth:processLogin', loginResponse);
@@ -101,10 +124,10 @@ export async function loginApi(credentials: LoginRequest): Promise<LoginResponse
     return processedResponse;
   } catch (error) {
     // Handle login failure
-    const errorResponse: LoginResponse = {
-      success: false,
-      message: error instanceof Error ? error.message : 'Login failed, please try again',
-    };
+    // const errorResponse: LoginResponse = {
+    //   success: false,
+    //   message: error instanceof Error ? error.message : 'Login failed, please try again',
+    // };
 
     return errorResponse;
   }

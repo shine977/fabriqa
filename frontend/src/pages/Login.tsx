@@ -39,7 +39,7 @@ import {
   Select,
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
-import { ViewIcon, ViewOffIco, EmailIcon } from '@chakra-ui/icons';
+import { ViewIcon, ViewOffIcon, EmailIcon } from '@chakra-ui/icons';
 import { FiUser, FiLogIn } from 'react-icons/fi';
 import { useTranslation } from '../plugins/i18nPlugin';
 import { ThemeMode } from '../plugins/themePlugin';
@@ -71,7 +71,6 @@ type LoginCredentialType = 'email' | 'username';
 const Login: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const navigate = useNavigate();
   const { login, loginStatus } = useAuth();
   const [identifier, setIdentifier] = useState(''); // 用户名或邮箱
   const [password, setPassword] = useState('');
@@ -79,16 +78,13 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [userType, setUserType] = useState<UserType>('employee'); // 默认为内部员工
-  const [credentialType, setCredentialType] = useState<LoginCredentialType>('email'); // 默认使用邮箱登录
+  const [credentialType, setCredentialType] = useState<LoginCredentialType>('username');
 
   // 获取当前主题
   const [themeMode, setThemeMode] = useState<ThemeMode>(appPlugin.applyHooks('theme:getCurrentTheme', 'system'));
 
   // 动画控制
   const { isOpen, onOpen } = useDisclosure();
-
-  // Toast通知
-  const toast = useToast();
 
   // 在组件挂载时启动入场动画
   useEffect(() => {
@@ -421,7 +417,7 @@ const Login: React.FC = () => {
               <Flex justify="space-between" mb="6" align="center">
                 <Checkbox
                   isChecked={rememberMe}
-                  onChange={e => setRememberMe(e.target.checked)}
+                  onChange={e => setRememberMe(!rememberMe)}
                   colorScheme="primary"
                   size="md"
                 >
