@@ -37,7 +37,8 @@ export function useAuth() {
   const profileQuery = useQuery({
     queryKey: authKeys.profile(),
     queryFn: authApi.getProfile,
-    enabled: !!tokenStorage.getAccessToken(),
+    // enabled: !!tokenStorage.getAccessToken(),
+    enabled: false,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
     onError: () => {
@@ -60,8 +61,7 @@ export function useAuth() {
   const loginMutation = useMutation({
     mutationFn: authApi.login,
     onSuccess: (data: ApiResponse<LoginResponse>) => {
-      debugger;
-      // Save auth data
+      // Save auth
       tokenStorage.saveTokens(data.item.accessToken, data.item.refreshToken);
       // tokenStorage.saveUser(data.item);
 

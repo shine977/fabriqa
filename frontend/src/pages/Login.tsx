@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -22,20 +22,11 @@ import {
   InputRightElement,
   Checkbox,
   useColorModeValue,
-  useToast,
   IconButton,
   Divider,
   useDisclosure,
   ScaleFade,
-  Radio,
-  RadioGroup,
-  HStack,
-  Container,
-  Center,
-  Spinner,
-  Icon,
   VStack,
-  Image,
   Select,
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
@@ -44,7 +35,7 @@ import { FiUser, FiLogIn } from 'react-icons/fi';
 import { useTranslation } from '../plugins/i18nPlugin';
 import { ThemeMode } from '../plugins/themePlugin';
 import { appPlugin } from '../plugins';
-import { useAuth } from '../services/auth';
+import { useAuth } from '../hooks/useAuth';
 import { encryptData } from '../utils/crypto';
 
 // 背景图案 SVG

@@ -139,6 +139,7 @@ export interface Plugin {
   priority?: number;
   hooks?: Record<string, Function>;
   initialize?: (pluginSystem: any) => void;
+  _initialized?: boolean;
 }
 
 // ==============================

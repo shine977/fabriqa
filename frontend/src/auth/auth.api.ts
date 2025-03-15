@@ -4,16 +4,8 @@
  * Contains pure API functions for authentication operations
  */
 import { appPlugin } from '../plugins';
+import { httpService } from '../services/http';
 import { ApiResponse } from '../types';
-
-// Types
-export interface User {
-  id: number | string;
-  name: string;
-  email: string;
-  role: string;
-  [key: string]: any; // Allow other properties
-}
 
 export interface AuthState {
   isAuthenticated: boolean;
@@ -66,30 +58,64 @@ export interface LoginResponse {
   roles: Role[];
   accessToken: string;
 }
+// Types
+export type User = LoginResponse;
+
+const API_ENDPOINT = '/auth';
+/**
+ * Core authentication API functions
+ */
+export const loginApi = {
+  /**
+   * Login with username/email and password
+   * @param credentials Login credentials
+   * @returns Login response with tokens and user info
+   */
+  login: (credentials: LoginRequest) => {
+    return httpService.post<ApiResponse<LoginResponse>>(`${API_ENDPOINT}/login`, credentials);
+  },
+
+  /**
+   * Logout current user
+   * @returns Success status
+   */
+  logout: () => {
+    return httpService.post(`${API_ENDPOINT}/logout`);
+  },
+
+  /**
+   * Refresh access token using refresh token
+   * @returns New access token
+   */
+  refreshToken: () => {
+    return httpService.post<{ accessToken: string }>(`${API_ENDPOINT}/refresh`);
+  },
+
+  /**
+   * Get current user profile
+   * @returns User profile data
+   */
+  getProfile: () => {
+    return httpService.get<User>(`${API_ENDPOINT}/profile`);
+  },
+};
 
 // Storage keys
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'user';
 
-/**
- * Token storage utility functions
- */
+// Helper functions for token management
 export const tokenStorage = {
-  /**
-   * Get authentication state from storage
-   */
   getAuthState(): AuthState {
     const token = localStorage.getItem(TOKEN_KEY);
     const userString = localStorage.getItem(USER_KEY);
-
     // Check if plugin system has custom auth state handling
-    return appPlugin.applyHooks('auth:getState', {
+    return {
       isAuthenticated: Boolean(token && userString),
       user: userString ? JSON.parse(userString) : null,
       token,
-    });
+    };
   },
-
   /**
    * Store authentication data
    */
@@ -105,33 +131,40 @@ export const tokenStorage = {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
   },
+  getAccessToken: (): string | null => {
+    return localStorage.getItem('auth_token');
+  },
+
+  getRefreshToken: (): string | null => {
+    return localStorage.getItem('refresh_token');
+  },
+
+  saveTokens: (accessToken: string, refreshToken: string): void => {
+    localStorage.setItem('auth_token', accessToken);
+    localStorage.setItem('refresh_token', refreshToken);
+  },
+
+  saveUser: (user: User): void => {
+    localStorage.setItem('user', JSON.stringify(user));
+  },
+
+  getUser: (): User | null => {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) return null;
+    try {
+      return JSON.parse(userStr);
+    } catch (e) {
+      console.error('Failed to parse user from localStorage', e);
+      return null;
+    }
+  },
+
+  clearAll: (): void => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+  },
 };
-
-/**
- * Login API function
- */
-export async function loginApi(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
-  try {
-    console.log('Login request:', credentials);
-    // This should be an actual API call
-    // For demo purposes, using a mock login process
-
-    // Mock successful login response
-
-    // Allow plugins to process login response
-    const processedResponse = appPlugin.applyHooks('auth:processLogin', loginResponse);
-
-    return processedResponse;
-  } catch (error) {
-    // Handle login failure
-    // const errorResponse: LoginResponse = {
-    //   success: false,
-    //   message: error instanceof Error ? error.message : 'Login failed, please try again',
-    // };
-
-    return errorResponse;
-  }
-}
 
 /**
  * Logout API function

@@ -12,6 +12,10 @@ export class ApplicationPlugin {
   private plugins: Map<string, Plugin> = new Map();
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   private hooks: Map<string, Map<string, Function[]>> = new Map();
+  // 用于记录已注册的钩子，避免重复注册
+  private registeredHooks: Set<string> = new Set();
+  // 用于缓存钩子执行结果
+  private hooksCache: Map<string, any> = new Map();
 
   /**
    * 注册一个新插件
@@ -45,13 +49,26 @@ export class ApplicationPlugin {
   }
 
   /**
-   * 添加钩子
+   * 添加钩子，并避免重复注册
    *
    * @param pluginId 插件ID
    * @param hookName 钩子名称
    * @param handler 处理函数
    */
   addHook(pluginId: string, hookName: string, handler: Function): void {
+    // 创建唯一标识符来检测重复注册
+    const hookKey = `${pluginId}:${hookName}:${handler.toString()}`;
+
+    // 如果已经注册过相同的钩子，则跳过
+    if (this.registeredHooks.has(hookKey)) {
+      console.log(`Hook ${hookName} for plugin ${pluginId} already registered. Skipping.`);
+      return;
+    }
+
+    // 记录这个钩子已被注册
+    this.registeredHooks.add(hookKey);
+
+    // 初始化钩子映射
     if (!this.hooks.has(hookName)) {
       this.hooks.set(hookName, new Map());
     }
@@ -64,6 +81,26 @@ export class ApplicationPlugin {
 
     hookMap.get(pluginId)!.push(handler);
     console.log(`Hook ${hookName} added for plugin ${pluginId}`);
+
+    // 清除可能存在的缓存，因为新钩子可能会改变结果
+    this.clearHookCache(hookName);
+  }
+
+  /**
+   * 清除特定钩子的缓存
+   *
+   * @param hookName 钩子名称
+   */
+  clearHookCache(hookName: string): void {
+    // 清除以这个钩子名开头的所有缓存
+    const keysToRemove: string[] = [];
+    this.hooksCache.forEach((_, key) => {
+      if (key.startsWith(`${hookName}:`)) {
+        keysToRemove.push(key);
+      }
+    });
+
+    keysToRemove.forEach(key => this.hooksCache.delete(key));
   }
 
   /**
@@ -81,9 +118,18 @@ export class ApplicationPlugin {
     this.plugins.delete(pluginId);
 
     // 移除插件的所有钩子
-    this.hooks.forEach(hookMap => {
+    this.hooks.forEach((hookMap, hookName) => {
       if (hookMap.has(pluginId)) {
         hookMap.delete(pluginId);
+        // 清除相关缓存
+        this.clearHookCache(hookName);
+      }
+    });
+
+    // 从已注册钩子集合中移除
+    Array.from(this.registeredHooks).forEach(key => {
+      if (key.startsWith(`${pluginId}:`)) {
+        this.registeredHooks.delete(key);
       }
     });
 
@@ -115,7 +161,7 @@ export class ApplicationPlugin {
   }
 
   /**
-   * 应用钩子并返回结果
+   * 应用钩子并返回结果，带有缓存优化
    *
    * @param hookName 钩子名称
    * @param defaultValue 默认值
@@ -123,8 +169,16 @@ export class ApplicationPlugin {
    * @returns 处理后的值
    */
   applyHooks<T>(hookName: string, defaultValue: T, ...args: any[]): T {
+    // 如果没有注册这个钩子，直接返回默认值
     if (!this.hooks.has(hookName)) {
       return defaultValue;
+    }
+
+    // 生成缓存键
+    const cacheKey = this.generateCacheKey(hookName, defaultValue, args);
+    // 检查缓存
+    if (this.hooksCache.has(cacheKey)) {
+      return this.hooksCache.get(cacheKey);
     }
 
     let result = defaultValue;
@@ -142,7 +196,36 @@ export class ApplicationPlugin {
       }
     }
 
+    // 缓存结果
+    this.hooksCache.set(cacheKey, result);
+
     return result;
+  }
+
+  /**
+   * 生成用于缓存的键
+   */
+  private generateCacheKey(hookName: string, defaultValue: any, args: any[]): string {
+    const argsString = args
+      .map(arg => {
+        try {
+          // 对于简单类型或可以安全序列化的对象
+          return JSON.stringify(arg);
+        } catch (e) {
+          // 对于无法序列化的对象，使用类型和内存地址
+          return `${typeof arg}:${arg?.toString()}`;
+        }
+      })
+      .join(',');
+
+    return `${hookName}:${JSON.stringify(defaultValue)}:${argsString}`;
+  }
+
+  /**
+   * 清除所有钩子缓存
+   */
+  clearAllCaches(): void {
+    this.hooksCache.clear();
   }
 }
 

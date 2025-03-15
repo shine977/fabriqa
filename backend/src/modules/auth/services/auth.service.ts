@@ -21,16 +21,17 @@ export class AuthService {
     return this.userService.findOneByUsername(username);
   }
 
-  async validateUser(key: string, username: string, pass: string) {
+  async validateUser(username: string, pass: string) {
     const user = await this.userService.findOneByUsername(username);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const decryptedPassword = decryptFrontendData(pass, 'e3a74e3c7599f3ab4601d587bd2cc768');
+
     const isValid = await bcrypt.compare(decryptedPassword, user.password);
     if (!isValid) {
-      return null;
+      return 'user or password is incorrect';
     }
 
     return user;

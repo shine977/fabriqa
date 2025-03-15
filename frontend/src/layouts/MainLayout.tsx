@@ -61,7 +61,7 @@ import Sidebar from './Sidebar';
 import { appPlugin } from '../plugins';
 import { ThemeMode } from '../plugins/themePlugin';
 import { useTranslation, useLanguage, Language, languageOptions } from '../plugins/i18nPlugin';
-import { useAuth } from '../auth/useAuth';
+import { useAuth } from '../hooks/useAuth';
 
 interface MainLayoutProps {
   breadcrumbs?: { label: string; path: string }[];

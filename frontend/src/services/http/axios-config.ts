@@ -54,7 +54,8 @@ axiosInstance.interceptors.response.use(
     if (data === null || data === undefined || typeof data !== 'object' || !('code' in data)) {
       return response;
     }
-    return data;
+
+    return response;
   },
   error => {
     // Default error handling
