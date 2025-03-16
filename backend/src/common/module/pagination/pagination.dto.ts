@@ -1,4 +1,3 @@
-// src/common/modules/pagination/pagination.dto.ts
 import { Transform } from 'class-transformer';
 import { IsOptional, Min } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';

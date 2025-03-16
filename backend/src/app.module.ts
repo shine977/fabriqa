@@ -29,11 +29,12 @@ import { PluginModule } from '@core/plugin';
 import * as path from 'path';
 import { PermissionModule } from '@modules/permission/permission.module';
 import { OrdersModule } from '@modules/orders/orders.module';
+import { PaginationModule } from '@common/module/pagination/pagination.module';
 
 @Module({
   imports: [
     InitModule,
-    // PaginationModule.forRoot(),
+    PaginationModule.forRoot(),
 
     ConfigModule.forRoot({ isGlobal: true, load: [JWTConfig, databaseConfig] }),
 
