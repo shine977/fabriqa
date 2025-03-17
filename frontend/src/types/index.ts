@@ -42,6 +42,7 @@ export interface TableColumn {
   width?: string;
   isNumeric?: boolean;
   isSortable?: boolean;
+  render?: (value: any, row: any, rowIndex: number) => React.ReactNode;
 }
 
 /**

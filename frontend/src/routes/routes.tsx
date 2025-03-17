@@ -17,6 +17,7 @@ import {
   FiGrid
 } from 'react-icons/fi';
 import { Route } from '../types';
+import MenuManagement from '../pages/system/MenuManagement';
 
 // 页面组件（使用懒加载提高性能）
 const Dashboard = React.lazy(() => import('../pages/Dashboard'));
@@ -127,6 +128,13 @@ const routes: Route[] = [
           component: Settings,
           menu: {
             title: '系统设置',
+          },
+        },
+        {
+          path: '/system/menu',
+          component: MenuManagement,
+          menu: {
+            title: '菜单管理',
           },
         },
         {

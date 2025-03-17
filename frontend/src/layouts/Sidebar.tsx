@@ -14,7 +14,6 @@ import {
   Box,
   Text,
   Flex,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import {
   ChevronRightIcon,
@@ -74,27 +73,40 @@ const buildMenuItems = (routes: Route[]): MenuItem[] => {
   });
 };
 
+// 预定义常用样式类，提高可维护性
+const styles = {
+  sidebarContainer: "flex flex-col h-[calc(100vh-4rem)] overflow-y-auto bg-white dark:bg-neutral-800",
+  scrollbar: "scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500",
+  navHeader: "text-xs font-medium uppercase text-gray-500 dark:text-gray-400 mb-4 ml-2",
+  menuList: "space-y-1",
+  menuItemBase: "flex items-center px-2 py-2.5 rounded-lg text-sm font-medium transition duration-200 ease-in-out",
+  menuItemActive: "bg-primary-100 dark:bg-primary-500/40 text-primary-700 dark:text-white font-medium",
+  menuItemInactive: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50",
+  menuSubmenuHeader: "flex items-center justify-between w-full px-2 py-2.5 rounded-lg text-sm font-medium transition duration-200 ease-in-out",
+  menuSubmenuHeaderActive: "bg-primary-100 dark:bg-primary-500/40 text-primary-700 dark:text-white font-medium",
+  menuSubmenuHeaderInactive: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50",
+  menuSubItem: "block px-2 py-1.5 rounded-lg text-sm font-medium transition duration-200 ease-in-out",
+  menuSubItemActive: "bg-primary-100 dark:bg-primary-500/40 text-primary-700 dark:text-white font-medium",
+  menuSubItemInactive: "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-700/50",
+  iconWrapper: "flex items-center justify-center w-7 h-7",
+  helpSection: "mt-auto p-4 border-t border-gray-200 dark:border-neutral-700",
+  helpBox: "bg-primary-100 dark:bg-primary-500/40 rounded-xl p-4",
+  helpTitle: "text-sm font-medium text-primary-700 dark:text-white mb-2",
+  helpText: "text-xs text-gray-600 dark:text-gray-400 mb-3",
+  helpButton: "inline-flex items-center justify-center w-full px-3 py-1.5 text-xs font-medium rounded-lg bg-primary-600 text-white hover:bg-primary-700 transition-all duration-200"
+};
+
 interface SidebarProps {
   collapsed: boolean;
+  onCollapse?: () => void;
 }
 
 /**
  * Sidebar component that renders navigation menu
  * Based on application routes and supports collapsible state
  */
-const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
+const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
   const location = useLocation();
-  
-  // Color mode values for consistent theming
-  const navBgActive = useColorModeValue('primary.50', 'rgba(66, 153, 225, 0.16)');
-  const navTextActive = useColorModeValue('primary.600', 'primary.200');
-  const navBgHover = useColorModeValue('gray.100', 'whiteAlpha.200');
-  const navText = useColorModeValue('gray.700', 'whiteAlpha.900');
-  const navTextSubtle = useColorModeValue('gray.600', 'whiteAlpha.700');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
-  const helpBg = useColorModeValue('primary.50', 'rgba(66, 153, 225, 0.16)');
-  const helpText = useColorModeValue('primary.600', 'primary.200');
-  const helpTextSecondary = useColorModeValue('gray.600', 'whiteAlpha.700');
   
   // Build menu items from routes configuration (memoized to prevent unnecessary recalculations)
   const menuItems = useMemo(() => buildMenuItems(routes), []);
@@ -141,225 +153,138 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   };
   
   return (
-    <Flex 
-      direction="column" 
-      h="calc(100vh - 4rem)" 
-      overflowY="auto"
-      className="sidebar-scrollbar"
-      bg={useColorModeValue('white', 'gray.800')}
-      css={{
-        '&::-webkit-scrollbar': { width: '4px' },
-        '&::-webkit-scrollbar-track': { background: 'transparent' },
-        '&::-webkit-scrollbar-thumb': { background: useColorModeValue('var(--chakra-colors-gray-300)', 'var(--chakra-colors-gray-600)') },
-        '&::-webkit-scrollbar-thumb:hover': { background: useColorModeValue('var(--chakra-colors-gray-400)', 'var(--chakra-colors-gray-500)') },
-      }}
-    >
-      <Box pt={4} pb={2} px={3}>
+    <div className={`${styles.sidebarContainer} ${styles.scrollbar} h-full`}>
+      <div className="pt-4 pb-2 px-3">
         {!collapsed && (
-          <Text 
-            fontSize="xs"
-            fontWeight="medium"
-            textTransform="uppercase"
-            color={useColorModeValue('gray.500', 'gray.400')}
-            mb={4}
-            ml={2}
-          >
+          <div className={styles.navHeader}>
             主导航
-          </Text>
+          </div>
         )}
         
-        <Box as="ul" className="space-y-1">
+        <ul className={styles.menuList}>
           {menuItems.map((item, index) => (
-            <Box as="li" key={index}>
+            <li key={index}>
               {item.submenu ? (
                 // Menu item with submenu
-                <Box>
-                  <Box
-                    as="button"
+                <div>
+                  <button
                     onClick={() => toggleSubmenu(index)}
-                    w="full"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent={collapsed ? "center" : "space-between"}
-                    px={2}
-                    py={2.5}
-                    borderRadius="lg"
-                    fontSize="sm"
-                    fontWeight="medium"
-                    transition="all 0.2s ease-in-out"
-                    bg={isActiveSubmenu(item.submenu) ? navBgActive : 'transparent'}
-                    color={isActiveSubmenu(item.submenu) ? navTextActive : navText}
-                    _hover={{
-                      bg: navBgHover,
-                    }}
+                    className={`
+                      ${styles.menuSubmenuHeader} 
+                      ${isActiveSubmenu(item.submenu) ? styles.menuSubmenuHeaderActive : styles.menuSubmenuHeaderInactive}
+                      ${collapsed ? 'justify-center' : 'justify-between'}
+                    `}
                   >
-                    <Flex alignItems="center" gap={collapsed ? 0 : 3}>
-                      <Flex 
-                        alignItems="center" 
-                        justifyContent="center" 
-                        w={7} 
-                        h={7}
-                      >
+                    <div className={`flex items-center ${collapsed ? '' : 'gap-3'}`}>
+                      <div className={styles.iconWrapper}>
                         {item.icon}
-                      </Flex>
+                      </div>
                       {!collapsed && <span>{item.label}</span>}
-                    </Flex>
+                    </div>
                     
                     {!collapsed && (
-                      <Box color={navTextSubtle}>
+                      <div className="text-gray-500 dark:text-gray-400">
                         {openSubmenus[index] ? (
                           <ChevronDownIcon boxSize={4} />
                         ) : (
                           <ChevronRightIcon boxSize={4} />
                         )}
-                      </Box>
+                      </div>
                     )}
-                  </Box>
+                  </button>
                   
                   {collapsed ? (
                     <Tooltip label={item.label} placement="right">
                       <span></span>
                     </Tooltip>
                   ) : (
-                    <Box
-                      overflow="hidden"
-                      transition="all 0.3s"
-                      maxH={openSubmenus[index] || isActiveSubmenu(item.submenu) ? "60rem" : "0"}
+                    <div
+                      className={`overflow-hidden transition-all duration-300`}
+                      style={{ 
+                        maxHeight: openSubmenus[index] || isActiveSubmenu(item.submenu) ? '60rem' : '0'
+                      }}
                     >
-                      <Box as="ul" mt={1} pl={10} className="space-y-1">
+                      <ul className="mt-1 pl-10 space-y-1">
                         {item.submenu.map((subItem, subIndex) => (
-                          <Box as="li" key={subIndex}>
+                          <li key={subIndex}>
                             <RouterLink
                               to={subItem.path}
                               className={({ isActive }) => `
-                                block px-2 py-1.5 rounded-lg text-sm font-medium transition duration-200 ease-in-out
-                                ${
-                                  isActive
-                                    ? `bg-${navBgActive.split('.')[0]}-${navBgActive.split('.')[1]} text-${navTextActive.split('.')[0]}-${navTextActive.split('.')[1]}`
-                                    : `text-${navTextSubtle.split('.')[0]}-${navTextSubtle.split('.')[1]} hover:bg-${navBgHover.split('.')[0]}-${navBgHover.split('.')[1]}`
-                                }
+                                ${styles.menuSubItem}
+                                ${isActive ? styles.menuSubItemActive : styles.menuSubItemInactive}
                               `}
                             >
-                              <Flex alignItems="center" gap={2}>
+                              <div className="flex items-center gap-2">
                                 {subItem.icon && <span>{subItem.icon}</span>}
                                 <span>{subItem.label}</span>
-                              </Flex>
+                              </div>
                             </RouterLink>
-                          </Box>
+                          </li>
                         ))}
-                      </Box>
-                    </Box>
+                      </ul>
+                    </div>
                   )}
-                </Box>
+                </div>
               ) : (
                 // Simple menu item (no submenu)
                 <>
                   {collapsed ? (
                     <Tooltip label={item.label} placement="right">
-                      <Box>
+                      <div>
                         <RouterLink
                           to={item.path}
                           className={({ isActive }) => `
-                            flex items-center justify-center px-2 py-2.5 rounded-lg text-sm font-medium transition duration-200 ease-in-out
-                            ${
-                              isActive
-                                ? `bg-${navBgActive.split('.')[0]}-${navBgActive.split('.')[1]} text-${navTextActive.split('.')[0]}-${navTextActive.split('.')[1]}`
-                                : `text-${navText.split('.')[0]}-${navText.split('.')[1]} hover:bg-${navBgHover.split('.')[0]}-${navBgHover.split('.')[1]}`
-                            }
+                            ${styles.menuItemBase} justify-center
+                            ${isActive ? styles.menuItemActive : styles.menuItemInactive}
                           `}
                         >
-                          <Flex 
-                            alignItems="center" 
-                            justifyContent="center" 
-                            w={7} 
-                            h={7}
-                          >
+                          <div className={styles.iconWrapper}>
                             {item.icon}
-                          </Flex>
+                          </div>
                         </RouterLink>
-                      </Box>
+                      </div>
                     </Tooltip>
                   ) : (
                     <RouterLink
                       to={item.path}
                       className={({ isActive }) => `
-                        flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium transition duration-200 ease-in-out
-                        ${
-                          isActive
-                            ? `bg-${navBgActive.split('.')[0]}-${navBgActive.split('.')[1]} text-${navTextActive.split('.')[0]}-${navTextActive.split('.')[1]}`
-                            : `text-${navText.split('.')[0]}-${navText.split('.')[1]} hover:bg-${navBgHover.split('.')[0]}-${navBgHover.split('.')[1]}`
-                        }
+                        ${styles.menuItemBase} gap-3
+                        ${isActive ? styles.menuItemActive : styles.menuItemInactive}
                       `}
                     >
-                      <Flex 
-                        alignItems="center" 
-                        justifyContent="center" 
-                        w={7} 
-                        h={7}
-                      >
+                      <div className={styles.iconWrapper}>
                         {item.icon}
-                      </Flex>
+                      </div>
                       <span>{item.label}</span>
                     </RouterLink>
                   )}
                 </>
               )}
-            </Box>
+            </li>
           ))}
-        </Box>
-      </Box>
+        </ul>
+      </div>
       
       {/* Help section at the bottom */}
       {!collapsed && (
-        <Box 
-          mt="auto" 
-          p={4} 
-          borderTop="1px" 
-          borderColor={borderColor}
-        >
-          <Box 
-            bg={helpBg}
-            borderRadius="xl" 
-            p={4}
-          >
-            <Text 
-              fontSize="sm" 
-              fontWeight="medium" 
-              color={helpText}
-              mb={2}
-            >
+        <div className={styles.helpSection}>
+          <div className={styles.helpBox}>
+            <div className={styles.helpTitle}>
               需要帮助?
-            </Text>
-            <Text 
-              fontSize="xs" 
-              color={helpTextSecondary}
-              mb={3}
-            >
+            </div>
+            <div className={styles.helpText}>
               查看我们的文档获取支持和帮助
-            </Text>
-            <Box
-              as="a"
+            </div>
+            <a
               href="#"
-              display="inline-flex"
-              alignItems="center"
-              justifyContent="center"
-              w="full"
-              px={3}
-              py={1.5}
-              fontSize="xs"
-              fontWeight="medium"
-              borderRadius="lg"
-              bg="primary.600"
-              color="white"
-              _hover={{ bg: "primary.700" }}
-              transition="all 0.2s ease-in-out"
+              className={styles.helpButton}
             >
               查看文档
-            </Box>
-          </Box>
-        </Box>
+            </a>
+          </div>
+        </div>
       )}
-    </Flex>
+    </div>
   );
 };
 

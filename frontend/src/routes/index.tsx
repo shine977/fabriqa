@@ -33,7 +33,6 @@ const AppRoutes: React.FC = () => {
 
   // 将嵌套路由展平为一维数组，方便渲染
   const flatRoutes = flattenRoutes(routes);
-  console.log(JSON.stringify(flatRoutes, null, 2));
   return (
     <Suspense fallback={<LoadingComponent />}>
       <Routes>

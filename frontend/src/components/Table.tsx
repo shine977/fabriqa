@@ -1,7 +1,7 @@
 /**
  * Table Component
  *
- * 通用表格组件，支持排序、筛选和分页，与插件系统深度集成
+ * 通用表格组件，支持排序、筛选和分页
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -40,7 +40,6 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
 } from '@chakra-ui/icons';
-import { appPlugin } from '../plugins';
 import { TableColumn } from '../types';
 
 // 表格配置接口
@@ -105,14 +104,14 @@ const Table: React.FC<TableProps> = ({
     highlightOnHover: defaultSettings?.highlightOnHover !== undefined ? defaultSettings.highlightOnHover : true,
   });
 
-  // 应用插件系统处理设置
+  // 直接使用设置，不再通过插件系统处理
   const finalSettings = useMemo(() => {
-    return appPlugin.applyHooks('dataTable:settings', settings);
+    return settings;
   }, [settings]);
 
-  // 使用插件系统处理列定义
+  // 直接使用列定义，不再通过插件系统处理
   const columns = useMemo(() => {
-    return appPlugin.applyHooks('table:columns', propColumns);
+    return propColumns;
   }, [propColumns]);
 
   // 排序状态
@@ -132,26 +131,19 @@ const Table: React.FC<TableProps> = ({
     if (sortConfig !== null) {
       const { key, direction } = sortConfig;
 
-      // 使用插件系统处理排序
-      sortableData = appPlugin.applyHooks(
-        'dataTable:sorter',
-        (data: any[], config: SortConfig) => {
-          return data.sort((a, b) => {
-            const aValue = a[config.key];
-            const bValue = b[config.key];
+      // 直接进行排序，不再通过插件系统处理
+      sortableData = sortableData.sort((a, b) => {
+        const aValue = a[key];
+        const bValue = b[key];
 
-            if (aValue < bValue) {
-              return config.direction === 'asc' ? -1 : 1;
-            }
-            if (aValue > bValue) {
-              return config.direction === 'asc' ? 1 : -1;
-            }
-            return 0;
-          });
-        },
-        sortableData,
-        sortConfig
-      );
+        if (aValue < bValue) {
+          return direction === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
     }
 
     return sortableData;
@@ -163,22 +155,15 @@ const Table: React.FC<TableProps> = ({
 
     // 应用筛选条件
     if (Object.keys(filterConfig).length > 0) {
-      // 使用插件系统处理过滤
-      filteredData = appPlugin.applyHooks(
-        'dataTable:filterProcessor',
-        (data: any[], config: FilterConfig) => {
-          return data.filter(item => {
-            for (const key in config) {
-              if (config[key] && item[key] !== config[key]) {
-                return false;
-              }
-            }
-            return true;
-          });
-        },
-        filteredData,
-        filterConfig
-      );
+      // 直接进行过滤，不再通过插件系统处理
+      filteredData = filteredData.filter(item => {
+        for (const key in filterConfig) {
+          if (filterConfig[key] && item[key] !== filterConfig[key]) {
+            return false;
+          }
+        }
+        return true;
+      });
     }
 
     // 应用搜索
@@ -195,9 +180,9 @@ const Table: React.FC<TableProps> = ({
     return filteredData;
   }, [sortedData, filterConfig, searchTerm, columns]);
 
-  // 使用插件系统处理数据
+  // 直接使用过滤后的数据，不再通过插件系统处理
   const data = useMemo(() => {
-    return appPlugin.applyHooks('table:data', filteredData);
+    return filteredData;
   }, [filteredData]);
 
   // 处理排序请求
@@ -226,14 +211,8 @@ const Table: React.FC<TableProps> = ({
     const key = String(record[rowKey]);
     const isSelected = selectedRowKeys.includes(key);
 
-    // 使用插件系统处理行选择
-    const newSelection = appPlugin.applyHooks(
-      'dataTable:rowSelection',
-      (current: boolean, rec: any, idx: number) => !current,
-      isSelected,
-      record,
-      propData.indexOf(record)
-    );
+    // 直接处理行选择，不再通过插件系统处理
+    const newSelection = !isSelected;
 
     const newSelectedRowKeys = newSelection ? [...selectedRowKeys, key] : selectedRowKeys.filter(k => k !== key);
 
@@ -431,17 +410,6 @@ const Table: React.FC<TableProps> = ({
 
                     // 自定义渲染或默认渲染
                     let cellContent = column.render ? column.render(value, record, recordIndex) : value;
-
-                    // 应用插件系统处理单元格渲染
-                    if (column.dataIndex === 'status' || column.key === 'status') {
-                      cellContent = appPlugin.applyHooks(
-                        'dataTable:statusCellRenderer',
-                        cellContent,
-                        value,
-                        record,
-                        recordIndex
-                      );
-                    }
 
                     return (
                       <Td
