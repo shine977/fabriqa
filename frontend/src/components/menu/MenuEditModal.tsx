@@ -56,7 +56,7 @@ const MenuEditModal: React.FC<MenuEditModalProps> = ({
         // Update existing menu
         await updateMenu(menuId, values as UpdateMenuDto);
         toast({
-          title: t('menu.updateSuccess'),
+          title: t('menu:updateSuccess'),
           status: 'success',
           duration: 3000,
           isClosable: true,
@@ -68,36 +68,41 @@ const MenuEditModal: React.FC<MenuEditModalProps> = ({
         }
         await createMenu(values as CreateMenuDto);
         toast({
-          title: t('menu.createSuccess'),
+          title: t('menu:createSuccess'),
           status: 'success',
           duration: 3000,
           isClosable: true,
         });
       }
       
-      onClose();
-      
+      // 成功后触发回调，但不关闭模态框（由EditModal处理）
       if (onSuccess) {
         onSuccess();
       }
+      
+      // 返回成功结果
+      return true;
     } catch (error) {
       console.error('Failed to save menu:', error);
       toast({
-        title: menuId ? t('menu.updateFailed') : t('menu.createFailed'),
+        title: menuId ? t('menu:updateFailed') : t('menu:createFailed'),
         description: String(error),
         status: 'error',
         duration: 5000,
         isClosable: true,
       });
+      
+      // 重新抛出错误，这样EditModal可以捕获到失败
+      throw error;
     }
   };
   
   // Get title based on operation (create, edit, view)
   const getTitle = () => {
     if (isViewOnly) {
-      return t('menu.viewMenu');
+      return t('menu:viewMenu');
     }
-    return menuId ? t('menu.editMenu') : t('menu.createMenu');
+    return menuId ? t('menu:editMenu') : t('menu:createMenu');
   };
   
   // Filter out potential menu's children and self from parent options
@@ -123,14 +128,21 @@ const MenuEditModal: React.FC<MenuEditModalProps> = ({
     return menus;
   };
   
+  // 创建一个包装函数来适配EditModal的onSubmit调用
+  const handleModalSubmit = async () => {
+    // 表单的提交将在Form组件内部处理
+    // 这个函数只是为了让EditModal能正确调用
+    return Promise.resolve();
+  };
+
   return (
     <EditModal
       isOpen={isOpen}
       onClose={onClose}
       title={getTitle()}
-      isLoading={isLoading}
       isSubmitting={isSubmitting}
       isViewOnly={isViewOnly}
+      onSubmit={handleModalSubmit}
       size="2xl"
     >
       <MenuForm

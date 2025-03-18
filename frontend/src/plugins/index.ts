@@ -7,7 +7,7 @@
 import { appPlugin, registerPlugins, ApplicationPluginProvider, useAppPlugin } from './ApplicationPlugin';
 import themePlugin from './themePlugin';
 import dataTablePlugin from './dataTablePlugin';
-import i18nPlugin, { I18nProvider } from './i18nPlugin';
+import i18n, { I18nProvider, changeLanguage, getCurrentLanguage } from './i18nPlugin';
 import authPlugin from './authPlugin';
 
 /**
@@ -17,23 +17,16 @@ export const initializePlugins = (): void => {
   // 注册核心插件
   registerPlugins([
     themePlugin,
-    i18nPlugin,
+    // i18n现在是一个服务而不是插件，不需要注册
     dataTablePlugin,
     authPlugin,
-    // 可在此处添加更多插件
   ]);
-
-  // 初始化插件
-  appPlugin.getPlugins().forEach(plugin => {
-    if (plugin.initialize) {
-      plugin.initialize(appPlugin);
-    }
-  });
-
-  console.log('Plugin system initialized with core plugins');
 };
 
+// 导出i18n相关功能
+export { I18nProvider, changeLanguage, getCurrentLanguage };
+
 // 导出插件系统实例，方便其他模块使用
-export { appPlugin, registerPlugins, I18nProvider, ApplicationPluginProvider, useAppPlugin };
+export { appPlugin, registerPlugins, ApplicationPluginProvider, useAppPlugin };
 
 export default appPlugin;

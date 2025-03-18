@@ -19,7 +19,16 @@
     "charts": "Charts",
     "settings": "Settings",
     "users": "Users",
-    "profile": "Profile"
+    "profile": "Profile",
+    "system": "System",
+    "menu": "Menu Management",
+    "permissions": "Permissions",
+    "content": "Content Management",
+    "analytics": "Analytics",
+    "components": "Components",
+    "products": "Products",
+    "productList": "Product List",
+    "productCategories": "Product Categories"
   },
   "action": {
     "save": "Save",
@@ -30,7 +39,16 @@
     "filter": "Filter",
     "reset": "Reset",
     "apply": "Apply",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "create": "Create",
+    "update": "Update",
+    "view": "View",
+    "add": "Add",
+    "remove": "Remove",
+    "enable": "Enable",
+    "disable": "Disable",
+    "moveUp": "Move Up",
+    "moveDown": "Move Down"
   },
   "messages": {
     "welcome": "Welcome back",
@@ -38,7 +56,34 @@
     "error": "An error occurred",
     "success": "Operation successful",
     "confirmDelete": "Are you sure you want to delete this item?",
-    "noData": "No data available"
+    "noData": "No data available",
+    "createSuccess": "Created successfully",
+    "updateSuccess": "Updated successfully",
+    "deleteSuccess": "Deleted successfully",
+    "createFailed": "Failed to create",
+    "updateFailed": "Failed to update",
+    "deleteFailed": "Failed to delete"
+  },
+  "common": {
+    "id": "ID",
+    "name": "Name",
+    "description": "Description",
+    "type": "Type",
+    "status": "Status",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "actions": "Actions",
+    "pleaseSelect": "Please select",
+    "create": "Create",
+    "update": "Update",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "visible": "Visible",
+    "invisible": "Hidden",
+    "yes": "Yes",
+    "no": "No"
   },
   "sidebar": {
     "toggle": "Toggle sidebar"

@@ -68,8 +68,8 @@ export function useMenu() {
       } catch (error) {
         console.error('Failed to get menu:', error);
         toast({
-          title: t('common.error'),
-          description: t('menu.getError'),
+          title: t('common:error'),
+          description: t('menu:getError'),
           status: 'error',
           duration: 3000,
           isClosable: true,
@@ -84,28 +84,28 @@ export function useMenu() {
   // Create menu mutation
   const createMenuMutation = useMutation({
     mutationFn: menuApi.createMenu,
-    onSuccess: (data) => {
+    onSuccess: data => {
       // Update cache
       queryClient.invalidateQueries({ queryKey: menuKeys.lists() });
-      
+
       // Success notification
       toast({
-        title: t('menu.createSuccess'),
-        description: t('menu.createSuccessDescription'),
+        title: t('menu:createSuccess'),
+        description: t('menu:createSuccessDescription'),
         status: 'success',
         duration: 3000,
         isClosable: true,
         position: 'top-right',
       });
-      
+
       return data;
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || t('menu.createError');
-      
+      const errorMessage = error?.message || t('menu:createError');
+
       // Error notification
       toast({
-        title: t('common.error'),
+        title: t('common:error'),
         description: errorMessage,
         status: 'error',
         duration: 3000,
@@ -117,33 +117,32 @@ export function useMenu() {
 
   // Update menu mutation
   const updateMenuMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateMenuDto }) => 
-      menuApi.updateMenu(id, data),
-    onSuccess: (data) => {
+    mutationFn: ({ id, data }: { id: string; data: UpdateMenuDto }) => menuApi.updateMenu(id, data),
+    onSuccess: data => {
       // Update cache
       queryClient.invalidateQueries({ queryKey: menuKeys.lists() });
       if (data.item?.id) {
         queryClient.invalidateQueries({ queryKey: menuKeys.detail(data.item.id) });
       }
-      
+
       // Success notification
       toast({
-        title: t('menu.updateSuccess'),
-        description: t('menu.updateSuccessDescription'),
+        title: t('menu:updateSuccess'),
+        description: t('menu:updateSuccessDescription'),
         status: 'success',
         duration: 3000,
         isClosable: true,
         position: 'top-right',
       });
-      
+
       return data;
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || t('menu.updateError');
-      
+      const errorMessage = error?.message || t('menu:updateError');
+
       // Error notification
       toast({
-        title: t('common.error'),
+        title: t('common:error'),
         description: errorMessage,
         status: 'error',
         duration: 3000,
@@ -159,11 +158,11 @@ export function useMenu() {
     onSuccess: () => {
       // Update cache
       queryClient.invalidateQueries({ queryKey: menuKeys.lists() });
-      
+
       // Success notification
       toast({
-        title: t('menu.deleteSuccess'),
-        description: t('menu.deleteSuccessDescription'),
+        title: t('menu:deleteSuccess'),
+        description: t('menu:deleteSuccessDescription'),
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -171,11 +170,11 @@ export function useMenu() {
       });
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || t('menu.deleteError');
-      
+      const errorMessage = error?.message || t('menu:deleteError');
+
       // Error notification
       toast({
-        title: t('common.error'),
+        title: t('common:error'),
         description: errorMessage,
         status: 'error',
         duration: 3000,
@@ -191,11 +190,11 @@ export function useMenu() {
     onSuccess: () => {
       // Update cache
       queryClient.invalidateQueries({ queryKey: menuKeys.lists() });
-      
+
       // Success notification
       toast({
-        title: t('menu.updateOrderSuccess'),
-        description: t('menu.updateOrderSuccessDescription'),
+        title: t('menu:updateOrderSuccess'),
+        description: t('menu:updateOrderSuccessDescription'),
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -203,11 +202,11 @@ export function useMenu() {
       });
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || t('menu.updateOrderError');
-      
+      const errorMessage = error?.message || t('menu:updateOrderError');
+
       // Error notification
       toast({
-        title: t('common.error'),
+        title: t('common:error'),
         description: errorMessage,
         status: 'error',
         duration: 3000,
@@ -263,7 +262,7 @@ export function useMenu() {
     userMenus,
     selectedMenu,
     setSelectedMenu,
-    
+
     // Status
     isLoadingMenus,
     isLoadingUserMenus,
@@ -271,11 +270,11 @@ export function useMenu() {
     isUpdating: updateMenuMutation.isPending,
     isDeleting: deleteMenuMutation.isPending,
     isUpdatingOrder: updateMenuOrderMutation.isPending,
-    
+
     // Errors
     menuError,
     userMenuError,
-    
+
     // Actions
     refetchMenus,
     refetchUserMenus,

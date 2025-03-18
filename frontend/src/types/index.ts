@@ -82,6 +82,7 @@ export interface FormFieldOption {
  * 表单字段定义
  */
 export interface FormField {
+  name: any;
   id: string;
   label: string;
   type:

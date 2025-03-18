@@ -4,11 +4,12 @@
  * Form component for creating and editing menu items
  * Uses the generic Form component
  */
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Form from '../Form';
 import { FormField } from '../../types';
 import { MenuDto, MenuTypeEnum, CreateMenuDto, UpdateMenuDto } from '../../api/menu';
+
 
 interface MenuFormProps {
   menu?: MenuDto | null;
@@ -45,7 +46,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
         isVisible: menu.isVisible,
         isEnabled: menu.isEnabled,
         parentId: menu.parentId || undefined,
-        meta: menu.meta || {
+        meta: menu.meta || { 
           title: '',
           icon: '',
           noCache: false,
@@ -82,7 +83,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
   const fields: FormField[] = useMemo(() => {
     // Create parent menu options for select field
     const parentOptions = [
-      { value: '', label: t('menu.noParent') },
+      { value: '', label: t('menu:noParent') },
       ...parentMenus
         .filter(m => m.id !== menu?.id) // Prevent self-reference
         .map(parent => ({
@@ -93,25 +94,25 @@ const MenuForm: React.FC<MenuFormProps> = ({
 
     // Create menu type options
     const typeOptions = [
-      { value: MenuTypeEnum.DIRECTORY, label: t('menu.typeDirectory') },
-      { value: MenuTypeEnum.MENU, label: t('menu.typeMenu') },
-      { value: MenuTypeEnum.BUTTON, label: t('menu.typeButton') },
+      { value: MenuTypeEnum.DIRECTORY, label: t('menu:typeDirectory') },
+      { value: MenuTypeEnum.MENU, label: t('menu:typeMenu') },
+      { value: MenuTypeEnum.BUTTON, label: t('menu:typeButton') },
     ];
 
     return [
       {
         id: 'name',
         name: 'name',
-        label: t('menu.name'),
+        label: t('menu:name'),
         type: 'text',
-        placeholder: t('menu.namePlaceholder'),
+        placeholder: t('menu:namePlaceholder'),
         required: true,
-        disabled: isViewOnly,
+        
       },
       {
         id: 'type',
         name: 'type',
-        label: t('menu.type'),
+        label: t('menu:type'),
         type: 'select',
         options: typeOptions,
         required: true,
@@ -120,117 +121,117 @@ const MenuForm: React.FC<MenuFormProps> = ({
       {
         id: 'parentId',
         name: 'parentId',
-        label: t('menu.parent'),
+        label: t('menu:parent'),
         type: 'select',
         options: parentOptions,
-        disabled: isViewOnly,
+        
       },
       {
         id: 'path',
         name: 'path',
-        label: t('menu.path'),
+        label: t('menu:path'),
         type: 'text',
-        placeholder: t('menu.pathPlaceholder'),
-        disabled: isViewOnly,
+        placeholder: t('menu:pathPlaceholder'),
+        
       },
       {
         id: 'component',
         name: 'component',
-        label: t('menu.component'),
+        label: t('menu:component'),
         type: 'text',
-        placeholder: t('menu.componentPlaceholder'),
-        disabled: isViewOnly,
+        placeholder: t('menu:componentPlaceholder'),
+        
       },
       {
         id: 'icon',
         name: 'icon',
-        label: t('menu.icon'),
+        label: t('menu:icon'),
         type: 'text',
-        placeholder: t('menu.iconPlaceholder'),
-        disabled: isViewOnly,
+        placeholder: t('menu:iconPlaceholder'),
+        
       },
       {
         id: 'orderNum',
         name: 'orderNum',
-        label: t('menu.orderNum'),
+        label: t('menu:orderNum'),
         type: 'number',
         min: 0,
         max: 9999,
         defaultValue: 0,
-        disabled: isViewOnly,
+        
       },
       {
         id: 'permission',
         name: 'permission',
-        label: t('menu.permission'),
+        label: t('menu:permission'),
         type: 'text',
-        placeholder: t('menu.permissionPlaceholder'),
-        disabled: isViewOnly,
+        placeholder: t('menu:permissionPlaceholder'),
+        
       },
       {
         id: 'isVisible',
         name: 'isVisible',
-        label: t('menu.isVisible'),
+        label: t('menu:isVisible'),
         type: 'switch',
         defaultValue: true,
-        disabled: isViewOnly,
+        
       },
       {
         id: 'isEnabled',
         name: 'isEnabled',
-        label: t('menu.isEnabled'),
+        label: t('menu:isEnabled'),
         type: 'switch',
         defaultValue: true,
-        disabled: isViewOnly,
+        
       },
       // Meta fields
       {
         id: 'meta.title',
         name: 'meta.title',
-        label: t('menu.metaTitle'),
+        label: t('menu:metaTitle'),
         type: 'text',
-        placeholder: t('menu.metaTitlePlaceholder'),
-        disabled: isViewOnly,
+        placeholder: t('menu:metaTitlePlaceholder'),
+        
       },
       {
         id: 'meta.icon',
         name: 'meta.icon',
-        label: t('menu.metaIcon'),
+        label: t('menu:metaIcon'),
         type: 'text',
-        placeholder: t('menu.metaIconPlaceholder'),
-        disabled: isViewOnly,
+        placeholder: t('menu:metaIconPlaceholder'),
+        
       },
       {
         id: 'meta.noCache',
         name: 'meta.noCache',
-        label: t('menu.metaNoCache'),
+        label: t('menu:metaNoCache'),
         type: 'switch',
         defaultValue: false,
-        disabled: isViewOnly,
+        
       },
       {
         id: 'meta.breadcrumb',
         name: 'meta.breadcrumb',
-        label: t('menu.metaBreadcrumb'),
+        label: t('menu:metaBreadcrumb'),
         type: 'switch',
         defaultValue: true,
-        disabled: isViewOnly,
+        
       },
       {
         id: 'meta.affix',
         name: 'meta.affix',
-        label: t('menu.metaAffix'),
+        label: t('menu:metaAffix'),
         type: 'switch',
         defaultValue: false,
-        disabled: isViewOnly,
+        
       },
       {
         id: 'meta.activeMenu',
         name: 'meta.activeMenu',
-        label: t('menu.metaActiveMenu'),
+        label: t('menu:metaActiveMenu'),
         type: 'text',
-        placeholder: t('menu.metaActiveMenuPlaceholder'),
-        disabled: isViewOnly,
+        placeholder: t('menu:metaActiveMenuPlaceholder'),
+        
       },
     ];
   }, [t, parentMenus, menu, isViewOnly, isEditing]);
@@ -260,7 +261,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
       fields={fields}
       initialValues={initialValues}
       onSubmit={handleFormSubmit}
-      submitButtonText={isEditing ? t('common.update') : t('common.create')}
+      submitButtonText={isEditing ? t('common:update') : t('common:create')}
       isLoading={isSubmitting}
       layout="vertical"
       columnCount={2}

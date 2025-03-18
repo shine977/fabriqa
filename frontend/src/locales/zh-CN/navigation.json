@@ -1,0 +1,14 @@
+{
+  "dashboard": "仪表盘",
+  "users": "用户管理",
+  "content": "内容管理",
+  "analytics": "数据分析",
+  "components": "组件示例",
+  "tables": "表格组件",
+  "products": "产品管理",
+  "productList": "产品列表",
+  "productCategories": "产品分类",
+  "system": "系统管理",
+  "settings": "系统设置",
+  "permissions": "权限管理"
+}

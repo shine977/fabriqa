@@ -19,7 +19,7 @@ import {
   ChevronRightIcon,
   ChevronDownIcon,
 } from '@chakra-ui/icons';
-import routes from '../routes/routes';
+import { useRoutes } from '../routes/routes';
 import { Route } from '../types';
 import { getMenuRoutes } from '../utils/routes';
 
@@ -108,16 +108,21 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
   const location = useLocation();
   
+  // 获取路由配置
+  const routes = useRoutes();
+  
   // Build menu items from routes configuration (memoized to prevent unnecessary recalculations)
-  const menuItems = useMemo(() => buildMenuItems(routes), []);
+  const menuItems = useMemo(() => buildMenuItems(routes), [routes]);
   
   // Track open submenus
   const [openSubmenus, setOpenSubmenus] = useState<Record<number, boolean>>({});
   
   // Function to check if any submenu item path matches current location
-  const isActiveSubmenu = (submenuItems: { path: string }[]) => {
-    return submenuItems.some(item => location.pathname === item.path);
-  };
+  const isActiveSubmenu = useMemo(() => {
+    return (submenuItems: { path: string }[]) => {
+      return submenuItems.some(item => location.pathname === item.path);
+    };
+  }, [location.pathname]);
   
   // Auto-expand submenus based on current route
   useEffect(() => {
@@ -133,7 +138,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
       ...prev,
       ...newOpenSubmenus
     }));
-  }, [location.pathname]); // Remove menuItems dependency since it's now memoized
+  }, [location.pathname, isActiveSubmenu]); // 只依赖路径变化和记忆化的函数
   
   /**
    * Toggle submenu open/closed state

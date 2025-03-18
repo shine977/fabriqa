@@ -8,7 +8,7 @@
 import React, { Suspense } from 'react';
 import { Routes, Route as RouterRoute, Navigate } from 'react-router-dom';
 import { Box, Spinner, Center } from '@chakra-ui/react';
-import routes from './routes';
+import { useRoutes } from './routes';
 import MainLayout from '../layouts/MainLayout';
 import { flattenRoutes } from '../utils/routes';
 
@@ -26,13 +26,12 @@ const LoadingComponent: React.FC = () => (
 
 // 路由组件
 const AppRoutes: React.FC = () => {
-  // const pluginSystem = useAppPlugin();
-
-  // 通过插件系统处理路由配置
-  // const processedRoutes = pluginSystem.applyHooks('routes:process', routes);
-
+  // 获取路由配置
+  const routes = useRoutes();
+  
   // 将嵌套路由展平为一维数组，方便渲染
   const flatRoutes = flattenRoutes(routes);
+  
   return (
     <Suspense fallback={<LoadingComponent />}>
       <Routes>

@@ -23,7 +23,7 @@ interface EditModalProps {
   title: string;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: () => Promise<void>;
+  onSubmit?: (...args: any[]) => Promise<void> | void;
   children: ReactNode;
   isSubmitting?: boolean;
   isViewOnly?: boolean;
@@ -64,14 +64,37 @@ const EditModal: React.FC<EditModalProps> = ({
 
   // Handle form submission
   const handleSubmit = async () => {
-    setInternalSubmitting(true);
-    try {
-      await onSubmit();
-    } catch (error) {
-      console.error('Form submission error:', error);
-    } finally {
-      setInternalSubmitting(false);
-    }
+    if (!onSubmit) return; // 如果onSubmit未定义，直接返回
+    
+    // 触发自定义事件，通知表单进行验证
+    const validationEvent = new CustomEvent('form:validate');
+    document.dispatchEvent(validationEvent);
+    
+    // 监听验证结果
+    const handleValidationResult = async (e: CustomEvent) => {
+      const { isValid, data } = e.detail;
+      
+      // 移除事件监听器
+      document.removeEventListener('form:validationResult', handleValidationResult as EventListener);
+      
+      if (isValid) {
+        setInternalSubmitting(true);
+        try {
+          // 等待提交完成
+          await Promise.resolve(onSubmit(data));
+          // 如果没有抛出错误，关闭模态框
+          onClose();
+        } catch (error) {
+          console.error('Form submission error:', error);
+          // 提交失败，不关闭模态框
+        } finally {
+          setInternalSubmitting(false);
+        }
+      }
+    };
+    
+    // 添加事件监听器
+    document.addEventListener('form:validationResult', handleValidationResult as EventListener);
   };
 
   return (
@@ -109,28 +132,27 @@ const EditModal: React.FC<EditModalProps> = ({
         </ModalBody>
 
         <ModalFooter borderTopWidth="1px" py={4}>
-          <Flex justify="flex-end" gap={3} width="full">
+        
+          <Button 
+            variant="outline" 
+            colorScheme="gray" 
+            onClick={onClose}
+            isDisabled={isSubmitting || internalSubmitting}
+            size="md"
+          >
+            {cancelLabel || t('common.cancel')}
+          </Button>
+          {!isViewOnly && onSubmit && (
             <Button 
-              variant="outline" 
-              colorScheme="gray" 
-              onClick={onClose}
-              size="md"
+              colorScheme="blue" 
+              ml={3} 
+              onClick={handleSubmit}
+              isLoading={isSubmitting || internalSubmitting}
+              loadingText={t('common.saving')}
             >
-              {cancelLabel || t('common.cancel')}
+              {submitLabel || t('common.save')}
             </Button>
-            
-            {!isViewOnly && (
-              <Button 
-                colorScheme="primary" 
-                onClick={handleSubmit}
-                isLoading={isSubmitting || internalSubmitting}
-                loadingText={t('common.saving')}
-                size="md"
-              >
-                {submitLabel || t('common.save')}
-              </Button>
-            )}
-          </Flex>
+          )}
         </ModalFooter>
       </ModalContent>
     </Modal>

@@ -78,9 +78,9 @@ const MenuManagement: React.FC = () => {
     isLoadingMenus,
     menuError,
     deleteMenu,
-    isDeletingMenu,
+    isDeleting,
     updateMenuOrder,
-    isUpdatingMenuOrder,
+    isUpdatingOrder,
     refetchMenus,
   } = useMenu();
   
@@ -102,7 +102,7 @@ const MenuManagement: React.FC = () => {
   const handleViewMenu = (menuId: string) => {
     setSelectedMenu(menuId);
     setSelectedParentId(undefined);
-    setIsViewOnly(true);
+    // setIsViewOnly(true);
     onModalOpen();
   };
   
@@ -117,7 +117,7 @@ const MenuManagement: React.FC = () => {
     try {
       await deleteMenu(menuToDelete.id);
       toast({
-        title: t('menu.deleteSuccess'),
+        title: t('menu:deleteSuccess'),
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -126,7 +126,7 @@ const MenuManagement: React.FC = () => {
     } catch (error) {
       console.error('Failed to delete menu:', error);
       toast({
-        title: t('menu.deleteFailed'),
+        title: t('menu:deleteFailed'),
         description: String(error),
         status: 'error',
         duration: 5000,
@@ -167,7 +167,7 @@ const MenuManagement: React.FC = () => {
     try {
       await updateMenuOrder(updatedMenus);
       toast({
-        title: t('menu.orderUpdateSuccess'),
+        title: t('menu:orderUpdateSuccess'),
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -175,7 +175,7 @@ const MenuManagement: React.FC = () => {
     } catch (error) {
       console.error('Failed to update menu order:', error);
       toast({
-        title: t('menu.orderUpdateFailed'),
+        title: t('menu:orderUpdateFailed'),
         description: String(error),
         status: 'error',
         duration: 5000,
@@ -192,19 +192,19 @@ const MenuManagement: React.FC = () => {
     switch (type) {
       case MenuTypeEnum.DIRECTORY:
         color = 'blue';
-        label = t('menu.typeDirectory');
+        label = t('menu:typeDirectory');
         break;
       case MenuTypeEnum.MENU:
         color = 'green';
-        label = t('menu.typeMenu');
+        label = t('menu:typeMenu');
         break;
       case MenuTypeEnum.BUTTON:
         color = 'purple';
-        label = t('menu.typeButton');
+        label = t('menu:typeButton');
         break;
       default:
         color = 'gray';
-        label = t('menu.typeUnknown');
+        label = t('menu:typeUnknown');
     }
     
     return <Badge colorScheme={color}>{label}</Badge>;
@@ -215,10 +215,10 @@ const MenuManagement: React.FC = () => {
     return (
       <HStack spacing={2}>
         <Tag size="sm" colorScheme={menu.isVisible ? 'green' : 'red'}>
-          {menu.isVisible ? t('menu.visible') : t('menu.hidden')}
+          {menu.isVisible ? t('menu:visible') : t('menu:hidden')}
         </Tag>
         <Tag size="sm" colorScheme={menu.isEnabled ? 'green' : 'red'}>
-          {menu.isEnabled ? t('menu.enabled') : t('menu.disabled')}
+          {menu.isEnabled ? t('menu:enabled') : t('menu:disabled')}
         </Tag>
       </HStack>
     );
@@ -228,27 +228,27 @@ const MenuManagement: React.FC = () => {
   const renderActions = (menu: MenuDto) => {
     return (
       <HStack spacing={2}>
-        <Tooltip label={t('common.view')}>
+        <Tooltip label={t('common:view')}>
           <IconButton
-            aria-label={t('common.view')}
+            aria-label={t('common:view')}
             icon={<ViewIcon />}
             size="sm"
             variant="ghost"
             onClick={() => handleViewMenu(menu.id)}
           />
         </Tooltip>
-        <Tooltip label={t('common.edit')}>
+        <Tooltip label={t('common:edit')}>
           <IconButton
-            aria-label={t('common.edit')}
+            aria-label={t('common:edit')}
             icon={<EditIcon />}
             size="sm"
             variant="ghost"
             onClick={() => handleEditMenu(menu.id)}
           />
         </Tooltip>
-        <Tooltip label={t('common.delete')}>
+        <Tooltip label={t('common:delete')}>
           <IconButton
-            aria-label={t('common.delete')}
+            aria-label={t('common:delete')}
             icon={<DeleteIcon />}
             size="sm"
             variant="ghost"
@@ -256,29 +256,29 @@ const MenuManagement: React.FC = () => {
             onClick={() => handleDeleteMenu(menu)}
           />
         </Tooltip>
-        <Tooltip label={t('menu.moveUp')}>
+        <Tooltip label={t('menu:moveUp')}>
           <IconButton
-            aria-label={t('menu.moveUp')}
+            aria-label={t('menu:moveUp')}
             icon={<ArrowUpIcon />}
             size="sm"
             variant="ghost"
-            isDisabled={isUpdatingMenuOrder}
+            isDisabled={isUpdatingOrder}
             onClick={() => handleMoveMenu(menu.id, 'up')}
           />
         </Tooltip>
-        <Tooltip label={t('menu.moveDown')}>
+        <Tooltip label={t('menu:moveDown')}>
           <IconButton
-            aria-label={t('menu.moveDown')}
+            aria-label={t('menu:moveDown')}
             icon={<ArrowDownIcon />}
             size="sm"
             variant="ghost"
-            isDisabled={isUpdatingMenuOrder}
+            isDisabled={isUpdatingOrder}
             onClick={() => handleMoveMenu(menu.id, 'down')}
           />
         </Tooltip>
-        <Tooltip label={t('menu.addSubMenu')}>
+        <Tooltip label={t('menu:addSubMenu')}>
           <IconButton
-            aria-label={t('menu.addSubMenu')}
+            aria-label={t('menu:addSubMenu')}
             icon={<AddIcon />}
             size="sm"
             variant="ghost"
@@ -294,7 +294,7 @@ const MenuManagement: React.FC = () => {
   const columns: TableColumn[] = useMemo(() => [
     {
       id: 'name',
-      header: t('menu.name'),
+      header: t('menu:name'),
       accessor: 'name',
       render: (value, row, index) => (
         <Flex alignItems="center">
@@ -310,47 +310,47 @@ const MenuManagement: React.FC = () => {
     },
     {
       id: 'type',
-      header: t('menu.type'),
+      header: t('menu:type'),
       accessor: 'type',
       render: (value) => renderMenuTypeBadge(value)
     },
     {
       id: 'path',
-      header: t('menu.path'),
+      header: t('menu:path'),
       accessor: 'path',
       render: (value) => value || '-'
     },
     {
       id: 'component',
-      header: t('menu.component'),
+      header: t('menu:component'),
       accessor: 'component',
       render: (value) => value || '-'
     },
     {
       id: 'icon',
-      header: t('menu.icon'),
+      header: t('menu:icon'),
       accessor: 'icon',
       render: (value) => value || '-'
     },
     {
       id: 'orderNum',
-      header: t('menu.orderNum'),
+      header: t('menu:orderNum'),
       accessor: 'orderNum',
       isNumeric: true
     },
     {
       id: 'status',
-      header: t('menu.status'),
+      header: t('menu:status'),
       accessor: 'id',
       render: (value, row) => renderStatusTags(row)
     },
     {
       id: 'actions',
-      header: t('common.actions'),
+      header: t('common:actions'),
       accessor: 'id',
       render: (value, row) => renderActions(row)
     }
-  ], [t, isUpdatingMenuOrder]);
+  ], [t, isUpdatingOrder]);
   
   // 处理菜单数据为扁平结构，并添加层级信息
   const flattenedMenus = useMemo(() => {
@@ -379,13 +379,13 @@ const MenuManagement: React.FC = () => {
       <Card boxShadow="sm" bg={bgColor} borderColor={borderColor} borderWidth="1px">
         <CardHeader>
           <Flex justifyContent="space-between" alignItems="center">
-            <Heading size="md">{t('menu.management')}</Heading>
+            <Heading size="md">{t('menu:management')}</Heading>
             <Button
               leftIcon={<AddIcon />}
               colorScheme="blue"
               onClick={() => handleAddMenu()}
             >
-              {t('menu.addRootMenu')}
+              {t('menu:addRootMenu')}
             </Button>
           </Flex>
         </CardHeader>
@@ -396,7 +396,7 @@ const MenuManagement: React.FC = () => {
             </Flex>
           ) : menuError ? (
             <Box textAlign="center" p={5} color="red.500">
-              {t('common.loadError')}: {String(menuError)}
+              {t('common:loadError')}: {String(menuError)}
             </Box>
           ) : (
             <Box overflowX="auto">
@@ -438,29 +438,29 @@ const MenuManagement: React.FC = () => {
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              {t('menu.deleteConfirmTitle')}
+              {t('menu:deleteConfirmTitle')}
             </AlertDialogHeader>
             
             <AlertDialogBody>
-              {t('menu.deleteConfirmMessage', { name: menuToDelete?.name })}
+              {t('menu:deleteConfirmMessage', { name: menuToDelete?.name })}
               {menuToDelete?.children && menuToDelete.children.length > 0 && (
                 <Text color="red.500" mt={2}>
-                  {t('menu.deleteChildrenWarning')}
+                  {t('menu:deleteChildrenWarning')}
                 </Text>
               )}
             </AlertDialogBody>
             
             <AlertDialogFooter>
               <Button ref={cancelRef} onClick={onDeleteDialogClose}>
-                {t('common.cancel')}
+                {t('common:cancel')}
               </Button>
               <Button
                 colorScheme="red"
                 onClick={confirmDeleteMenu}
                 ml={3}
-                isLoading={isDeletingMenu}
+                isLoading={isDeleting}
               >
-                {t('common.delete')}
+                {t('common:delete')}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

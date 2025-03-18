@@ -1,0 +1,14 @@
+{
+  "dashboard": "Dashboard",
+  "users": "Users",
+  "content": "Content",
+  "analytics": "Analytics",
+  "components": "Components",
+  "tables": "Tables",
+  "products": "Products",
+  "productList": "Product List",
+  "productCategories": "Product Categories",
+  "system": "System",
+  "settings": "Settings",
+  "permissions": "Permissions"
+}
