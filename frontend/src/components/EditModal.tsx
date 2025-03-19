@@ -14,8 +14,7 @@ import {
   ModalFooter,
   ModalCloseButton,
   Button,
-  useDisclosure,
-  Flex,
+
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 
@@ -75,7 +74,7 @@ const EditModal: React.FC<EditModalProps> = ({
       const { isValid, data } = e.detail;
       
       // 移除事件监听器
-      document.removeEventListener('form:validationResult', handleValidationResult as EventListener);
+      document.removeEventListener('form:validationResult', handleValidationResult as unknown as EventListener);
       
       if (isValid) {
         setInternalSubmitting(true);
@@ -94,12 +93,13 @@ const EditModal: React.FC<EditModalProps> = ({
     };
     
     // 添加事件监听器
-    document.addEventListener('form:validationResult', handleValidationResult as EventListener);
+    document.addEventListener('form:validationResult', handleValidationResult as unknown as EventListener);
   };
 
   return (
     <Modal
       isOpen={isOpen}
+
       onClose={onClose}
       size={size}
       initialFocusRef={initialFocusRef}
@@ -148,9 +148,9 @@ const EditModal: React.FC<EditModalProps> = ({
               ml={3} 
               onClick={handleSubmit}
               isLoading={isSubmitting || internalSubmitting}
-              loadingText={t('common.saving')}
+              loadingText={t('action.saving')}
             >
-              {submitLabel || t('common.save')}
+              {submitLabel || t('action.save')}
             </Button>
           )}
         </ModalFooter>

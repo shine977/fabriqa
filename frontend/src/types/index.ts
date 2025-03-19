@@ -33,16 +33,22 @@ export interface Route {
  * 表格列定义
  */
 export interface TableColumn {
+  align?: string;
+  title: ReactI18NextChildren | Iterable<ReactI18NextChildren>;
+  sorter: SortConfig | null;
+  ellipsis?: boolean;
+  fixed?: string;
+  dataIndex: string;
   id: string;
   header: string;
   accessor: string;
-  cell?: (value: any, row?: any) => any;
+  cell?: (value: any, row?: Record<string, any>) => any;
   minWidth?: string;
   maxWidth?: string;
   width?: string;
   isNumeric?: boolean;
   isSortable?: boolean;
-  render?: (value: any, row: any, rowIndex: number) => React.ReactNode;
+  render?: (value: any, row: Record<string, any>, rowIndex: number) => React.ReactNode;
 }
 
 /**
@@ -82,7 +88,7 @@ export interface FormFieldOption {
  * 表单字段定义
  */
 export interface FormField {
-  name: any;
+  name: string;
   id: string;
   label: string;
   type:
@@ -115,7 +121,12 @@ export interface FormField {
   // 自定义渲染函数
   render?: (field: FormField, value: any, onChange: (value: any) => void) => React.ReactNode;
   // 自定义验证函数
-  validate?: (value: any) => string | null;
+  validate?: (value: any) => string | null | boolean | Record<string, any>;
+  // 正则验证
+  pattern?: RegExp;
+  patternMessage?: string;
+  // 高级验证规则
+  validationRules?: Record<string, any>;
 }
 
 // ==============================
@@ -159,7 +170,7 @@ export interface MultiItemsResponse<T> {
   message: string;
   items: T[];
 }
-export type ApiResponse<T, IsArray extends boolean = false> = IsArray extends true
+export type ApiResponse<T, IsArray extends boolean = true> = IsArray extends true
   ? MultiItemsResponse<T>
   : SingleItemResponse<T>;
 

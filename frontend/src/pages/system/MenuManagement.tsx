@@ -74,16 +74,16 @@ const MenuManagement: React.FC = () => {
   
   // Fetch menu data
   const {
-    menus,
-    isLoadingMenus,
-    menuError,
+    userMenus,
+    isLoadingUserMenus,
+    userMenuError,
     deleteMenu,
     isDeleting,
     updateMenuOrder,
     isUpdatingOrder,
-    refetchMenus,
+    refetchUserMenus,
   } = useMenu();
-  
+    console.log('userMenus',userMenus)
   // Action handlers
   const handleAddMenu = (parentId?: string) => {
     setSelectedMenu(undefined);
@@ -136,13 +136,13 @@ const MenuManagement: React.FC = () => {
   };
   
   const handleMoveMenu = async (menuId: string, direction: 'up' | 'down') => {
-    if (!menus) return;
+    if (!userMenus) return;
     
-    const menu = menus.find(m => m.id === menuId);
+    const menu = userMenus.find(m => m.id === menuId);
     if (!menu) return;
     
     // Find siblings (menus with the same parent)
-    const siblings = menus.filter(m => m.parentId === menu.parentId);
+    const siblings = userMenus.filter(m => m.parentId === menu.parentId);
     siblings.sort((a, b) => a.orderNum - b.orderNum);
     
     const currentIndex = siblings.findIndex(m => m.id === menuId);
@@ -226,17 +226,9 @@ const MenuManagement: React.FC = () => {
   
   // 渲染操作按钮
   const renderActions = (menu: MenuDto) => {
+    console.log('renderActions',menu);
     return (
       <HStack spacing={2}>
-        <Tooltip label={t('common:view')}>
-          <IconButton
-            aria-label={t('common:view')}
-            icon={<ViewIcon />}
-            size="sm"
-            variant="ghost"
-            onClick={() => handleViewMenu(menu.id)}
-          />
-        </Tooltip>
         <Tooltip label={t('common:edit')}>
           <IconButton
             aria-label={t('common:edit')}
@@ -254,26 +246,6 @@ const MenuManagement: React.FC = () => {
             variant="ghost"
             colorScheme="red"
             onClick={() => handleDeleteMenu(menu)}
-          />
-        </Tooltip>
-        <Tooltip label={t('menu:moveUp')}>
-          <IconButton
-            aria-label={t('menu:moveUp')}
-            icon={<ArrowUpIcon />}
-            size="sm"
-            variant="ghost"
-            isDisabled={isUpdatingOrder}
-            onClick={() => handleMoveMenu(menu.id, 'up')}
-          />
-        </Tooltip>
-        <Tooltip label={t('menu:moveDown')}>
-          <IconButton
-            aria-label={t('menu:moveDown')}
-            icon={<ArrowDownIcon />}
-            size="sm"
-            variant="ghost"
-            isDisabled={isUpdatingOrder}
-            onClick={() => handleMoveMenu(menu.id, 'down')}
           />
         </Tooltip>
         <Tooltip label={t('menu:addSubMenu')}>
@@ -294,67 +266,68 @@ const MenuManagement: React.FC = () => {
   const columns: TableColumn[] = useMemo(() => [
     {
       id: 'name',
-      header: t('menu:name'),
-      accessor: 'name',
-      render: (value, row, index) => (
-        <Flex alignItems="center">
-          {/* 根据层级缩进 */}
-          {row._level > 0 && (
-            <Box w={`${row._level * 8}px`} h="1px" />
-          )}
-          <Text fontWeight={row._level === 0 ? 'bold' : 'normal'}>
-            {value}
-          </Text>
-        </Flex>
-      )
+      title: t('menu:name'),
+      dataIndex: 'name',
+      render: (value, row, index) => {
+        console.log('render', value, row, index)
+        return <Flex alignItems="center">
+        {/* 根据层级缩进 */}
+        {row._level > 0 && (
+          <Box w={`${row._level * 8}px`} h="1px" />
+        )}
+        <Text fontWeight={row._level === 0 ? 'bold' : 'normal'}>
+          {value}
+        </Text>
+      </Flex>
+      }
     },
     {
       id: 'type',
-      header: t('menu:type'),
-      accessor: 'type',
+      title: t('menu:type'),
+      dataIndex: 'type',
       render: (value) => renderMenuTypeBadge(value)
     },
     {
       id: 'path',
-      header: t('menu:path'),
-      accessor: 'path',
+      title: t('menu:path'),
+      dataIndex: 'path',
       render: (value) => value || '-'
     },
     {
       id: 'component',
-      header: t('menu:component'),
-      accessor: 'component',
+      title: t('menu:component'),
+      dataIndex: 'component',
       render: (value) => value || '-'
     },
     {
       id: 'icon',
-      header: t('menu:icon'),
-      accessor: 'icon',
+      title: t('menu:icon'),
+      dataIndex: 'icon',
       render: (value) => value || '-'
     },
     {
       id: 'orderNum',
-      header: t('menu:orderNum'),
-      accessor: 'orderNum',
+      title: t('menu:orderNum'),
+      dataIndex: 'orderNum',
       isNumeric: true
     },
     {
       id: 'status',
-      header: t('menu:status'),
-      accessor: 'id',
+      title: t('menu:status'),
+      dataIndex: 'id',
       render: (value, row) => renderStatusTags(row)
     },
     {
       id: 'actions',
-      header: t('common:actions'),
-      accessor: 'id',
+      title: t('common:actions'),
+      dataIndex: 'id',
       render: (value, row) => renderActions(row)
     }
   ], [t, isUpdatingOrder]);
   
   // 处理菜单数据为扁平结构，并添加层级信息
   const flattenedMenus = useMemo(() => {
-    if (!menus) return [];
+  if (!userMenus) return [];
     
     const result: (MenuDto & { _level: number })[] = [];
     
@@ -366,13 +339,12 @@ const MenuManagement: React.FC = () => {
         // 添加到结果数组，并附带层级信息
         result.push({ ...item, _level: level });
         // 递归处理子菜单
-        processList(items, item.id, level + 1);
+        // processList(items, item.id, level + 1);
       }
     };
-    
-    processList(menus);
+    processList(userMenus);
     return result;
-  }, [menus]);
+  }, [userMenus]);
   
   return (
     <Box p={5}>
@@ -390,13 +362,13 @@ const MenuManagement: React.FC = () => {
           </Flex>
         </CardHeader>
         <CardBody>
-          {isLoadingMenus ? (
+          {isLoadingUserMenus ? (
             <Flex justifyContent="center" alignItems="center" p={10}>
               <Spinner size="xl" />
             </Flex>
-          ) : menuError ? (
+          ) : userMenuError ? (
             <Box textAlign="center" p={5} color="red.500">
-              {t('common:loadError')}: {String(menuError)}
+              {t('common:loadError')}: {String(userMenuError)}
             </Box>
           ) : (
             <Box overflowX="auto">
@@ -404,15 +376,16 @@ const MenuManagement: React.FC = () => {
                 columns={columns}
                 data={flattenedMenus}
                 rowKey="id"
-                loading={isLoadingMenus}
+                loading={isLoadingUserMenus}
                 showSearch={true}
                 showSettings={true}
                 defaultSettings={{
-                  density: 'compact',
+                  density: 'comfortable',
                   stripedRows: true,
                   showBorders: true,
                   highlightOnHover: true
                 }}
+               
               />
             </Box>
           )}
@@ -425,7 +398,7 @@ const MenuManagement: React.FC = () => {
         onClose={onModalClose}
         menuId={selectedMenu}
         parentId={selectedParentId}
-        onSuccess={refetchMenus}
+        onSuccess={refetchUserMenus}
         isViewOnly={isViewOnly}
       />
       

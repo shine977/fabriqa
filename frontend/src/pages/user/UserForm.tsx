@@ -23,7 +23,7 @@ import {
   VStack,
   HStack,
 } from '@chakra-ui/react';
-import Form from '../../components/Form';
+import Form from '../../components/Form_bak';
 import { FormField } from '../../types';
 import { userService } from '../../services/user';
 import { useTranslation } from 'react-i18next';

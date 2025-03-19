@@ -36,25 +36,60 @@ const MenuEditModal: React.FC<MenuEditModalProps> = ({
   const toast = useToast();
   
   const {
-    menu,
-    isLoadingMenu,
-    menus,
-    isLoadingMenus,
     createMenu,
     updateMenu,
-    isCreatingMenu,
-    isUpdatingMenu,
-  } = useMenu(menuId);
+    isCreating,
+    isUpdating,
+    isLoadingUserMenus,
+    userMenus,
+    getMenuById,
+  } = useMenu();
   
-  const isSubmitting = isCreatingMenu || isUpdatingMenu;
-  const isLoading = isLoadingMenu || isLoadingMenus;
+  // 当编辑现有菜单时，获取菜单详情
+  const [menu, setMenu] = React.useState<MenuDto | null>(null);
+  const [isLoadingMenu, setIsLoadingMenu] = React.useState(false);
+  
+  // 加载菜单数据
+  React.useEffect(() => {
+    if (menuId && isOpen) {
+      setIsLoadingMenu(true);
+      getMenuById(menuId)
+        .then(item => {
+          console.log('Menu loaded:', item);
+          if (item) {
+            setMenu(item);
+          }
+        })
+        .catch(error => {
+          console.error('Failed to load menu:', error);
+          toast({
+            title: t('menu:loadError'),
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          });
+        })
+        .finally(() => {
+          setIsLoadingMenu(false);
+        });
+    } else {
+      // 创建新菜单时重置表单
+      setMenu(null);
+    }
+  }, [menuId, isOpen]);
+  
+  
+  const isSubmitting = isCreating || isUpdating;
   
   // Handle form submission
-  const handleSubmit = async (values: CreateMenuDto | UpdateMenuDto) => {
+  const handleSubmit = async (values: any): Promise<void> => {
     try {
+      // 确保values是正确格式的DTO对象
+      const menuData = values as (CreateMenuDto | UpdateMenuDto);
+      
       if (menuId) {
         // Update existing menu
-        await updateMenu(menuId, values as UpdateMenuDto);
+        await updateMenu(menuId, menuData as UpdateMenuDto);
         toast({
           title: t('menu:updateSuccess'),
           status: 'success',
@@ -64,9 +99,9 @@ const MenuEditModal: React.FC<MenuEditModalProps> = ({
       } else {
         // Create new menu with parent ID if provided
         if (parentId) {
-          values.parentId = parentId;
+          menuData.parentId = parentId;
         }
-        await createMenu(values as CreateMenuDto);
+        await createMenu(menuData as CreateMenuDto);
         toast({
           title: t('menu:createSuccess'),
           status: 'success',
@@ -75,13 +110,12 @@ const MenuEditModal: React.FC<MenuEditModalProps> = ({
         });
       }
       
-      // 成功后触发回调，但不关闭模态框（由EditModal处理）
+      // 成功后触发回调
       if (onSuccess) {
         onSuccess();
       }
       
-      // 返回成功结果
-      return true;
+      // 不返回任何值
     } catch (error) {
       console.error('Failed to save menu:', error);
       toast({
@@ -107,7 +141,7 @@ const MenuEditModal: React.FC<MenuEditModalProps> = ({
   
   // Filter out potential menu's children and self from parent options
   const getParentMenuOptions = () => {
-    if (!menus) return [];
+    if (!userMenus) return [];
     
     // When editing, we need to exclude the current menu and its children
     if (menuId) {
@@ -121,19 +155,14 @@ const MenuEditModal: React.FC<MenuEditModalProps> = ({
         }, [] as string[]);
       };
       
-      const descendantIds = findDescendantIds(menuId, menus);
-      return menus.filter(m => m.id !== menuId && !descendantIds.includes(m.id));
+      const descendantIds = findDescendantIds(menuId, userMenus);
+      return userMenus.filter(m => m.id !== menuId && !descendantIds.includes(m.id));
     }
     
-    return menus;
+    return userMenus;
   };
   
-  // 创建一个包装函数来适配EditModal的onSubmit调用
-  const handleModalSubmit = async () => {
-    // 表单的提交将在Form组件内部处理
-    // 这个函数只是为了让EditModal能正确调用
-    return Promise.resolve();
-  };
+
 
   return (
     <EditModal
@@ -142,13 +171,12 @@ const MenuEditModal: React.FC<MenuEditModalProps> = ({
       title={getTitle()}
       isSubmitting={isSubmitting}
       isViewOnly={isViewOnly}
-      onSubmit={handleModalSubmit}
+      onSubmit={handleSubmit}
       size="2xl"
     >
       <MenuForm
         menu={menu}
         parentMenus={getParentMenuOptions()}
-        onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         isViewOnly={isViewOnly}
       />

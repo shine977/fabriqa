@@ -20,7 +20,7 @@ import {
 import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
 import Page from '../components/Page';
 import Table from '../components/Table';
-import Form from '../components/Form';
+import Form from '../components/Form_bak';
 import { TableColumn, FormField } from '../types';
 
 // 模拟用户数据

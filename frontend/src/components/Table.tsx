@@ -63,7 +63,7 @@ interface FilterConfig {
 
 interface TableProps {
   columns: TableColumn[];
-  data: any[];
+  data: object[];
   rowKey?: string;
   loading?: boolean;
   pagination?: {
@@ -73,10 +73,10 @@ interface TableProps {
     onChange: (page: number, pageSize: number) => void;
   };
   className?: string;
-  onRowClick?: (record: any) => void;
+  onRowClick?: (record: Record<string, any>) => void;
   rowSelection?: {
     selectedRowKeys: string[];
-    onChange: (selectedRowKeys: string[], selectedRows: any[]) => void;
+    onChange: (selectedRowKeys: string[], selectedRows: Record<string, any>[]) => void;
   };
   showSearch?: boolean;
   showSettings?: boolean;
@@ -228,6 +228,7 @@ const Table: React.FC<TableProps> = ({
   const headerBg = useColorModeValue('gray.50', 'gray.800');
   const hoverBg = useColorModeValue('gray.50', 'gray.700');
   const stripedBg = useColorModeValue('gray.50', 'gray.700');
+  const fixedCellBg = useColorModeValue('white', 'gray.800');
 
   // 行高样式
   const densityStyles = {
@@ -420,7 +421,7 @@ const Table: React.FC<TableProps> = ({
                         left={column.fixed === 'left' ? 0 : undefined}
                         right={column.fixed === 'right' ? 0 : undefined}
                         zIndex={column.fixed ? 1 : undefined}
-                        bg={column.fixed ? useColorModeValue('white', 'gray.800') : undefined}
+                        bg={column.fixed ? fixedCellBg : undefined}
                         whiteSpace="nowrap"
                         isTruncated={column.ellipsis}
                       >

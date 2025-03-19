@@ -1,13 +1,13 @@
 /**
- * Form Component
+ * FormV2 Component
  *
- * 通用表单组件，支持多种字段类型和验证
+ * 通用表单组件，使用React Hook Form实现，支持多种字段类型和验证
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import {
   Box,
-  Button,
   Checkbox,
   FormControl,
   FormLabel,
@@ -22,10 +22,8 @@ import {
   Switch,
   Textarea,
   Stack,
-  HStack,
   VStack,
   Heading,
-  Divider,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { FormField } from '../types';
@@ -42,7 +40,7 @@ interface FormProps {
   className?: string;
 }
 
-const Form: React.FC<FormProps> = ({
+const FormV2: React.FC<FormProps> = ({
   title,
   fields,
   initialValues = {},
@@ -53,97 +51,24 @@ const Form: React.FC<FormProps> = ({
   columnCount = 1,
   className = '',
 }) => {
+  // 使用React Hook Form替代手动状态管理
+  const {
+    control,
+    handleSubmit: rhfHandleSubmit,
+    formState: { errors },
+    reset,
+    getValues,
+    trigger
+  } = useForm({
+    defaultValues: initialValues,
+  });
+
+  // 当initialValues变化时重置表单
+  useEffect(() => {
+    reset(initialValues);
+  }, [initialValues, reset]);
 
 
-  // 表单状态
-  const [values, setValues] = React.useState<Record<string, any>>(initialValues);
-  const [errors, setErrors] = React.useState<Record<string, string>>({});
-  const [touched, setTouched] = React.useState<Record<string, boolean>>({});
-
-  // 监听验证事件
-  React.useEffect(() => {
-    // 处理验证请求
-    const handleValidateRequest = () => {
-      // 标记所有字段为已触碰
-      const allTouched: Record<string, boolean> = {};
-      fields.forEach(field => {
-        allTouched[field.name] = true;
-      });
-      setTouched(allTouched);
-
-      // 执行验证
-      const isValid = validate();
-
-      // 发送验证结果
-      const resultEvent = new CustomEvent('form:validationResult', {
-        detail: {
-          isValid,
-          data: isValid ? values : null
-        }
-      });
-      document.dispatchEvent(resultEvent);
-    };
-
-    // 添加事件监听器
-    document.addEventListener('form:validate', handleValidateRequest);
-
-    // 清理函数
-    return () => {
-      document.removeEventListener('form:validate', handleValidateRequest);
-    };
-  }, [fields, values]);
-
-  // 表单变更处理
-  const handleChange = (name: string, value: any) => {
-    setValues(prev => ({ ...prev, [name]: value }));
-
-    // 标记为已触碰
-    if (!touched[name]) {
-      setTouched(prev => ({ ...prev, [name]: true }));
-    }
-
-    // 清除错误
-    if (errors[name]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  };
-
-  // 验证表单
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    fields.forEach(field => {
-      if (field.required && !values[field.name]) {
-        newErrors[field.name] = `${field.label}是必填项`;
-      }
-
-      // 可以在这里添加更多验证规则
-    });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // 表单提交
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // 标记所有字段为已触碰
-    const allTouched: Record<string, boolean> = {};
-    fields.forEach(field => {
-      allTouched[field.name] = true;
-    });
-    setTouched(allTouched);
-
-    // 验证表单
-    if (validate()) {
-      onSubmit(values);
-    }
-  };
 
   // 渲染表单字段
   const renderField = (field: FormField) => {
@@ -152,144 +77,199 @@ const Form: React.FC<FormProps> = ({
 
     // 自定义渲染
     if (field.render) {
-      return field.render(field, values[field.name], (value) => handleChange(field.name, value));
+      return (
+        <Controller
+          control={control}
+          name={field.name}
+          render={({ field: { onChange, value } }) => 
+            field.render!(field, value, onChange)
+          }
+        />
+      );
     }
 
-    const hasError = !!errors[field.name] && touched[field.name];
+    const hasError = !!errors[field.name];
 
-    // 基础属性
-    const commonProps = {
-      id: field.id,
-      name: field.name,
-      value: values[field.name] !== undefined ? values[field.name] : field.defaultValue || '',
-      placeholder: field.placeholder,
-      isDisabled: field.disabled,
-      isReadOnly: field.readOnly,
-      isInvalid: hasError,
-    };
+    // 使用Controller包装字段
+    return (
+      <Controller
+        control={control}
+        name={field.name}
+        rules={{ 
+          required: field.required ? `${field.label}是必填项` : false,
+          // 可以添加其他验证规则
+        }}
+        render={({ field: { onChange, value, ref, onBlur } }) => {
+          // 基础属性
+          const commonProps = {
+            id: field.id,
+            name: field.name,
+            ref,
+            onBlur,
+            placeholder: field.placeholder,
+            isDisabled: field.disabled,
+            isReadOnly: field.readOnly,
+            isInvalid: hasError,
+          };
 
-    switch (field.type) {
-      case 'text':
-      case 'email':
-      case 'password':
-        return (
-          <FormControl isInvalid={hasError} isRequired={field.required}>
-            <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
-            <Input {...commonProps} onChange={e => handleChange(field.name, e.target.value)} />
-            {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
-            {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
-          </FormControl>
-        );
+          switch (field.type) {
+            case 'text':
+            case 'email':
+            case 'password':
+              return (
+                <FormControl isInvalid={hasError} isRequired={field.required}>
+                  <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
+                  <Input 
+                    {...commonProps} 
+                    value={value || ''}
+                    onChange={e => onChange(e.target.value)} 
+                    type={field.type}
+                  />
+                  {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
+                  {hasError && <FormErrorMessage>{errors[field.name]?.message as string}</FormErrorMessage>}
+                </FormControl>
+              );
 
-      case 'textarea':
-        return (
-          <FormControl isInvalid={hasError} isRequired={field.required}>
-            <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
-            <Textarea 
-              {...commonProps} 
-              rows={field.rows} 
-              onChange={e => handleChange(field.name, e.target.value)} 
-            />
-            {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
-            {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
-          </FormControl>
-        );
+            case 'textarea':
+              return (
+                <FormControl 
+                  isInvalid={hasError} 
+                  isRequired={field.required}
+                  display={layout === 'horizontal' ? 'flex' : 'block'}
+                  alignItems={layout === 'horizontal' ? 'center' : 'stretch'}
+                >
+                  <FormLabel 
+                    htmlFor={field.id}
+                    width={layout === 'horizontal' ? '120px' : 'auto'}
+                    mb={layout === 'horizontal' ? 0 : 2}
+                  >
+                    {field.label}
+                  </FormLabel>
+                  <Box flex={layout === 'horizontal' ? 1 : 'auto'}>
+                    <Textarea 
+                      {...commonProps} 
+                      value={value || ''}
+                      onChange={e => onChange(e.target.value)} 
+                      rows={field.rows} 
+                    />
+                    {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
+                    {hasError && <FormErrorMessage>{errors[field.name]?.message as string}</FormErrorMessage>}
+                  </Box>
+                </FormControl>
+              );
 
-      case 'select':
-        return (
-          <FormControl isInvalid={hasError} isRequired={field.required}>
-            <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
-            <Select {...commonProps} onChange={e => handleChange(field.name, e.target.value)}>
-              {!field.required && <option value="">请选择</option>}
-              {field.options?.map((option, index) => (
-                <option key={index} value={option.value} disabled={option.disabled}>
-                  {option.label}
-                </option>
-              ))}
-            </Select>
-            {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
-            {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
-          </FormControl>
-        );
+            case 'select':
+              return (
+                <FormControl 
+                  isInvalid={hasError} 
+                  isRequired={field.required}
+                  display={layout === 'horizontal' ? 'flex' : 'block'}
+                  alignItems={layout === 'horizontal' ? 'center' : 'stretch'}
+                >
+                  <FormLabel 
+                    htmlFor={field.id}
+                    width={layout === 'horizontal' ? '120px' : 'auto'}
+                    mb={layout === 'horizontal' ? 0 : 2}
+                  >
+                    {field.label}
+                  </FormLabel>
+                  <Box flex={layout === 'horizontal' ? 1 : 'auto'}>
+                    <Select 
+                      {...commonProps} 
+                      value={value || ''}
+                      onChange={e => onChange(e.target.value)}
+                    >
+                      {!field.required && <option value="">请选择</option>}
+                      {field.options?.map((option, index) => (
+                        <option key={index} value={option.value} disabled={option.disabled}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </Select>
+                    {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
+                    {hasError && <FormErrorMessage>{errors[field.name]?.message as string}</FormErrorMessage>}
+                  </Box>
+                </FormControl>
+              );
 
-      case 'radio':
-        return (
-          <FormControl isInvalid={hasError} isRequired={field.required}>
-            <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
-            <RadioGroup 
-              name={field.name}
-              value={String(values[field.name] || '')} 
-              onChange={value => handleChange(field.name, value)}
-            >
-              <Stack direction="row">
-                {field.options?.map((option, index) => (
-                  <Radio key={index} value={String(option.value)} isDisabled={option.disabled || field.disabled}>
-                    {option.label}
-                  </Radio>
-                ))}
-              </Stack>
-            </RadioGroup>
-            {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
-            {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
-          </FormControl>
-        );
+            case 'radio':
+              return (
+                <FormControl isInvalid={hasError} isRequired={field.required}>
+                  <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
+                  <RadioGroup 
+                    value={String(value || '')}
+                    onChange={onChange}
+                  >
+                    <Stack direction="row">
+                      {field.options?.map((option, index) => (
+                        <Radio 
+                          key={index} 
+                          value={String(option.value)} 
+                          isDisabled={option.disabled || field.disabled}
+                        >
+                          {option.label}
+                        </Radio>
+                      ))}
+                    </Stack>
+                  </RadioGroup>
+                  {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
+                  {hasError && <FormErrorMessage>{errors[field.name]?.message as string}</FormErrorMessage>}
+                </FormControl>
+              );
 
-      case 'checkbox':
-        return (
-          <FormControl isInvalid={hasError} isRequired={field.required}>
-            <Checkbox
-              id={field.id}
-              name={field.name}
-              isChecked={!!values[field.name]}
-              onChange={e => handleChange(field.name, e.target.checked)}
-              isDisabled={field.disabled}
-            >
-              {field.label}
-            </Checkbox>
-            {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
-            {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
-          </FormControl>
-        );
+            case 'checkbox':
+              return (
+                <FormControl isInvalid={hasError} isRequired={field.required}>
+                  <Checkbox
+                    {...commonProps}
+                    isChecked={!!value}
+                    onChange={e => onChange(e.target.checked)}
+                  >
+                    {field.label}
+                  </Checkbox>
+                  {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
+                  {hasError && <FormErrorMessage>{errors[field.name]?.message as string}</FormErrorMessage>}
+                </FormControl>
+              );
 
-      case 'switch':
-        return (
-          <FormControl isInvalid={hasError} isRequired={field.required}>
-            <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
-            <Switch
-              id={field.id}
-              name={field.name}
-              isChecked={!!values[field.name]}
-              onChange={e => handleChange(field.name, e.target.checked)}
-              isDisabled={field.disabled}
-            />
-            {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
-            {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
-          </FormControl>
-        );
+            case 'switch':
+              return (
+                <FormControl isInvalid={hasError} isRequired={field.required}>
+                  <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
+                  <Switch
+                    {...commonProps}
+                    isChecked={!!value}
+                    onChange={e => onChange(e.target.checked)}
+                  />
+                  {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
+                  {hasError && <FormErrorMessage>{errors[field.name]?.message as string}</FormErrorMessage>}
+                </FormControl>
+              );
 
-      case 'number':
-        return (
-          <FormControl isInvalid={hasError} isRequired={field.required}>
-            <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
-            <NumberInput 
-              id={field.id}
-              name={field.name}
-              value={values[field.name]}
-              min={field.min}
-              max={field.max}
-              onChange={(valueAsString, valueAsNumber) => handleChange(field.name, valueAsNumber)}
-              isDisabled={field.disabled}
-            >
-              <NumberInputField placeholder={field.placeholder} />
-            </NumberInput>
-            {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
-            {hasError && <FormErrorMessage>{errors[field.name]}</FormErrorMessage>}
-          </FormControl>
-        );
+            case 'number':
+              return (
+                <FormControl isInvalid={hasError} isRequired={field.required}>
+                  <FormLabel htmlFor={field.id}>{field.label}</FormLabel>
+                  <NumberInput 
+                    {...commonProps}
+                    value={value || ''}
+                    min={field.min}
+                    max={field.max}
+                    onChange={(valueAsString, valueAsNumber) => onChange(valueAsNumber)}
+                  >
+                    <NumberInputField placeholder={field.placeholder} />
+                  </NumberInput>
+                  {field.helper && <FormHelperText>{field.helper}</FormHelperText>}
+                  {hasError && <FormErrorMessage>{errors[field.name]?.message as string}</FormErrorMessage>}
+                </FormControl>
+              );
 
-      default:
-        return null;
-    }
+            default:
+              return null;
+          }
+        }}
+      />
+    );
   };
 
   const formBg = useColorModeValue('white', 'gray.800');
@@ -310,12 +290,7 @@ const Form: React.FC<FormProps> = ({
       )}
 
       <Box p={6}>
-        <form onSubmit={(e) => {
-          e.preventDefault(); // 阻止表单默认提交，避免页面刷新
-          if (validate()) {
-            onSubmit(values);
-          }
-        }}>
+        <form onSubmit={rhfHandleSubmit(onSubmit)}>
           <Stack spacing={6} direction="column">
             {columnCount === 1 ? (
               // 单列布局
@@ -356,4 +331,4 @@ const Form: React.FC<FormProps> = ({
   );
 };
 
-export default Form;
+export default FormV2;

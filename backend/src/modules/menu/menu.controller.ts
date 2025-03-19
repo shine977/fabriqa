@@ -55,7 +55,7 @@ export class MenuController {
   @ApiOperation({ summary: '获取菜单详情' })
   @ApiResponse({ status: 200, type: MenuEntity })
   @RequirePermissions([Permissions.SYSTEM.MENU.VIEW])
-  findOne(@Param('id', ParseIntPipe) id: string) {
+  findOne(@Param('id') id: string) {
     return this.menuService.findOne(id);
   }
 
@@ -64,7 +64,7 @@ export class MenuController {
   @ApiResponse({ status: 200, type: MenuEntity })
   @RequirePermissions([Permissions.SYSTEM.MENU.UPDATE])
   @NoRepeatSubmit()
-  update(@Param('id', ParseIntPipe) id: string, @Body() updateMenuDto: UpdateMenuDto) {
+  update(@Param('id') id: string, @Body() updateMenuDto: UpdateMenuDto) {
     return this.menuService.update(id, updateMenuDto);
   }
 
@@ -72,7 +72,7 @@ export class MenuController {
   @ApiOperation({ summary: '删除菜单' })
   @ApiResponse({ status: 200 })
   @RequirePermissions([Permissions.SYSTEM.MENU.DELETE])
-  remove(@Param('id', ParseIntPipe) id: string) {
+  remove(@Param('id') id: string) {
     return this.menuService.remove(id);
   }
 

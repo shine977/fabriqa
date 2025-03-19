@@ -30,19 +30,19 @@ export function useMenu() {
   const [selectedMenu, setSelectedMenu] = useState<MenuDto | null>(null);
 
   // Get all menus (tree structure)
-  const {
-    data: menus,
-    isLoading: isLoadingMenus,
-    error: menuError,
-    refetch: refetchMenus,
-  } = useQuery({
-    queryKey: menuKeys.lists(),
-    queryFn: async () => {
-      const response = await menuApi.getAllMenus();
-      return response.item || [];
-    },
-    staleTime: 60 * 1000, // 1 minute
-  });
+  // const {
+  //   data: menus,
+  //   isLoading: isLoadingMenus,
+  //   error: menuError,
+  //   refetch: refetchMenus,
+  // } = useQuery({
+  //   queryKey: menuKeys.lists(),
+  //   queryFn: async () => {
+  //     const response = await menuApi.getAllMenus();
+  //     return response.item || [];
+  //   },
+  //   staleTime: 60 * 1000, // 1 minute
+  // });
 
   // Get user's menus
   const {
@@ -54,7 +54,7 @@ export function useMenu() {
     queryKey: menuKeys.userMenus(),
     queryFn: async () => {
       const response = await menuApi.getUserMenus();
-      return response.item || [];
+      return response.items || [];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -86,7 +86,7 @@ export function useMenu() {
     mutationFn: menuApi.createMenu,
     onSuccess: data => {
       // Update cache
-      queryClient.invalidateQueries({ queryKey: menuKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: menuKeys.userMenus() });
 
       // Success notification
       toast({
@@ -120,7 +120,7 @@ export function useMenu() {
     mutationFn: ({ id, data }: { id: string; data: UpdateMenuDto }) => menuApi.updateMenu(id, data),
     onSuccess: data => {
       // Update cache
-      queryClient.invalidateQueries({ queryKey: menuKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: menuKeys.userMenus() });
       if (data.item?.id) {
         queryClient.invalidateQueries({ queryKey: menuKeys.detail(data.item.id) });
       }
@@ -258,13 +258,11 @@ export function useMenu() {
 
   return {
     // Data
-    menus,
     userMenus,
     selectedMenu,
     setSelectedMenu,
 
     // Status
-    isLoadingMenus,
     isLoadingUserMenus,
     isCreating: createMenuMutation.isPending,
     isUpdating: updateMenuMutation.isPending,
@@ -272,11 +270,10 @@ export function useMenu() {
     isUpdatingOrder: updateMenuOrderMutation.isPending,
 
     // Errors
-    menuError,
+
     userMenuError,
 
     // Actions
-    refetchMenus,
     refetchUserMenus,
     getMenuById,
     createMenu,

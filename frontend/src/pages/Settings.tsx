@@ -30,7 +30,7 @@ import {
 } from '@chakra-ui/react';
 import { FiSave, FiUpload } from 'react-icons/fi';
 import Page from '../components/Page';
-import Form from '../components/Form';
+import Form from '../components/Form_bak';
 import { FormField } from '../types';
 
 // 个人设置表单字段

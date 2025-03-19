@@ -4,7 +4,7 @@
  * Contains API functions for menu CRUD operations
  */
 import { httpService } from '../services/http/http.service';
-import { ApiResponse } from '../types';
+import { ApiResponse, MultiItemsResponse, SingleItemResponse } from '../types';
 
 // Type definitions
 export enum MenuTypeEnum {
@@ -23,6 +23,9 @@ export interface MenuMetaDto {
 }
 
 export interface MenuDto {
+  hidden: boolean;
+  redirect: string;
+  title: string;
   id: string;
   name: string;
   path?: string;
@@ -73,7 +76,7 @@ export const menuApi = {
    * @returns Menu tree
    */
   getAllMenus: () => {
-    return httpService.get<ApiResponse<MenuDto[]>>(API_ENDPOINT);
+    return httpService.get<MultiItemsResponse<MenuDto>>(API_ENDPOINT);
   },
 
   /**
@@ -81,7 +84,7 @@ export const menuApi = {
    * @returns User's menu tree
    */
   getUserMenus: () => {
-    return httpService.get<ApiResponse<MenuDto[]>>(`${API_ENDPOINT}/user-menus`);
+    return httpService.get<MultiItemsResponse<MenuDto>>(`${API_ENDPOINT}/user-menus`);
   },
 
   /**
@@ -90,7 +93,7 @@ export const menuApi = {
    * @returns Menu details
    */
   getMenuById: (id: string) => {
-    return httpService.get<ApiResponse<MenuDto>>(`${API_ENDPOINT}/${id}`);
+    return httpService.get<SingleItemResponse<MenuDto>>(`${API_ENDPOINT}/${id}`);
   },
 
   /**
@@ -109,7 +112,7 @@ export const menuApi = {
    * @returns Updated menu
    */
   updateMenu: (id: string, menu: UpdateMenuDto) => {
-    return httpService.patch<ApiResponse<MenuDto>>(`${API_ENDPOINT}/${id}`, menu);
+    return httpService.patch<SingleItemResponse<MenuDto>>(`${API_ENDPOINT}/${id}`, menu);
   },
 
   /**
@@ -118,7 +121,7 @@ export const menuApi = {
    * @returns Success status
    */
   deleteMenu: (id: string) => {
-    return httpService.delete<ApiResponse<null>>(`${API_ENDPOINT}/${id}`);
+    return httpService.delete<SingleItemResponse<null>>(`${API_ENDPOINT}/${id}`);
   },
 
   /**
@@ -127,7 +130,7 @@ export const menuApi = {
    * @returns Success status
    */
   updateMenuOrder: (orders: UpdateMenuOrderDto[]) => {
-    return httpService.post<ApiResponse<null>>(`${API_ENDPOINT}/order`, orders);
+    return httpService.post<SingleItemResponse<null>>(`${API_ENDPOINT}/order`, orders);
   },
 };
 
