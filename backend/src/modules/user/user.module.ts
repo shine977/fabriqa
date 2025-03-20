@@ -6,8 +6,9 @@ import { UserController } from './user.controller';
 import { UserEntity } from './entities/user.entity';
 import { RoleEntity } from '../role/entities/role.entity';
 import { JwtModule } from '@nestjs/jwt';
-import { CacheModule } from '@nestjs/cache-manager';
+
 import { PermissionCoreModule } from 'src/core/permission/core/permission.module';
+import { CacheModule } from '@core/cache';
 
 /**
  * UserModule - 统一的用户模块

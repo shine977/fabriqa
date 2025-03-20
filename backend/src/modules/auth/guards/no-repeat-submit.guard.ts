@@ -20,12 +20,15 @@ export class NoRepeatSubmitGuard implements CanActivate {
 
     const key = `repeat:${userId}:${request.method}:${request.url}`;
     const value = await this.cacheManager.get(key);
-
+    console.log('防重复提交Key:', key);
+    console.log('timeout值:', timeout);
+    console.log('实际TTL(秒):', timeout / 1000);
+    console.log('实际TTL(秒):', timeout / 1000);
     if (value) {
       throw new HttpException('请求过于频繁，请稍后再试', HttpStatus.TOO_MANY_REQUESTS);
     }
 
-    await this.cacheManager.set(key, '1', timeout / 1000);
+    await this.cacheManager.set(key, '1', 3);
     return true;
   }
 }

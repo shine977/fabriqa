@@ -1,8 +1,4 @@
-/**
- * FormV2 Component
- *
- * 通用表单组件，使用React Hook Form实现，支持多种字段类型和验证
- */
+
 
 import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
@@ -40,7 +36,7 @@ interface FormProps {
   className?: string;
 }
 
-const FormV2: React.FC<FormProps> = ({
+const Form: React.FC<FormProps> = (({
   title,
   fields,
   initialValues = {},
@@ -68,7 +64,30 @@ const FormV2: React.FC<FormProps> = ({
     reset(initialValues);
   }, [initialValues, reset]);
 
-
+  useEffect(() => {
+    const handleValidate = () => {
+      // 触发所有字段的验证
+      trigger().then(isValid => {
+        console.log(getValues())
+        // 发送验证结果事件
+        const resultEvent = new CustomEvent('form:validationResult', {
+          detail: {
+            isValid,
+            data: getValues()
+          }
+        });
+        document.dispatchEvent(resultEvent);
+      });
+    };
+  
+    // 添加事件监听
+    document.addEventListener('form:validate', handleValidate);
+    
+    // 清理函数
+    return () => {
+      document.removeEventListener('form:validate', handleValidate);
+    };
+  }, [trigger, getValues]);
 
   // 渲染表单字段
   const renderField = (field: FormField) => {
@@ -329,6 +348,6 @@ const FormV2: React.FC<FormProps> = ({
       </Box>
     </Box>
   );
-};
+})
 
-export default FormV2;
+export default Form;

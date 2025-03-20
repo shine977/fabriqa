@@ -5,10 +5,11 @@ import { InventoryController } from './inventory.controller';
 import { InventoryEntity } from './entities/inventory.entity';
 import { InventoryTransactionEntity } from './entities/inventory-transaction.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { CacheModule } from '@nestjs/cache-manager';
+
 import { UserModule } from '../user/user.module';
 import { MaterialModule } from '@modules/bom/material.module';
 import { FactoryModule } from '@modules/factories/factory.module';
+import { CacheModule } from '@core/cache';
 
 @Module({
   imports: [

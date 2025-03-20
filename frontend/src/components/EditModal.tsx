@@ -71,6 +71,7 @@ const EditModal: React.FC<EditModalProps> = ({
     
     // 监听验证结果
     const handleValidationResult = async (e: CustomEvent) => {
+  
       const { isValid, data } = e.detail;
       
       // 移除事件监听器

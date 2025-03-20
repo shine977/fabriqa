@@ -6,7 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { PermissionEntity } from './entities/permission.entity';
 import { CacheModule } from '@core/cache';
-import { DataSource } from 'typeorm';
 
 @Module({
   imports: [

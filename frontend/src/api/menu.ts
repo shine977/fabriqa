@@ -23,7 +23,6 @@ export interface MenuMetaDto {
 }
 
 export interface MenuDto {
-  hidden: boolean;
   redirect: string;
   title: string;
   id: string;

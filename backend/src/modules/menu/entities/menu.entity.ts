@@ -19,6 +19,9 @@ export class MenuEntity extends BaseEntity {
   @Column({ length: 100, nullable: true, comment: '菜单路由路径' })
   path: string;
 
+  @Column({ length: 100, nullable: true, comment: '跳转' })
+  redirect: string;
+
   @Column({ length: 100, nullable: true, comment: '组件路径' })
   component: string;
 

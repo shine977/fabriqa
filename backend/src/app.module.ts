@@ -22,7 +22,7 @@ import { TraceMiddleware } from './shared/middleware/trace.middleware';
 import { TraceContextService } from './shared/services/trace-context.service';
 import { AlertService } from './shared/services/alert.service';
 import { GlobalInterceptor } from './shared/interceptors';
-import { JwtAuthGuard } from '@modules/auth/guards';
+import { JwtAuthGuard, NoRepeatSubmitGuard } from '@modules/auth/guards';
 import { AuthModule } from '@modules/auth/auth.module';
 import { UserModule } from '@modules/user/user.module';
 import { PluginModule } from '@core/plugin';
@@ -81,8 +81,9 @@ import { PaginationModule } from '@common/module/pagination/pagination.module';
     JwtService,
     TraceContextService,
     AlertService,
+
     { provide: APP_GUARD, useClass: JwtAuthGuard },
-    // { provide: APP_GUARD, useClass: PermissionGuard },
+    { provide: APP_GUARD, useClass: NoRepeatSubmitGuard },
     { provide: APP_INTERCEPTOR, useClass: GlobalInterceptor },
     {
       provide: CustomLogger,

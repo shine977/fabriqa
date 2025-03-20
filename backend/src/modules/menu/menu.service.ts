@@ -153,6 +153,8 @@ export class MenuService extends BaseService {
       if (parent.type === 'BUTTON') {
         throw new BadRequestException('按钮类型的菜单不能作为父级菜单');
       }
+    } else {
+      createMenuDto.parentId = null;
     }
 
     // 验证权限标识唯一性
@@ -207,6 +209,8 @@ export class MenuService extends BaseService {
       if (parent.type === 'BUTTON') {
         throw new BadRequestException('按钮类型的菜单不能作为父级菜单');
       }
+    } else {
+      updateMenuDto.parentId = null;
     }
 
     // 验证权限标识唯一性

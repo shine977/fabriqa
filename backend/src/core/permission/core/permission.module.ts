@@ -6,10 +6,11 @@ import { PermissionGuard } from '../guards/permission.guard';
 import { DataPermissionGuard } from '../guards/data.permission.guard';
 
 import { UserContextModule } from 'src/core/context/user-context.module';
-import { CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
+
 import { PermissionEntity } from '@modules/permission/entities/permission.entity';
 import { UserEntity } from '@modules/user/entities/user.entity';
 import { RoleEntity } from '@modules/role/entities/role.entity';
+import { CacheModule } from '@core/cache';
 
 /**
  * PermissionCoreModule

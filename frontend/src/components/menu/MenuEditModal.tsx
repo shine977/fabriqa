@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@chakra-ui/react';
 import EditModal from '../EditModal';
 import MenuForm from './MenuForm';
+import {FormRefMethods} from '../Form'
 import { useMenu } from '../../hooks/useMenu';
 import { MenuDto, CreateMenuDto, UpdateMenuDto } from '../../api/menu';
 
@@ -55,7 +56,6 @@ const MenuEditModal: React.FC<MenuEditModalProps> = ({
       setIsLoadingMenu(true);
       getMenuById(menuId)
         .then(item => {
-          console.log('Menu loaded:', item);
           if (item) {
             setMenu(item);
           }
@@ -80,13 +80,13 @@ const MenuEditModal: React.FC<MenuEditModalProps> = ({
   
   
   const isSubmitting = isCreating || isUpdating;
+  const formRef = React.useRef<FormRefMethods>(null);
   
   // Handle form submission
   const handleSubmit = async (values: any): Promise<void> => {
     try {
       // 确保values是正确格式的DTO对象
-      const menuData = values as (CreateMenuDto | UpdateMenuDto);
-      
+      const menuData = values as (CreateMenuDto | UpdateMenuDto)
       if (menuId) {
         // Update existing menu
         await updateMenu(menuId, menuData as UpdateMenuDto);
@@ -175,6 +175,7 @@ const MenuEditModal: React.FC<MenuEditModalProps> = ({
       size="2xl"
     >
       <MenuForm
+      
         menu={menu}
         parentMenus={getParentMenuOptions()}
         isSubmitting={isSubmitting}

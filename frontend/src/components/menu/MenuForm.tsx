@@ -2,14 +2,14 @@
  * Menu Form Component V2
  * 
  * Form component for creating and editing menu items
- * Uses the FormV2 component with React Hook Form
+ * Uses the Form component with React Hook Form
  */
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import FormV2 from '../Form';
+import Form from '../Form';
 import { FormField } from '../../types';
-import { MenuDto } from '../../api/menu';
+import { MenuDto,MenuTypeEnum } from '../../api/menu';
 interface MenuFormProps {
   menu?: MenuDto | null;
   parentMenus?: MenuDto[];
@@ -18,8 +18,8 @@ interface MenuFormProps {
   onSubmit?: (values: any) => void;
 }
 
-// Menu form component using the FormV2 component
-const MenuFormV2: React.FC<MenuFormProps> = ({
+
+const MenuForm: React.FC<MenuFormProps> = (({
   menu,
   parentMenus = [],
   isSubmitting = false,
@@ -34,7 +34,6 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
     if (menu) {
       return {
         // Basic fields
-        title: menu.title || '',
         name: menu.name || '',
         parentId: menu.parentId || '',
         path: menu.path || '',
@@ -42,7 +41,7 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
         redirect: menu.redirect || '',
         icon: menu.icon || '',
         orderNum: menu.orderNum || 0,
-        hidden: menu.hidden || false,
+        isVisible: menu.isVisible || false,
 
         meta: menu.meta || { 
           title: '',
@@ -55,7 +54,6 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
       };
     }
     return {
-      title: '',
       name: '',
       parentId: '',
       path: '',
@@ -63,7 +61,9 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
       redirect: '',
       icon: '',
       orderNum: 0,
-      hidden: false,
+      isVisible: true,
+      type: MenuTypeEnum.MENU,
+      isEnabled:true,
       meta: { 
         title: '',
         icon: '',
@@ -90,18 +90,13 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
       label: t('menu:noParent'),
       disabled: false,
     });
-
+    // Create menu type options
+    const typeOptions = [
+      { value: MenuTypeEnum.DIRECTORY, label: t('menu:typeDirectory') },
+      { value: MenuTypeEnum.MENU, label: t('menu:typeMenu') },
+      { value: MenuTypeEnum.BUTTON, label: t('menu:typeButton') },
+    ];
     return [
-      // Basic info section
-      {
-        id: 'title',
-        name: 'title',
-        label: t('menu:title'),
-        type: 'text',
-        placeholder: t('menu:titlePlaceholder'),
-        required: true,
-        disabled: isViewOnly,
-      },
       {
         id: 'name',
         name: 'name',
@@ -109,7 +104,16 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
         type: 'text',
         placeholder: t('menu:namePlaceholder'),
         required: true,
-        disabled: isViewOnly,
+        
+      },
+      {
+        id: 'type',
+        name: 'type',
+        label: t('menu:type'),
+        type: 'select',
+        options: typeOptions,
+        required: true,
+        disabled: isViewOnly || isEditing,
       },
       {
         id: 'parentId',
@@ -117,7 +121,7 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
         label: t('menu:parent'),
         type: 'select',
         options: parentOptions,
-        disabled: isViewOnly,
+        
       },
       {
         id: 'path',
@@ -126,7 +130,7 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
         type: 'text',
         placeholder: t('menu:pathPlaceholder'),
         required: true,
-        disabled: isViewOnly,
+        
       },
       {
         id: 'component',
@@ -135,7 +139,7 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
         type: 'text',
         placeholder: t('menu:componentPlaceholder'),
         required: true,
-        disabled: isViewOnly,
+        
       },
       {
         id: 'icon',
@@ -144,15 +148,7 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
         type: 'text',
         placeholder: t('menu:iconPlaceholder'),
         required: true,
-        disabled: isViewOnly,
-      },
-      {
-        id: 'redirect',
-        name: 'redirect',
-        label: t('menu:redirect'),
-        type: 'text',
-        placeholder: t('menu:redirectPlaceholder'),
-        disabled: isViewOnly,
+        
       },
       {
         id: 'orderNum',
@@ -161,24 +157,41 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
         type: 'number',
         min: 0,
         max: 9999,
-        disabled: isViewOnly,
+        defaultValue: 0,
+        
       },
       {
-        id: 'hidden',
-        name: 'hidden',
-        label: t('menu:hidden'),
-        type: 'switch',
-        disabled: isViewOnly,
+        id: 'permission',
+        name: 'permission',
+        label: t('menu:permission'),
+        type: 'text',
+        placeholder: t('menu:permissionPlaceholder'),
+        
       },
-      
-      // Meta section
+      {
+        id: 'isVisible',
+        name: 'isVisible',
+        label: t('menu:isVisible'),
+        type: 'switch',
+        defaultValue: true,
+        
+      },
+      {
+        id: 'isEnabled',
+        name: 'isEnabled',
+        label: t('menu:isEnabled'),
+        type: 'switch',
+        defaultValue: true,
+        
+      },
+      // Meta fields
       {
         id: 'meta.title',
         name: 'meta.title',
         label: t('menu:metaTitle'),
         type: 'text',
         placeholder: t('menu:metaTitlePlaceholder'),
-        disabled: isViewOnly,
+        
       },
       {
         id: 'meta.icon',
@@ -186,22 +199,31 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
         label: t('menu:metaIcon'),
         type: 'text',
         placeholder: t('menu:metaIconPlaceholder'),
-        disabled: isViewOnly,
+        
       },
       {
         id: 'meta.noCache',
         name: 'meta.noCache',
         label: t('menu:metaNoCache'),
         type: 'switch',
-        disabled: isViewOnly,
+        defaultValue: false,
+        
       },
       {
-        id: 'meta.link',
-        name: 'meta.link',
-        label: t('menu:metaLink'),
-        type: 'text',
-        placeholder: t('menu:metaLinkPlaceholder'),
-        disabled: isViewOnly,
+        id: 'meta.breadcrumb',
+        name: 'meta.breadcrumb',
+        label: t('menu:metaBreadcrumb'),
+        type: 'switch',
+        defaultValue: true,
+        
+      },
+      {
+        id: 'meta.affix',
+        name: 'meta.affix',
+        label: t('menu:metaAffix'),
+        type: 'switch',
+        defaultValue: false,
+        
       },
       {
         id: 'meta.activeMenu',
@@ -209,13 +231,13 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
         label: t('menu:metaActiveMenu'),
         type: 'text',
         placeholder: t('menu:metaActiveMenuPlaceholder'),
-        disabled: isViewOnly,
+        
       },
     ];
   }, [t, parentMenus, menu, isViewOnly, isEditing]);
 
   return (
-    <FormV2
+    <Form
       fields={fields}
       initialValues={initialValues}
       isLoading={isSubmitting}
@@ -224,6 +246,6 @@ const MenuFormV2: React.FC<MenuFormProps> = ({
       onSubmit={onSubmit || (() => {})}
     />
   );
-};
+})
 
-export default MenuFormV2;
+export default MenuForm;

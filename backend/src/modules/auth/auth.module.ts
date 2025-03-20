@@ -24,17 +24,17 @@ import { MenuService } from '../menu/menu.service';
 import { UserService } from '../user/user.service';
 import { MenuEntity } from '../menu/entities/menu.entity';
 import { UserContextService } from 'src/core/context/user-context.service';
-import { CacheModule } from '@nestjs/cache-manager';
 import { UserContextModule } from 'src/core/context/user-context.module';
 import { PermissionCoreModule } from 'src/core/permission/core/permission.module';
 import { AuditableEntity, AuditLogEntity } from 'src/core/database/entities';
+import { CacheModule } from '@core/cache';
 
 @Module({
   imports: [
     PassportModule.register({
       defaultStrategy: 'jwt',
     }),
-    // CacheModule.register(),
+    CacheModule.register(),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
