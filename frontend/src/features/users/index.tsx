@@ -6,10 +6,10 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { columns } from './components/users-columns'
 import { UsersDialogs } from './components/users-dialogs'
 import { UsersPrimaryButtons } from './components/users-primary-buttons'
-import { UsersTable } from './components/users-table'
 import UsersProvider from './context/users-context'
 import { userListSchema } from './data/schema'
 import { users } from './data/users'
+import { Table } from '@/components/table/table'
 
 export default function Users() {
   // Parse user list
@@ -36,11 +36,11 @@ export default function Users() {
           <UsersPrimaryButtons />
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
-          <UsersTable data={userList} columns={columns} />
+         <Table dataSource={userList} columns={columns} />
         </div>
       </Main>
 
-      <UsersDialogs />
+      {/* <UsersDialogs /> */}
     </UsersProvider>
   )
 }
