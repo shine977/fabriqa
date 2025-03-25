@@ -1,0 +1,9 @@
+{
+    "table": {
+      "noResults": "未找到结果。",
+      "rowsPerPage": "每页行数",
+      "pageOf": "第 {{page}} 页，共 {{total}} 页",
+      "searchPlaceholder": "搜索...",
+      "resetFilters": "重置"
+    }
+  }

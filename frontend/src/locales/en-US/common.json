@@ -1,0 +1,9 @@
+{
+    "table": {
+      "noResults": "No results found.",
+      "rowsPerPage": "Rows per page",
+      "pageOf": "Page {{page}} of {{total}}",
+      "searchPlaceholder": "Search...",
+      "resetFilters": "Reset"
+    }
+  }

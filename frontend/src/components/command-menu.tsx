@@ -24,7 +24,6 @@ export function CommandMenu() {
   const navigate = useNavigate()
   const { setTheme } = useTheme()
   const { open, setOpen } = useSearch()
-
   const runCommand = React.useCallback(
     (command: () => unknown) => {
       setOpen(false)

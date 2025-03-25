@@ -23,10 +23,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DataTableToolbar } from "./data-table-toolbar";
+import { DataTableToolbar, Options } from "./data-table-toolbar";
 import { DataTablePagination } from "./data-table-pagination";
 import { cn } from "@/lib/utils";
-
+import { useTranslation } from "react-i18next";
 interface TableProps<TData> {
   dataSource: TData[];
   columns: ColumnDef<TData>[];
@@ -35,6 +35,7 @@ interface TableProps<TData> {
   enableColumnFilters?: boolean;
   enableSorting?: boolean;
   enablePagination?: boolean;
+  searchOptions?: Options[];
   filterOptions?: {
     columnId: string;
     title: string;
@@ -61,6 +62,7 @@ export function Table<TData>({
   enableSorting = true,
   enablePagination = true,
   filterOptions = [],
+  searchOptions = [],
   onRowSelectionChange,
   globalFilterColumnId = "name",
 }: TableProps<TData>) {
@@ -68,7 +70,7 @@ export function Table<TData>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
-
+  const { t } = useTranslation();
   const table = useReactTable({
     data: dataSource,
     columns,
@@ -104,6 +106,7 @@ export function Table<TData>({
           table={table}
           filterOptions={filterOptions}
           globalFilterColumnId={globalFilterColumnId}
+          options={searchOptions}
         />
       )}
       <div className="rounded-md border">
@@ -146,7 +149,7 @@ export function Table<TData>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  未找到结果。
+                {t("table.noResults")}
                 </TableCell>
               </TableRow>
             )}

@@ -20,6 +20,7 @@ import {
   IconUsers,
 } from '@tabler/icons-react'
 import { AudioWaveform, Command, GalleryVerticalEnd } from 'lucide-react'
+import { title } from 'process'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
@@ -53,6 +54,11 @@ export const sidebarData: SidebarData = {
           title: 'Dashboard',
           url: '/',
           icon: IconLayoutDashboard,
+        },
+        {
+          title: 'Orders',
+          url: '/orders',
+          icon: IconPackages,
         },
         {
           title: 'Tasks',
